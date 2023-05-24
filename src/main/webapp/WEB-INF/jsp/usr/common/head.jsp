@@ -57,25 +57,24 @@
 		</div>
 		<div class="flex-none">
 		<ul class="menu menu-horizontal px-1">
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/"><span>HOME</span></a></li>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=1"><span>NOTICE</span></a></li>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=2"><span>FREE</span></a></li>
+			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/"><span>메인</span></a></li>
+			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=1"><span>공지사항</span></a></li>
+			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=2"><span>자유게시판</span></a></li>
 			<c:if test="${rq.getLoginedMemberId() == 0 }">
-				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/login"><span>LOGIN</span></a></li>
-				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/join"><span>JOIN</span></a></li>
+				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/login"><span>로그인</span></a></li>
+				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/join"><span>회원가입</span></a></li>
 			</c:if>
 			<c:if test="${rq.getLoginedMemberId() != 0  }">
-				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>MYPAGE</span></a></li>
-				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/doLogout"><span>LOGOUT</span></a></li>
+				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>마이페이지</span></a></li>
+				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>참가신청</span></a></li>
+				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/doLogout"><span>로그아웃</span></a></li>
 			</c:if>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/home/APITest"><span>API1</span></a></li>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/home/APITest2"><span>API2</span></a></li>
 		</ul>
 		</div>
 	</div>
 	
-	<section class="my-3 text-2xl">
+<%-- 	<section class="my-3 text-2xl">
 		<div class="container mx-auto px-3">
 			<h1>${pageTitle }&nbsp;</h1>
 		</div>
-	</section>
+	</section> --%>

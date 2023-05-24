@@ -1,15 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="Main" />
+<c:set var="pageTitle" value="WebBettelRoyale" />
 <%@ include file="../common/head.jsp" %>
-	<section class="mt-8 bg-black text-white h-full">
-		<div class="container mx-auto">
-			<div>
-				Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus ut voluptates atque quod tempore quaerat non cumque magni nihil eveniet molestiae eius earum ratione! Voluptate error minus magni quibusdam similique.
-			</div>
-			<div>
-				안녕하세요
+	<section class="mt-8 bg-black text-white h-screen">
+		<div class="container mx-auto text-center">
+			<div class="text-3xl">
+				WebBettleRoyale에 오신것을 환영합니다
 			</div>
 		</div>
 	</section>
