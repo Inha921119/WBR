@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="Find LoginId" />
 <%@ include file="../common/head.jsp" %>
-	<section class="mt-8 text-xl">
+	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3">
 			<form action="doFindLoginId" method="POST">
 				<div class="table-box-type-1">
@@ -14,11 +14,11 @@
 						<tbody>
 							<tr>
 								<th>이름</th>
-								<td><input class="input input-bordered w-full max-w-xs" type="text" name="name" placeholder="이름을 입력해주세요"/></td>
+								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="name" placeholder="이름을 입력해주세요"/></td>
 							</tr>
 							<tr>
 								<th>이메일</th>
-								<td><input class="input input-bordered w-full max-w-xs" type="text" name="email" placeholder="이메일을 입력해주세요"/></td>
+								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="email" placeholder="이메일을 입력해주세요"/></td>
 							</tr>
 							<tr>
 								<td colspan="2"><button class="btn-text-link btn btn-active">아이디 찾기</button></td>

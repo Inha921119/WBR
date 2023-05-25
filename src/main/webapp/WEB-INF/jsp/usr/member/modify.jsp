@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="MODIFY MEMBER" />
 <%@ include file="../common/head.jsp" %>
-	<section class="mt-8 text-xl">
+	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3">
 			<form action="doModify" method="POST">
 				<div class="table-box-type-1">
@@ -11,13 +11,13 @@
 						<colgroup>
 							<col width="200" />
 						</colgroup>
-						<tbody>
+						<tbody class="text-black">
 							<tr>
 								<th>가입일</th>
 								<td>${rq.loginedMember.regDate }</td>
 							</tr>
 							<tr>
-								<th>로그인 아이디</th>
+								<th>아이디</th>
 								<td>${rq.loginedMember.loginId }</td>
 							</tr>
 							<tr>

@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="MODIFY PASSWORD" />
 <%@ include file="../common/head.jsp" %>
-	<section class="mt-8 text-xl">
+	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3">
 			<form action="doPasswordModify" method="POST">
 				<div class="table-box-type-1">
@@ -14,11 +14,11 @@
 						<tbody>
 							<tr>
 								<th>새 비밀번호</th>
-								<td><input class="input input-bordered w-full max-w-xs" type="text" name="loginPw" placeholder="새 비밀번호를 입력해주세요"/></td>
+								<td><input class="input input-bordered w-full max-w-xs text-black" type="password" name="loginPw" placeholder="새 비밀번호를 입력해주세요"/></td>
 							</tr>
 							<tr>
 								<th>새 비밀번호 확인</th>
-								<td><input class="input input-bordered w-full max-w-xs" type="text" name="loginPwChk" placeholder="새 비밀번호 확인을 입력해주세요"/></td>
+								<td><input class="input input-bordered w-full max-w-xs text-black" type="password" name="loginPwChk" placeholder="새 비밀번호 확인을 입력해주세요"/></td>
 							</tr>
 							<tr>
 								<td colspan="2"><button class="btn-text-link btn btn-active">변경</button></td>
