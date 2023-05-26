@@ -6,7 +6,7 @@
 	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3 text-black">
 				<div class="mb-2 flex justify-between items-end">
-					<div><span>총 : ${articlesCnt } 개</span></div>
+					<div class="text-white"><span>총 : ${articlesCnt } 개</span></div>
 					<form>
 						<input type="hidden" name="boardId" value="${board.id }"/>
 						<select data-value="${searchKeywordType }" class="select select-bordered" name='searchKeywordType'>
@@ -58,7 +58,7 @@
 			</div>
 			<div class="mt-2 flex justify-end">
 				<c:if test="${rq.getLoginedMemberId() != 0 }">
-						<a class="btn btn-active" href="/usr/article/write">WRITE</a>
+						<a class="btn btn-active" href="/usr/article/write">글 쓰기</a>
 				</c:if>
 			</div>
 			<div class="mt-2 flex justify-center">

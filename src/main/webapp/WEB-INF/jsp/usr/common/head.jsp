@@ -23,23 +23,40 @@
 </head>
 <body class="bg-black text-white h-full">
 	<div class="navbar">
-	<div class="flex-1">
-		<a href="/" class="btn btn-ghost normal-case text-xl"><img src="/resource/images/logo.png"/></a>
+		<div class="flex-1">
+			<a href="/" class="btn btn-ghost normal-case text-xl"><img src="/resource/images/logo.png"/></a>
 		</div>
-		<div class="flex-none">
-		<ul class="menu menu-horizontal px-1">
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/"><span>메인</span></a></li>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=1"><span>공지사항</span></a></li>
-			<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/article/list?boardId=2"><span>자유게시판</span></a></li>
-			<c:if test="${rq.getLoginedMemberId() == 0 }">
-				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/login"><span>로그인</span></a></li>
-				<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/join"><span>회원가입</span></a></li>
-			</c:if>
-			<c:if test="${rq.getLoginedMemberId() != 0  }">
-				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>마이페이지</span></a></li>
-				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>참가신청</span></a></li>
-				<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/doLogout"><span>로그아웃</span></a></li>
-			</c:if>
-		</ul>
+		<div class="flex-none" id="category">
+			<ul class="px-1">
+				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">게임소식
+					<ul>
+						<li><a href="/usr/article/list?boardId=1"><span>공지사항</span></a></li>
+						<li><a href="/usr/article/list?boardId=3"><span>업데이트</span></a></li>
+						<li><a href="/usr/article/list?boardId=4"><span>이벤트</span></a></li>
+					</ul>
+				</li>
+				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">커뮤니티
+					<ul>
+						<li><a href="/usr/article/list?boardId=2"><span>자유게시판</span></a></li>
+						<li><a href="/usr/article/list?boardId=2"><span>명예의전당</span></a></li>
+					</ul>
+				</li>
+				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">가이드
+					<ul>
+						<li><a href="/usr/article/list?boardId=2"><span>아이템 목록 및 조합법</span></a></li>				
+						<li><a href="/usr/article/list?boardId=2"><span>스킬목록</span></a></li>				
+						<li><a href="/usr/article/list?boardId=2"><span>경기구역 지도 및 설명</span></a></li>				
+					</ul>
+				</li>
+				<c:if test="${rq.getLoginedMemberId() == 0 }">
+					<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/login"><span>로그인</span></a></li>
+					<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/join"><span>회원가입</span></a></li>
+				</c:if>
+				<c:if test="${rq.getLoginedMemberId() != 0  }">
+					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>마이페이지</span></a></li>
+					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>참가신청</span></a></li>
+					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/doLogout"><span>로그아웃</span></a></li>
+				</c:if>
+			</ul>
 		</div>
 	</div>

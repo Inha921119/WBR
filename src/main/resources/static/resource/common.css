@@ -30,6 +30,27 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	text-align: center;
 }
 
+#category > ul{
+	padding-bottom: 2px;
+}
+
+#category > ul > li{
+	display: inline-block;
+}
+
+#category > ul ul{
+	display : none;
+  	position : relative;
+}
+
+#category > ul > li:hover > ul {
+	display: block;
+}
+
+#category > ul > li > ul > li {
+	display: inline-block;
+}
+
 .btn-text-link {
 	color:white;
 }
