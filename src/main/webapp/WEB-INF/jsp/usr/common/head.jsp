@@ -22,41 +22,50 @@
 
 </head>
 <body class="bg-black text-white h-full">
-	<div class="navbar">
-		<div class="flex-1">
+	<div class="flex justify-between ">
+		<div class="inline-block mt-2">
 			<a href="/" class="btn btn-ghost normal-case text-xl"><img src="/resource/images/logo.png"/></a>
 		</div>
-		<div class="flex-none" id="category">
-			<ul class="px-1">
-				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">게임소식
-					<ul>
-						<li><a href="/usr/article/list?boardId=1"><span>공지사항</span></a></li>
-						<li><a href="/usr/article/list?boardId=3"><span>업데이트</span></a></li>
-						<li><a href="/usr/article/list?boardId=4"><span>이벤트</span></a></li>
+		<div class="inline-block mt-2">
+			<ul class="px-1" id="category">
+				<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4">게임소식
+					<ul class="py-4">
+						<li><a href="/usr/article/list?boardId=1">공지사항</a></li>
+						<li><a href="/usr/article/list?boardId=3">업데이트</a></li>
+						<li><a href="/usr/article/list?boardId=4">이벤트</a></li>
+						<li><a href="/usr/content/playingGameLog">진행중인 게임</a></li>
 					</ul>
 				</li>
-				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">커뮤니티
-					<ul>
-						<li><a href="/usr/article/list?boardId=2"><span>자유게시판</span></a></li>
-						<li><a href="/usr/article/list?boardId=2"><span>명예의전당</span></a></li>
+				<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4">커뮤니티
+					<ul class="py-4">
+						<li><a href="/usr/article/list?boardId=2">자유게시판</a></li>
+						<li><a href="/usr/content/winnerRanking">명예의전당</a></li>
 					</ul>
 				</li>
-				<li class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl mt-4">가이드
-					<ul>
-						<li><a href="/usr/article/list?boardId=2"><span>아이템 목록 및 조합법</span></a></li>				
-						<li><a href="/usr/article/list?boardId=2"><span>스킬목록</span></a></li>				
-						<li><a href="/usr/article/list?boardId=2"><span>경기구역 지도 및 설명</span></a></li>				
+				<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4">가이드
+					<ul class="py-4">
+						<li><a href="/usr/content/itemListAndRecipe">아이템 목록 및 조합법</a></li>				
+						<li><a href="/usr/content/skillList">스킬목록</a></li>				
+						<li><a href="/usr/content/map">경기구역 지도 및 설명</a></li>				
 					</ul>
-				</li>
+				</li>				
 				<c:if test="${rq.getLoginedMemberId() == 0 }">
-					<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/login"><span>로그인</span></a></li>
-					<li><a class="h-full px-3 flex items-center btn btn btn-ghost normal-case text-xl" href="/usr/member/join"><span>회원가입</span></a></li>
+					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/login">로그인</a></li>
+					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/join">회원가입</a></li>
 				</c:if>
 				<c:if test="${rq.getLoginedMemberId() != 0  }">
-					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>마이페이지</span></a></li>
-					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/myPage?id=${rq.getLoginedMemberId()}"><span>참가신청</span></a></li>
-					<li><a class="h-full px-3 flex items-center btn btn-ghost normal-case text-xl" href="/usr/member/doLogout"><span>로그아웃</span></a></li>
+					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/myPage?id=${rq.getLoginedMemberId()}">마이페이지</a></li>
+					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/myPage?id=${rq.getLoginedMemberId()}">참가신청</a></li>
+					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/doLogout">로그아웃</a></li>
 				</c:if>
 			</ul>
 		</div>
 	</div>
+	
+	<c:if test="${pageTitle != 'WebBettelRoyale' }">
+		<section class="my-3 text-2xl">
+			<div class="container font-bold mx-auto px-3">
+				<h1>${pageTitle }&nbsp;</h1>
+			</div>
+		</section>
+	</c:if>

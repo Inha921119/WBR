@@ -30,25 +30,48 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	text-align: center;
 }
 
-#category > ul{
-	padding-bottom: 2px;
+#category {
+	display:flex;
+	position: relative;
+	justify-items: space-between;
+	padding-left: 0;
+	margin-right: 20%;
 }
 
-#category > ul > li{
+#category > li {
+	padding-left: 0;
+	margin-right: 2.5rem;
+}
+
+#category > li > span{
+	padding-left: 0;
+}
+
+#category > li > a {
 	display: inline-block;
+	padding-left: 0;
 }
 
-#category > ul ul{
-	display : none;
-  	position : relative;
+#category ul {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0%;
 }
 
-#category > ul > li:hover > ul {
+#category > li:hover > ul {
+	display: flex;
+	justify-items: space-between;
+	cursor: pointer;
+}
+
+#category > li > ul > li {
+	display: inline-block;
+	margin-right: 3rem;
+}
+
+#category > li > ul > li > a {
 	display: block;
-}
-
-#category > ul > li > ul > li {
-	display: inline-block;
 }
 
 .btn-text-link {

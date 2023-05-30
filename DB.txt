@@ -1,3 +1,148 @@
 CREATE DATABASE WBR;
 
 USE WBR;
+
+# member 테이블 생성
+CREATE TABLE `member`(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	loginId VARCHAR(20) NOT NULL UNIQUE,
+	loginPw VARCHAR(100) NOT NULL,
+	`authLevel` SMALLINT UNSIGNED NOT NULL DEFAULT 3 COMMENT '권한 레벨 (일반 = 3, 관리자 = 7)',
+	`name` VARCHAR(20) NOT NULL,
+	nickname VARCHAR(20) NOT NULL,
+	cellphoneNum VARCHAR(20) NOT NULL,
+	email VARCHAR(50) NOT NULL,
+	delStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '탈퇴여부 (탈퇴 전 = 0, 탈퇴 후 = 1)',
+	delDate DATETIME COMMENT '탈퇴 날짜'
+);
+
+SELECT * FROM `member`;
+SELECT * FROM board;
+
+# 관리자 추가
+INSERT INTO `member`
+SET regDate = NOW(),
+updateDate = NOW(),
+loginId = 'admin',
+loginPw = SHA2('admin', 256),
+`authLevel` = 7,
+`name` = '관리자',
+nickname = '관리자',
+cellphoneNum = '010-1111-1111',
+email = 'admin@naver.com';
+
+# article 테이블 생성
+CREATE TABLE article(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	title VARCHAR(100) NOT NULL,
+	`body` TEXT NOT NULL
+);
+
+ALTER TABLE article ADD COLUMN memberId INT UNSIGNED NOT NULL AFTER updateDate;
+ALTER TABLE article ADD COLUMN boardId INT UNSIGNED NOT NULL AFTER memberId;
+ALTER TABLE article ADD COLUMN hitCount INT UNSIGNED NOT NULL DEFAULT 0 AFTER `body`;
+
+# board 테이블 생성
+CREATE TABLE board(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	`code` VARCHAR(20) NOT NULL UNIQUE COMMENT 'notice(공지사항), free(자유), ...',
+	`name` VARCHAR(20) NOT NULL UNIQUE COMMENT '게시판 이름',
+	delStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '삭제여부 (삭제 전 = 0, 삭제 후 = 1)',
+	delDate DATETIME COMMENT '삭제 날짜'
+);
+
+# reactionPoint 테이블 생성
+CREATE TABLE reactionPoint(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	memberId INT UNSIGNED NOT NULL,
+	relTypeCode VARCHAR(20) NOT NULL COMMENT '관련 데이터 타입 코드',
+	relId INT UNSIGNED NOT NULL COMMENT '관련 데이터 번호',
+	`point` SMALLINT NOT NULL DEFAULT 0 COMMENT '반응 (좋아요 = +1, 싫어요 = -1)'
+);
+
+# reply 테이블 생성
+CREATE TABLE reply(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	memberId INT UNSIGNED NOT NULL,
+	relTypeCode VARCHAR(20) NOT NULL COMMENT '관련 데이터 타입 코드',
+	relId INT UNSIGNED NOT NULL COMMENT '관련 데이터 번호',
+	`body` TEXT NOT NULL
+);
+
+# article 테스트 데이터
+INSERT INTO article
+SET regDate = NOW(),
+updateDate = NOW(),
+memberId = 2,
+boardId = 2,
+title = '제목1',
+`body` = '내용1';
+
+INSERT INTO article
+SET regDate = NOW(),
+updateDate = NOW(),
+memberId = 1,
+boardId = 1,
+title = '제목2',
+`body` = '내용2';
+
+# board 테스트 데이터
+INSERT INTO board
+SET regDate = NOW(),
+updateDate = NOW(),
+`code` = 'notice',
+`name` = '공지사항';
+
+# board 테스트 데이터
+INSERT INTO board
+SET regDate = NOW(),
+updateDate = NOW(),
+`code` = 'free',
+`name` = '자유게시판';
+
+# board 테스트 데이터
+INSERT INTO board
+SET regDate = NOW(),
+updateDate = NOW(),
+`code` = 'update',
+`name` = '업데이트';
+
+# board 테스트 데이터
+INSERT INTO board
+SET regDate = NOW(),
+updateDate = NOW(),
+`code` = 'event',
+`name` = '이벤트';
+
+SELECT `point` FROM reactionPoint;
+
+SELECT * FROM reactionPoint;
+
+WITH AM AS (
+				    SELECT A.*, M.nickname AS writerName 
+				        FROM article AS A
+				        INNER JOIN `member` AS M
+				        ON A.memberId = M.id
+				        WHERE 1 = 1
+						AND A.boardId = 1
+					)
+					SELECT AM.* 
+			            	, IFNULL(SUM(RP.point), 0) AS sumReactionPoint
+			            	, IFNULL(SUM(IF(RP.point > 0, RP.comment, 0)), 0) AS goodReactionPoint
+			           		, IFNULL(SUM(IF(RP.point < 0, RP.comment, 0)), 0) AS badReactionPoint
+			        	FROM AM
+		            	LEFT JOIN reactionPoint AS RP
+		            	ON RP.relTypeCode = 'article'
+		            	AND RP.relId = AM.id
+					    GROUP BY AM.id
+					    ORDER BY AM.id DESC
