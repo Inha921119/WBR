@@ -7,17 +7,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Member {
+public class ItemVO {
 	private int id;
 	private String regDate;
 	private String updateDate;
-	private String loginId;
-	private String loginPw;
-	private int authLevel;
 	private String name;
-	private String nickname;
-	private String cellphoneNum;
-	private String email;
-	private int delStatus;
-	private String delDate;
+	private int attackPoint;
+	private int defencePoint;
+	private int hitRate;
+	private int avoidanceRate;
+	private int dropRate;
+	private int durabilityPoint;
+	private int inventoryPoint;
 }

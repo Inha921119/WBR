@@ -28,12 +28,7 @@ public class UsrContentContorller {
 	public String showMap() {
 		return "usr/content/map";
 	}
-	
-	@RequestMapping("/usr/content/participationApp")
-	public String showParticipationApp() {
-		return "usr/content/participationApp";
-	}
-	
+		
 	@RequestMapping("/usr/content/playingGameLog")
 	public String showPlayingGameLog() {
 		return "usr/content/playingGameLog";

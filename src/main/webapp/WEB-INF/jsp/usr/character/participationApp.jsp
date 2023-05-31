@@ -1,13 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="회원가입" />
+<c:set var="pageTitle" value="참가신청" />
 <%@ include file="../common/head.jsp" %>
 
 <script>
 	let validLoginId = '';
 
-	function join_submitForm(form) {
+	function create_submitForm(form) {
 		
 		form.loginId.value = form.loginId.value.trim();
 		if (form.loginId.value.length == 0) {
@@ -78,33 +78,33 @@
 		form.submit();
 	}
 	
-	function loginIdDupCheck(el) {
-		let loginIdDupCheckMsg = $('#loginIdDupCheckMsg');
+	function charNameDupCheck(el) {
+		let charNameDupCheckMsg = $('#charNameDupCheckMsg');
 
-		loginIdDupCheckMsg.empty();
+		charNameDupCheckMsg.empty();
 		
 		el.value = el.value.trim();
 		
 		if (el.value.length == 0) {
-			loginIdDupCheckMsg.removeClass('text-green-500');
-			loginIdDupCheckMsg.addClass('text-red-500');
-			loginIdDupCheckMsg.html('<span>아이디는 필수 입력 정보입니다</span>');
+			charNameDupCheckMsg.removeClass('text-green-500');
+			charNameDupCheckMsg.addClass('text-red-500');
+			charNameDupCheckMsg.html('<span>이름은 필수 입력 정보입니다</span>');
 			return;
 		}
 		
-		$.get('loginIdDupCheck', {
-			loginId : el.value,
+		$.get('charNameDupCheck', {
+			name : el.value,
 		}, function(data) {
 			if (data.success) {
-				loginIdDupCheckMsg.removeClass('text-red-500');
-				loginIdDupCheckMsg.addClass('text-green-500');
-				loginIdDupCheckMsg.html(`<span>\${data.data1 }은(는) \${data.msg }</span>`);
+				charNameDupCheckMsg.removeClass('text-red-500');
+				charNameDupCheckMsg.addClass('text-green-500');
+				charNameDupCheckMsg.html(`<span>\${data.data1 }은(는) \${data.msg }</span>`);
 				validLoginId = data.data1;
 				
 			} else {
-				loginIdDupCheckMsg.removeClass('text-green-500');
-				loginIdDupCheckMsg.addClass('text-red-500');
-				loginIdDupCheckMsg.html(`<span>\${data.data1 }은(는) \${data.msg }</span>`);
+				charNameDupCheckMsg.removeClass('text-green-500');
+				charNameDupCheckMsg.addClass('text-red-500');
+				charNameDupCheckMsg.html(`<span>\${data.data1 }은(는) \${data.msg }</span>`);
 				validLoginId = '';
 			}
 			
@@ -114,7 +114,7 @@
 
 	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3">
-			<form action="doJoin" method="POST" onsubmit="join_submitForm(this); return false;">
+			<form action="createChar" method="POST" onsubmit="create_submitForm(this); return false;">
 				<div class="table-box-type-1">
 					<table>
 						<colgroup>
@@ -122,38 +122,19 @@
 						</colgroup>
 						<tbody>
 							<tr height="105">
-								<th>아이디</th>
+								<th>이름</th>
 								<td>
-									<input class="input input-bordered w-full max-w-xs text-black" type="text" name="loginId" placeholder="아이디를 입력해주세요" onblur="loginIdDupCheck(this);"/>
+									<input class="input input-bordered w-full max-w-xs text-black" type="text" name="name" placeholder="이름을 입력해주세요" onblur="charNameDupCheck(this);"/>
 									<div id="loginIdDupCheckMsg" class="text-sm mt-2 h-5 text-red-500"></div>
 								</td>
 							</tr>
 							<tr>
-								<th>비밀번호</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="password" name="loginPw" placeholder="비밀번호를 입력해주세요"/></td>
+								<th>성별</th>
+								<td><input class="input input-bordered w-full max-w-xs text-black" type="password" name="sex"/></td>
 							</tr>
+							
 							<tr>
-								<th>비밀번호 확인</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="password" name="loginPwChk" placeholder="비밀번호확인을 입력해주세요"/></td>
-							</tr>
-							<tr>
-								<th>이름</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="name" placeholder="이름을 입력해주세요"/></td>
-							</tr>
-							<tr>
-								<th>닉네임</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="nickname" placeholder="닉네임을 입력해주세요"/></td>
-							</tr>
-							<tr>
-								<th>전화번호</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="cellphoneNum" placeholder="전화번호를 입력해주세요"/></td>
-							</tr>
-							<tr>
-								<th>이메일</th>
-								<td><input class="input input-bordered w-full max-w-xs text-black" type="text" name="email" placeholder="이메일을 입력해주세요"/></td>
-							</tr>
-							<tr>
-								<td colspan="2"><button class="btn-text-link btn btn-active">회원가입</button></td>
+								<td colspan="2"><button class="btn-text-link btn btn-active">참가신청</button></td>
 							</tr>
 						</tbody>
 					</table>
