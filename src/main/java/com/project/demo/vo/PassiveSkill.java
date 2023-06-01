@@ -18,8 +18,8 @@ public class PassiveSkill {
 	private int decreseDefencePoint;
 	private int increseHitRate;
 	private int decreseHitRate;
-	private int increseAvoidanceRate;
-	private int decreseAvoidanceRate;
+	private int increseMissRate;
+	private int decreseMissRate;
 	private int increseFindItemRate;
 	private int decreseFindItemRate;
 	private int increseFindEnemyRate;
