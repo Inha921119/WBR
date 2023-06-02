@@ -3,10 +3,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="아이템 목록 및 조합법" />
 <%@ include file="../common/head.jsp" %>
-	<section class="mt-8 text-sm h-full ">
+	<section class="mt-8 text-base h-screen ">
 		<div class="">
-			<div class="category">
-				<div class="hp">
+			<div class="category flex justify-center">
+				<div class="hp mr-20">
+					<span class="text-lg font-bold">체력회복</span>
+					<br />
+					<br />
 					<span>약초</span>
 					<br />
 					<span>붕대 = 천쪼가리 + 천쪼가리</span>
@@ -15,7 +18,10 @@
 					<br />
 					<span>구급상자 = 빈 상자 + 약초 + 붕대</span>
 				</div>
-				<div class="sp">
+				<div class="sp mr-20">
+					<span class="text-lg font-bold">스테미나회복</span>
+					<br />
+					<br />
 					<span>빵</span>
 					<br />
 					<span>컵라면</span>
@@ -30,7 +36,10 @@
 					<br />
 					<span>전투식량</span>
 				</div>
-				<div class="weapon">
+				<div class="weapon mr-20">
+					<span class="text-lg font-bold">무기</span>
+					<br />
+					<br />
 					<span>단검</span>
 					<br />
 					<span>호미</span>
@@ -99,7 +108,10 @@
 					<br />
 					<span>다이너마이트</span>
 				</div>
-				<div class="armor">
+				<div class="armor mr-20">
+					<span class="text-lg font-bold">방어구</span>
+					<br />
+					<br />
 					<span>안전모</span>
 					<br />
 					<span>싸이클헬멧</span>
@@ -163,6 +175,9 @@
 					<span>강철부츠</span>
 				</div>
 				<div class="etc">
+					<span class="text-lg font-bold">재료</span>
+					<br />
+					<br />
 					<span>실</span>
 					<br />
 					<span>솜</span>

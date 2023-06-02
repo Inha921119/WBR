@@ -79,10 +79,10 @@
 							<tr>
 								<th>성별</th>
 								<td>
-									<input class="mr-2" type="radio" id="male" name="gender" value="male" checked><label class="text-xl" for="male">남성</label>
+									<input class="mr-2" type="radio" id="male" name="gender" value=0 checked><label class="text-xl">남성</label>
 								</td>
 								<td>	
-									<input class="mr-2" type="radio" id="female" name="gender" value="female"><label class="text-xl" for="female">여성</label>
+									<input class="mr-2" type="radio" id="female" name="gender" value=1><label class="text-xl">여성</label>
 								</td>
 							</tr>
 						</tbody>
