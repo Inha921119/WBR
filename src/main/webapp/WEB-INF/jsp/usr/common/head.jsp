@@ -55,14 +55,19 @@
 				</c:if>
 				<c:if test="${rq.getLoginedMemberId() != 0  }">
 					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/myPage?id=${rq.getLoginedMemberId()}">마이페이지</a></li>
-					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/character/participationApp">참가신청</a></li>
+					<c:if test="${rq.loginedMember.existChar == 0 }">
+						<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/character/participationApp">참가신청</a></li>
+					</c:if>
+					<c:if test="${rq.loginedMember.existChar != 0 }">
+						<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/character/battle">전장입장</a></li>
+					</c:if>
 					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/doLogout">로그아웃</a></li>
 				</c:if>
 			</ul>
 		</div>
 	</div>
 	
-	<c:if test="${pageTitle != 'WebBettelRoyale' }">
+	<c:if test="${pageTitle != 'WebBattleRoyale' }">
 		<section class="my-3 text-2xl">
 			<div class="container font-bold mx-auto px-3">
 				<h1>${pageTitle }&nbsp;</h1>

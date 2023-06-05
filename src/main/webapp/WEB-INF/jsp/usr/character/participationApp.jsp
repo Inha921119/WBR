@@ -62,8 +62,9 @@
 
 	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3">
-			<form action="createChar" method="POST" onsubmit="create_submitForm(this); return false;">
+			<form action="doParticipationApp" method="POST" onsubmit="create_submitForm(this); return false;">
 				<div class="table-box-type-1">
+					<input type="hidden" name="memberId" value="${loginedMemberId }"/>
 					<table>
 						<colgroup>
 							<col width="200" />

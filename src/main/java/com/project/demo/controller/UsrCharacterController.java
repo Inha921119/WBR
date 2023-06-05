@@ -29,13 +29,13 @@ public class UsrCharacterController {
 	
 	@RequestMapping("/usr/character/doParticipationApp")
 	@ResponseBody
-	public String doParticipationApp(String name, int gender) {
+	public String doParticipationApp(int memberId, String name, int gender) {
 
 		if (Util.empty(name)) {
-			return Util.jsHistoryBack("제목을 입력해주세요");
+			return Util.jsHistoryBack("이름을 입력해주세요");
 		}
 
-		ResultData<Integer> doParticipationAppRd = characterService.doParticipationApp(name, gender);
+		ResultData<Integer> doParticipationAppRd = characterService.doParticipationApp(memberId, name, gender);
 		
 		if (doParticipationAppRd.isFail()) {
 			return Util.jsHistoryBack(doParticipationAppRd.getMsg());
@@ -45,18 +45,23 @@ public class UsrCharacterController {
 	}
 	@RequestMapping("/usr/character/charNameDupCheck")
 	@ResponseBody
-	public ResultData charNameDupCheck(String charName) {
+	public ResultData charNameDupCheck(String name) {
 		
-		if (Util.empty(charName)) {
-			return ResultData.from("F-1", "아이디를 입력해주세요");
+		if (Util.empty(name)) {
+			return ResultData.from("F-1", "이름을 입력해주세요");
 		}
 		
-		Character character = characterService.getCharacterByCharName(charName);
+		Character character = characterService.getCharacterByName(name);
 		
 		if (character != null) {
-			return ResultData.from("F-2", "이미 사용중인 이름입니다", "loginId", charName);
+			return ResultData.from("F-2", "이미 사용중인 이름입니다", "loginId", name);
 		}
 		
-		return ResultData.from("S-1", "사용 가능한 이름입니다", "loginId", charName);
+		return ResultData.from("S-1", "사용 가능한 이름입니다", "loginId", name);
+	}
+	
+	@RequestMapping("/usr/character/battle")
+	public String showBattle() {
+		return "usr/character/battle";
 	}
 }
