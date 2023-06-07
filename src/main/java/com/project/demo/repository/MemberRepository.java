@@ -29,21 +29,21 @@ public interface MemberRepository {
 	@Select("""
 			SELECT *
 				FROM `member`
-				WHERE id = #{id}
+				WHERE id = #{id};
 			""")
 	public Member getMemberById(int id);
 
 	@Select("""
 			SELECT *
 				FROM `member`
-				WHERE loginId = #{loginId}
+				WHERE loginId = #{loginId};
 			""")
 	public Member getMemberByLoginId(String loginId);
 
 	@Select("""
 			SELECT *
 				FROM `member`
-				WHERE nickname = #{nickname}
+				WHERE nickname = #{nickname};
 			""")
 	public Member getMemberByNickname(String nickname);
 
@@ -61,7 +61,7 @@ public interface MemberRepository {
 					nickname = #{nickname},
 					cellphoneNum = #{cellphoneNum},
 					email = #{email}
-				WHERE id = #{loginedMemberId}
+				WHERE id = #{loginedMemberId};
 			""")
 	public void doModify(int loginedMemberId, String nickname, String cellphoneNum, String email);
 
@@ -72,5 +72,19 @@ public interface MemberRepository {
 				WHERE id = #{loginedMemberId}
 			""")
 	public void doPasswordModify(int loginedMemberId, String loginPw);
-
+	
+	@Update("""
+			UPDATE `member`
+				SET existPlayer = 1
+				WHERE id = #{loginedMemberId};
+			""")
+	public void increseExistPlayer(int loginedMemberId);
+	
+	@Update("""
+			UPDATE `member`
+				SET existPlayer = 0
+				WHERE id = #{loginedMemberId};
+			""")
+	public void decreseExistPlayer(int loginedMemberId);
+	
 }

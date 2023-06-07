@@ -11,7 +11,7 @@ public class Equipment {
 	private int id;
 	private String regDate;
 	private String updateDate;
-	private int characterId;
+	private int playerId;
 	private int head;
 	private int headDP;
 	private int top;

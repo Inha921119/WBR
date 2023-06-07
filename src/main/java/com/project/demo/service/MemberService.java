@@ -97,4 +97,12 @@ public class MemberService {
 		memberRepository.doPasswordModify(member.getId(), Util.sha256(tempPassword));
 	}
 	
+	public void increseExistPlayer(int loginedMemberId) {
+		memberRepository.increseExistPlayer(loginedMemberId);
+	}
+	
+	public void decreseExistPlayer(int loginedMemberId) {
+		memberRepository.decreseExistPlayer(loginedMemberId);
+	}
+	
 }

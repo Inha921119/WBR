@@ -15,7 +15,7 @@
 								</th>
 							</tr>
 							<tr>
-								<td rowspan="5" style="width: 15%;">아이콘</td>
+								<td rowspan="5" style="width: 15%;"><img class="ml-2" src="/resource/images/${rq.player.image }.jpg"/></td>
 								<td style="width: 35%;"></td>
 								<td class="equip" style="width: 50%">[왼손]</td>
 							</tr>
@@ -36,70 +36,46 @@
 								<td class="equip">[팔]</td>
 							</tr>
 							<tr>
-								<td>td 위치</td>
-								<td>td 위치</td>
+								<td>체력</td>
+								<td>${rq.player.hp } / ${rq.player.maxhp }</td>
 								<td class="equip">[하의]</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>스테미나</td>
+								<td>${rq.player.sp } / ${rq.player.maxsp }</td>
 								<td class="equip">[신발]</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>공격력</td>
+								<td>${rq.player.attackPoint }</td>
 								<td class="equip">
 									td 위치
 								</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>방어력</td>
+								<td>${rq.player.defencePoint }</td>
 								<td class="equip">
 									td 위치
 								</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>적중률</td>
+								<td>${rq.player.hitRate } %</td>
 								<td class="equip">
 									td 위치
 								</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>회피율</td>
+								<td>${rq.player.missRate } %</td>
 								<td class="equip">
 									td 위치
 								</td>
 							</tr>
 							<tr>
-								<td>
-									td 위치
-								</td>
-								<td>
-									td 위치
-								</td>
+								<td>스킬</td>
+								<td>td</td>
 								<td class="equip">
 									td 위치
 								</td>

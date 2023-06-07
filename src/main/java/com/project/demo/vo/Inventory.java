@@ -11,7 +11,7 @@ public class Inventory {
 	private int id;
 	private String regDate;
 	private String updateDate;
-	private int characterId;
+	private int playerId;
 	private int itemId;
 	private int quantity;
 }
