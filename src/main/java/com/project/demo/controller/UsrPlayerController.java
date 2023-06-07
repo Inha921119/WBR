@@ -2,12 +2,15 @@ package com.project.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.project.demo.service.EquipmentService;
 import com.project.demo.service.MemberService;
 import com.project.demo.service.PlayerService;
 import com.project.demo.util.Util;
+import com.project.demo.vo.Equipment;
 import com.project.demo.vo.Player;
 import com.project.demo.vo.ResultData;
 import com.project.demo.vo.Rq;
@@ -17,12 +20,14 @@ public class UsrPlayerController {
 	
 	private PlayerService playerService;
 	private MemberService memberService;
+	private EquipmentService equipmentService;
 	private Rq rq;
 	
 	@Autowired
-	public UsrPlayerController(PlayerService playerService, MemberService memberService, Rq rq) {
+	public UsrPlayerController(PlayerService playerService, MemberService memberService, EquipmentService equipmentService, Rq rq) {
 		this.playerService = playerService;
 		this.memberService = memberService;
+		this.equipmentService = equipmentService;
 		this.rq = rq;
 	}
 
@@ -46,6 +51,7 @@ public class UsrPlayerController {
 		}
 		
 		memberService.increseExistPlayer(memberId);
+		equipmentService.createEquipment(doParticipationAppRd.getData1());
 		
 		return Util.jsReplace(doParticipationAppRd.getMsg(), "/");
 	}
@@ -67,7 +73,14 @@ public class UsrPlayerController {
 	}
 	
 	@RequestMapping("/usr/player/battle")
-	public String showBattle() {
+	public String showBattle(Model model, int id) {
+		
+		Player player = playerService.getPlayerByMemberId(id);
+		
+		Equipment equipment = equipmentService.getEquipmentById(player.getId());
+		
+		model.addAttribute(equipment);
+		
 		return "usr/player/battle";
 	}
 }

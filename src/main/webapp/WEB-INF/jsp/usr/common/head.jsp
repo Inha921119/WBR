@@ -59,7 +59,7 @@
 						<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/player/participationApp">참가신청</a></li>
 					</c:if>
 					<c:if test="${rq.loginedMember.existPlayer != 0 }">
-						<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/player/battle">전장입장</a></li>
+						<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/player/battle?id=${rq.getLoginedMemberId() }">전장입장</a></li>
 					</c:if>
 					<li class="h-full px-3 flex items-center whitespace-nowrap text-sm font-bold cursor-pointer mt-4"><a href="/usr/member/doLogout">로그아웃</a></li>
 				</c:if>

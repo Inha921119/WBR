@@ -17,33 +17,54 @@
 							<tr>
 								<td rowspan="5" style="width: 15%;"><img class="ml-2" src="/resource/images/${rq.player.image }.jpg"/></td>
 								<td style="width: 35%;"></td>
-								<td class="equip" style="width: 50%">[왼손]</td>
+								<td class="equip" style="width: 50%">[왼손] : <c:choose>
+																				<c:when test="${equipment.leftHand == 0}">없음</c:when>
+																				<c:otherwise>${equipment.leftHand }</c:otherwise>
+																			</c:choose></td>
 							</tr>
 							<tr>
 								<td>이름</td>
-								<td class="equip">[오른손]</td>
+								<td class="equip">[오른손] : <c:choose>
+																<c:when test="${equipment.rightHand == 0}">없음</c:when>
+																<c:otherwise>${equipment.rightHand }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td>Lv</td>	
-								<td class="equip">[머리]</td>
+								<td class="equip">[머리] : <c:choose>
+																<c:when test="${equipment.head == 0}">없음</c:when>
+																<c:otherwise>${equipment.head }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td>경험치</td>
-								<td class="equip">[상의]</td>
+								<td class="equip">[상의] : <c:choose>
+																<c:when test="${equipment.top == 0}">없음</c:when>
+																<c:otherwise>${equipment.top }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td></td>
-								<td class="equip">[팔]</td>
+								<td class="equip">[팔] : <c:choose>
+																<c:when test="${equipment.arm == 0}">없음</c:when>
+																<c:otherwise>${equipment.arm }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td>체력</td>
 								<td>${rq.player.hp } / ${rq.player.maxhp }</td>
-								<td class="equip">[하의]</td>
+								<td class="equip">[하의] : <c:choose>
+																<c:when test="${equipment.pants == 0}">없음</c:when>
+																<c:otherwise>${equipment.pants }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td>스테미나</td>
 								<td>${rq.player.sp } / ${rq.player.maxsp }</td>
-								<td class="equip">[신발]</td>
+								<td class="equip">[신발] : <c:choose>
+																<c:when test="${equipment.foot == 0}">없음</c:when>
+																<c:otherwise>${equipment.foot }</c:otherwise>
+															</c:choose></td>
 							</tr>
 							<tr>
 								<td>공격력</td>

@@ -22,8 +22,8 @@ public class Equipment {
 	private int armDP;
 	private int foot;
 	private int footDP;
-	private int leftHands;
-	private int leftHandsDP;
-	private int rightHands;
-	private int rightHandsDP;
+	private int leftHand;
+	private int leftHandDP;
+	private int rightHand;
+	private int rightHandDP;
 }
