@@ -17,89 +17,89 @@
 							<tr>
 								<td rowspan="5" style="width: 15%;"><img class="ml-2" src="/resource/images/${rq.player.image }.jpg"/></td>
 								<td style="width: 35%;"></td>
-								<td class="equip" style="width: 50%">[왼손] : <c:choose>
-																				<c:when test="${equipment.leftHand == 0}">없음</c:when>
-																				<c:otherwise>${equipment.leftHand }</c:otherwise>
+								<td class="equip" style="width: 50%">[왼손 ${equipments[0].category }] : <c:choose>
+																				<c:when test="${equipments[0].usedItemCode != 999}">${equipments[0].name }</c:when>
+																				<c:otherwise>없음</c:otherwise>
 																			</c:choose></td>
 							</tr>
 							<tr>
-								<td>이름</td>
-								<td class="equip">[오른손] : <c:choose>
-																<c:when test="${equipment.rightHand == 0}">없음</c:when>
-																<c:otherwise>${equipment.rightHand }</c:otherwise>
+								<td>이름 : ${rq.player.name }</td>
+								<td class="equip">[오른손 ${equipments[1].category }] : <c:choose>
+																<c:when test="${equipments[1].usedItemCode != 999}">${equipments[1].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
-								<td>Lv</td>	
-								<td class="equip">[머리] : <c:choose>
-																<c:when test="${equipment.head == 0}">없음</c:when>
-																<c:otherwise>${equipment.head }</c:otherwise>
+								<td>Lv : ${rq.player.level }</td>	
+								<td class="equip">[${equipments[2].category }] : <c:choose>
+																<c:when test="${equipments[2].usedItemCode != 999}">${equipments[2].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
-								<td>경험치</td>
-								<td class="equip">[상의] : <c:choose>
-																<c:when test="${equipment.top == 0}">없음</c:when>
-																<c:otherwise>${equipment.top }</c:otherwise>
+								<td class="text-green-500">경험치 : ${rq.player.exp } / ${rq.player.maxExp }</td>
+								<td class="equip">[${equipments[3].category }] : <c:choose>
+																<c:when test="${equipments[3].usedItemCode != 999}">${equipments[3].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
 								<td></td>
-								<td class="equip">[팔] : <c:choose>
-																<c:when test="${equipment.arm == 0}">없음</c:when>
-																<c:otherwise>${equipment.arm }</c:otherwise>
+								<td class="equip">[${equipments[4].category }] : <c:choose>
+																<c:when test="${equipments[4].usedItemCode != 999}">${equipments[4].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
-								<td>체력</td>
-								<td>${rq.player.hp } / ${rq.player.maxhp }</td>
-								<td class="equip">[하의] : <c:choose>
-																<c:when test="${equipment.pants == 0}">없음</c:when>
-																<c:otherwise>${equipment.pants }</c:otherwise>
+								<td class="text-red-400">체력</td>
+								<c:set var = "sumIncreseHP" value = "0" />
+								<c:set var = "sumDecreseHP" value = "0" />
+								<c:forEach var="equipment" items="${equipments }" varStatus="status">     
+									<c:set var= "sumIncreseHP" value="${sumIncreseHP + equipment.increseHP}"/>
+									<c:set var= "sumDecreseHP" value="${sumDecreseHP + equipment.decreseHP}"/>
+								</c:forEach>
+								<td class="text-red-400">${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</td>
+								<td class="equip">[${equipments[5].category }] : <c:choose>
+																<c:when test="${equipments[5].usedItemCode != 999}">${equipments[5].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
-								<td>스테미나</td>
-								<td>${rq.player.sp } / ${rq.player.maxsp }</td>
-								<td class="equip">[신발] : <c:choose>
-																<c:when test="${equipment.foot == 0}">없음</c:when>
-																<c:otherwise>${equipment.foot }</c:otherwise>
+								<td class="text-yellow-400">스테미나</td>
+								<td class="text-yellow-400">${rq.player.sp } / ${rq.player.maxSp }</td>
+								<td class="equip">[${equipments[6].category }] : <c:choose>
+																<c:when test="${equipments[6].usedItemCode != 999}">${equipments[6].name }</c:when>
+																<c:otherwise>없음</c:otherwise>
 															</c:choose></td>
 							</tr>
 							<tr>
 								<td>공격력</td>
 								<td>${rq.player.attackPoint }</td>
-								<td class="equip">
-									td 위치
+								<td class="ownItem text-blue-500" colspan="4">
+									아이템 목록
 								</td>
 							</tr>
 							<tr>
 								<td>방어력</td>
 								<td>${rq.player.defencePoint }</td>
-								<td class="equip">
-									td 위치
+								<td class="ownItem">
 								</td>
 							</tr>
 							<tr>
 								<td>적중률</td>
 								<td>${rq.player.hitRate } %</td>
-								<td class="equip">
-									td 위치
+								<td class="ownItem">
 								</td>
 							</tr>
 							<tr>
 								<td>회피율</td>
 								<td>${rq.player.missRate } %</td>
-								<td class="equip">
-									td 위치
+								<td class="ownItem">
 								</td>
 							</tr>
 							<tr>
 								<td>스킬</td>
-								<td>td</td>
-								<td class="equip">
-									td 위치
-								</td>
+								<td rowspan="2">td</td>
 							</tr>
 						</tbody>
 					</table>

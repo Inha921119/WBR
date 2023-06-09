@@ -11,6 +11,7 @@ public class ItemVO {
 	private int id;
 	private String regDate;
 	private String updateDate;
+	private int itemCode;
 	private String name;
 	private int rarity;
 	private int useType;

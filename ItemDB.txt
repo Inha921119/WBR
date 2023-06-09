@@ -102,4 +102,75 @@ INSERT INTO item
 		`name` = '총알';
 
 
+CREATE TABLE equipment(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	usedItemCode INT UNSIGNED NOT NULL DEFAULT 999,
+	usedItemDP INT UNSIGNED NOT NULL DEFAULT 999
+);
+
+DESC equipment
+
+INSERT INTO equipment
+	SET regDate = NOW(),
+		updateDate = NOW(),
+		playerId = 4
+
+SELECT * FROM equipment
+SELECT * FROM player
+SELECT * FROM item
+
+DESC item
+
+
+CREATE TABLE itemCategory(
+	itemCode INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	category VARCHAR(20) NOT NULL
+)
+
+SELECT * FROM itemCategory
+
+UPDATE itemCategory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, category = '신발'
+	WHERE itemCode BETWEEN 451 AND 500;
+
+
+SELECT e.*
+	, ic.category
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	FROM equipment AS e
+	INNER JOIN itemCategory AS ic
+	ON e.usedItemCode = ic.itemCode
+	INNER JOIN item AS i
+	ON ic.itemCode = i.itemCode
+	WHERE e.playerId = 1;
 

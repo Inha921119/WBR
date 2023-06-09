@@ -7,15 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Equipment {
+public class Skill {
 	private int id;
 	private String regDate;
 	private String updateDate;
 	private int playerId;
-	private int usedItemCode;
-	private int usedItemDP;
-	private String name;
-	private String category;
-	private int increseHP;
-	private int decreseHP;
+	private int activeSkillId;
+	private int passiveSkillId;
 }

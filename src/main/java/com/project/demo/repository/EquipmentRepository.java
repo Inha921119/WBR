@@ -1,5 +1,7 @@
 package com.project.demo.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -19,9 +21,38 @@ public interface EquipmentRepository {
 	public void createEquipment(int id);
 
 	@Select("""
-			SELECT *
-				FROM equipment
-				WHERE playerId = #{playerId};
+			SELECT e.*
+				, ic.category
+				, i.name
+				, i.rarity
+				, i.useType
+				, i.useHP
+				, i.increseHP
+				, i.decreseHP
+				, i.useSP
+				, i.increseSP
+				, i.decreseSP
+				, i.increseAttackPoint
+				, i.decreseAttackPoint
+				, i.increseDefencePoint
+				, i.decreseDefencePoint
+				, i.increseHitRate
+				, i.decreseHitRate
+				, i.increseMissRate
+				, i.decreseMissRate
+				, i.increseFindItemRate
+				, i.decreseFindItemRate
+				, i.increseFindEnemyRate
+				, i.decreseFindEnemyRate
+				, i.durabilityPoint
+				, i.inventoryPoint
+				, i.dropRate
+				FROM equipment AS e
+				INNER JOIN itemCategory AS ic
+				ON e.usedItemCode = ic.itemCode
+				INNER JOIN item AS i
+				ON ic.itemCode = i.itemCode
+				WHERE e.playerId = #{playerId};
 			""")
-	public Equipment getEquipmentById(int playerId);
+	public List<Equipment> getEquipmentById(int playerId);
 }

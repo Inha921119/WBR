@@ -1,5 +1,7 @@
 package com.project.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -77,9 +79,9 @@ public class UsrPlayerController {
 		
 		Player player = playerService.getPlayerByMemberId(id);
 		
-		Equipment equipment = equipmentService.getEquipmentById(player.getId());
+		List<Equipment> equipments = equipmentService.getEquipmentById(player.getId());
 		
-		model.addAttribute(equipment);
+		model.addAttribute("equipments", equipments);
 		
 		return "usr/player/battle";
 	}

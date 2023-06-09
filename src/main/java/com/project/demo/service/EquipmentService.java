@@ -1,5 +1,7 @@
 package com.project.demo.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +22,8 @@ public class EquipmentService {
 		equipmentRepository.createEquipment(id);
 	}
 
-	public Equipment getEquipmentById(int playerId) {
+	public List<Equipment> getEquipmentById(int playerId) {
 		
-		Equipment equipment = equipmentRepository.getEquipmentById(playerId);
-		
-		return equipment;
+		return equipmentRepository.getEquipmentById(playerId);
 	}
 }

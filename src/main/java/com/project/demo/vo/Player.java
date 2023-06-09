@@ -16,10 +16,12 @@ public class Player {
 	private String image;
 	private int gender;
 	private int level;
+	private int exp;
+	private int maxExp;
 	private int hp;
-	private int maxhp;
+	private int maxHp;
 	private int sp;
-	private int maxsp;
+	private int maxSp;
 	private int attackPoint;
 	private int defencePoint;
 	private int hitRate;

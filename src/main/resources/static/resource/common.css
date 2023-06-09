@@ -139,7 +139,7 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	cursor: pointer;
 }
 
-.equip {
+.equip, .ownItem {
 	text-align: left;
 }
 
