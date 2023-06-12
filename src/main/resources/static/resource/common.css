@@ -143,7 +143,19 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	text-align: left;
 }
 
-
+.active-list {
+	width: 100%;
+}
+.active {
+	border: 2px solid white;
+	padding: 10px;
+	border-radius: 0.75rem;
+	width: 100%
+}
+.alert-section {
+	border: 2px solid white;
+	width: 100%
+}
 
 
 
