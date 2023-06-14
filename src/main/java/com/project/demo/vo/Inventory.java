@@ -14,4 +14,7 @@ public class Inventory {
 	private int playerId;
 	private int itemId;
 	private int quantity;
+	private String name;
+	private int recoveryHP;
+	private int recoverySP;
 }

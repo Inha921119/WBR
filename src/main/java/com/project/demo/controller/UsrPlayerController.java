@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.demo.service.EquipmentService;
+import com.project.demo.service.InventoryService;
 import com.project.demo.service.MemberService;
 import com.project.demo.service.PlayerService;
 import com.project.demo.util.Util;
 import com.project.demo.vo.Equipment;
+import com.project.demo.vo.Inventory;
 import com.project.demo.vo.Player;
-import com.project.demo.vo.Reply;
 import com.project.demo.vo.ResultData;
 import com.project.demo.vo.Rq;
 
@@ -24,13 +25,15 @@ public class UsrPlayerController {
 	private PlayerService playerService;
 	private MemberService memberService;
 	private EquipmentService equipmentService;
+	private InventoryService inventoryService;
 	private Rq rq;
 	
 	@Autowired
-	public UsrPlayerController(PlayerService playerService, MemberService memberService, EquipmentService equipmentService, Rq rq) {
+	public UsrPlayerController(PlayerService playerService, MemberService memberService, EquipmentService equipmentService, InventoryService inventoryService, Rq rq) {
 		this.playerService = playerService;
 		this.memberService = memberService;
 		this.equipmentService = equipmentService;
+		this.inventoryService = inventoryService;
 		this.rq = rq;
 	}
 
@@ -81,8 +84,10 @@ public class UsrPlayerController {
 		Player player = playerService.getPlayerByMemberId(id);
 		
 		List<Equipment> equipments = equipmentService.getEquipmentById(player.getId());
+		List<Inventory> inventory = inventoryService.getInventoryById(player.getId());
 		
 		model.addAttribute("equipments", equipments);
+		model.addAttribute("inventory", inventory);
 		
 		return "usr/player/battle";
 	}

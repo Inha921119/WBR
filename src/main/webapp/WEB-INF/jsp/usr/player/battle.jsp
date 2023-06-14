@@ -140,26 +140,32 @@
 									</li>
 								</ul>
 								<ul class="text-left p-1">
+									<c:forEach var="inventory" items="${inventory }">
 									<li>
 										<span>
-											약초
-											<b class="text-red-400">
-												(5)
-											</b>
-											<font class="num">
-												수량 10
+											${inventory.name }
+											<c:if test="${inventory.recoveryHP != 0}">
+												<b class="text-red-400 text-base">
+													(${inventory.recoveryHP })
+												</b>
+											</c:if>
+											<c:if test="${inventory.recoverySP != 0}">
+												<b class="text-yellow-400 text-base">
+													(${inventory.recoverySP })
+												</b>
+											</c:if>
+											<font class="text-sm font-bold mr-2" style="color: green;">
+												수량 : ${inventory.quantity }
 											</font>
 										</span>
 										<button class="mybtn">
-											사용
+											<span>사용</span>
 										</button>
 										<button class="mybtn">
-											버림
+											<span>버림</span>
 										</button>
 									</li>
-									<li>
-										<button>구급상자</button>
-									</li>
+									</c:forEach>
 								</ul>
 							</div>
 						</div>

@@ -2,26 +2,16 @@ package com.project.demo.repository;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import com.project.demo.vo.Equipment;
+import com.project.demo.vo.Inventory;
 
 @Mapper
-public interface EquipmentRepository {
+public interface InventoryRepository {
 	
-	
-	@Insert("""
-			INSERT INTO equipment
-				SET regDate = NOW(),
-					updateDate = NOW(),
-					playerId = #{id};
-			""")
-	public void createEquipment(int id);
-
 	@Select("""
-			SELECT e.*
+			SELECT iv.*
 				, ic.category
 				, i.name
 				, i.rarity
@@ -49,12 +39,13 @@ public interface EquipmentRepository {
 				, i.durabilityPoint
 				, i.inventoryPoint
 				, i.dropRate
-				FROM equipment AS e
-				INNER JOIN itemCategory AS ic
-				ON e.usedItemCode = ic.itemCode
+				FROM inventory AS iv
 				INNER JOIN item AS i
-				ON ic.itemCode = i.itemCode
-				WHERE e.playerId = #{playerId};
+				ON iv.itemId = i.itemCode
+				INNER JOIN itemCategory AS ic
+				ON i.itemCode = ic.itemCode
+				WHERE iv.playerId = #{playerId};
 			""")
-	public List<Equipment> getEquipmentById(int playerId);
+	List<Inventory> getInventoryById(int playerId);
+
 }

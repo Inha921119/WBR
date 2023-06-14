@@ -9,9 +9,11 @@ CREATE TABLE item(
 	useType INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '사용타입 ( 재료 = 0, 회복 = 1, 장비 = 2)',
 	useHand INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '사용타입 ( 기본 = 0, 한손 = 1, 양손 = 2)', 
 	useHP INT UNSIGNED NOT NULL DEFAULT 0,
+	recoveryHP INT NOT NULL DEFAULT 0,
 	increseHP INT UNSIGNED NOT NULL DEFAULT 0,
 	decreseHP INT UNSIGNED NOT NULL DEFAULT 0,
 	useSP INT UNSIGNED NOT NULL DEFAULT 0,
+	recoverySP INT NOT NULL DEFAULT 0,
 	increseSP INT UNSIGNED NOT NULL DEFAULT 0,
 	decreseSP INT UNSIGNED NOT NULL DEFAULT 0,
 	increseAttackPoint INT UNSIGNED NOT NULL DEFAULT 0,
@@ -50,9 +52,11 @@ UPDATE item
 		useType = 0,
 		useHand = 0,
 		useHP = 0,
+		recoveryHP = 0,
 		increseHP = 0,
 		decreseHP = 0,
 		useSP = 0,
+		recoverySP = 0,
 		increseSP = 0,
 		decreseSP = 0,
 		increseAttackPoint = 0,
@@ -147,9 +151,11 @@ SELECT e.*
 	, i.rarity
 	, i.useType
 	, i.useHP
+	, i.recoveryHP
 	, i.increseHP
 	, i.decreseHP
 	, i.useSP
+	, i.recoverySP
 	, i.increseSP
 	, i.decreseSP
 	, i.increseAttackPoint

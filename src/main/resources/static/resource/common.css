@@ -166,6 +166,8 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 .mybtn {
 	color: black;
 	font-size: 14px;
+	text-align: center;
+	height: 27px;
 	border: 2px solid gray;
 	border-radius: 0.75rem;
 	background-color: white;
@@ -175,10 +177,4 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 }
 .mybtn:hover {
 	background-color: gray;
-}
-
-.num {
-	font-size: 16px;
-	color: green;
-	font-weight: 700;
 }
