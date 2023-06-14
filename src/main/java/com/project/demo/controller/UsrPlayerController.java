@@ -95,24 +95,17 @@ public class UsrPlayerController {
 		return playerService.getLocationNameById(location);
 	}
 	
-	@RequestMapping("/usr/player/getNowLocation")
+	@RequestMapping("/usr/player/changeActionType")
 	@ResponseBody
-	public ResultData<Player> getNowLocation(int id) {
+	public String changeActionType(int memberId, int type) {
+		playerService.changeActionType(rq.getLoginedMemberId(), type);
 		
-		Player player = playerService.getPlayerByMemberId(id);
-		
-		if(player == null) {
-			return ResultData.from("F-1", "해당 플레이어는 존재하지 않습니다.");
-		}
-		
-		return ResultData.from("S-1", "플레이어 정보 조회 성공", "player", player);
+		return playerService.getActionTypeNameById(type);
 	}
 	
-	@RequestMapping("/usr/player/changeActiveEffect")
+	@RequestMapping("/usr/player/getNowActionType")
 	@ResponseBody
-	public String changeActiveEffect(int memberId, int effect) {
-		playerService.changeActiveEffect(rq.getLoginedMemberId(), effect);
-		
-		return playerService.getActionTypeNameById(effect);
+	public int getNowActionType(int memberId) {
+		return playerService.getNowActionType(rq.getLoginedMemberId());
 	}
 }

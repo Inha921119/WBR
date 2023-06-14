@@ -83,15 +83,22 @@ public interface PlayerRepository {
 	
 	@Update("""
 			UPDATE player
-				SET actionType = #{effect}
+				SET actionType = #{type}
 				WHERE memberId = #{loginedMemberId};
 			""")
-	public void changeActiveEffect(int loginedMemberId, int effect);
+	public void changeActionType(int loginedMemberId, int type);
 	
 	@Select("""
 			SELECT TypeName
 				FROM actionType
-				WHERE id = #{effect};
+				WHERE id = #{type};
 			""")
-	public String getActionTypeNameById(int effect);
+	public String getActionTypeNameById(int type);
+	
+	@Select("""
+			SELECT actionType
+				FROM player
+				WHERE memberId = #{loginedMemberId};
+			""")
+	public int getNowActionType(int loginedMemberId);
 }

@@ -22,17 +22,30 @@
 				});
 			 
 			}
-		function active_effect(memberId, ef) {
+		function action_type(memberId, ty) {
 			var memberId = memberId;
-			var effect = ef.value;
+			var type = ty.value;
 			
 			$.ajax({
-				url:"../player/changeActiveEffect?memberId="+memberId+"&effect="+effect,
+				url:"../player/getNowActionType?memberId="+memberId,
 				type:"get",
 				datatype:"text",
 				success : function(data) {
-					$("#notify").append("<p>행동유형을 " + data + "(으)로 변경했다.</p><p>이제 무엇을 하지?</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					if (data == type) {
+						$("#notify").append("<p>이미 적용중인 행동유형입니다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					} else {
+						$.ajax({
+							url:"../player/changeActionType?memberId="+memberId+"&type="+type,
+							type:"get",
+							datatype:"text",
+							success : function(data) {
+								$("#active-effect").text(data);
+								$("#notify").append("<p>행동유형을 " + data + "(으)로 변경했다.</p><p>이제 무엇을 하지?</p>");
+								$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+							}
+						});
+					}
 				}
 			});
 		}
@@ -43,14 +56,12 @@
 		<div class="container mx-auto text-center">
 			<div class="mb-20 text-2xl" id="nowLocation">현재 위치 : ${rq.player.lname }</div>
 				<div class="text-xl flex" style="height: 420px;">
-					<div style="border: 2px solid white; width: 45%; height: 100%;" >
+					<div style="border: 2px solid white; width: 45%; position:relative;" >
 						<div>
-							<ul style="border: 2px solid white; text-align: center; height: 10%;">
-								<li>
-									스테이터스
-								</li>
+							<ul style="border: 2px solid white; text-align: center;">
+								<li>스테이터스</li>
 							</ul>
-							<div class="flex" style="width: 100%; height: 80%;">
+							<div class="flex" style="width: 100%;">
 								<ul style="width: 50%;">
 									<li class="flex mb-2 mt-2" >
 										<div style="width: 40%">
@@ -108,13 +119,20 @@
 																</c:choose></li>
 								</ul>
 							</div>
-							<ul class="text-left" style="border-top: 1px solid white; height: 10%;">
-								<li class="ml-2">스킬</li>
-							</ul>
+							<div class="text-left absolute overflow-y-scroll" style="border-top: 1px solid white; width:100%; height: 18.5%;">
+								<ul class="ml-2">
+									<li class="flex">
+										<span>스킬</span>
+										<div class="ml-10" id="skill-list">
+											<span id="active-effect">기본</span>
+										</div>
+									</li>
+								</ul>
+							</div>
 						</div>
 					</div>
 					
-						<div class="ml-2" style="border: 2px solid white; width: 20%" >
+						<div class="ml-2" style="border: 2px solid white; width: 20%; position:relative;" >
 							<div>
 								<ul style="border: 2px solid white">
 									<li>
@@ -146,7 +164,7 @@
 							</div>
 						</div>
 					
-					<div class="ml-2" style="border: 2px solid white; width: 20%" >
+					<div class="ml-2" style="border: 2px solid white; width: 20%; position:relative;" >
 						<div>
 							<ul style="border: 2px solid white">
 									<li>
@@ -182,7 +200,7 @@
 						</div>
 					</div>
 					
-					<div class="ml-2" style="border: 2px solid white; width: 15%" >
+					<div class="ml-2" style="border: 2px solid white; width: 15%; position:relative;" >
 						<div>
 							<ul style="border: 2px solid white">
 								<li>
@@ -193,22 +211,22 @@
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-2">
 										<li class="mb-2">
-											<button class="active" value="1" onclick="active_effect(${rq.getLoginedMemberId() },this)">기본</button>
+											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="2" onclick="active_effect(${rq.getLoginedMemberId() },this)">선제공격</button>
+											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="3" onclick="active_effect(${rq.getLoginedMemberId() },this)">방어태세</button>
+											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="4" onclick="active_effect(${rq.getLoginedMemberId() },this)">주변탐색</button>
+											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="5" onclick="active_effect(${rq.getLoginedMemberId() },this)">사주경계</button>
+											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
 										</li>
 										<li>
-											<button class="active" value="6" onclick="active_effect(${rq.getLoginedMemberId() },this)">은밀기동</button>
+											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
 										</li>
 									</ul>
 								</li>

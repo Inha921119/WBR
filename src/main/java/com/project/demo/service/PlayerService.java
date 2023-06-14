@@ -45,11 +45,15 @@ private PlayerRepository playerRepository;
 		return playerRepository.getLocationNameById(location);
 	}
 
-	public void changeActiveEffect(int loginedMemberId, int effect) {
-		playerRepository.changeActiveEffect(loginedMemberId, effect);
+	public void changeActionType(int loginedMemberId, int type) {
+		playerRepository.changeActionType(loginedMemberId, type);
 	}
 
-	public String getActionTypeNameById(int effect) {
-		return playerRepository.getActionTypeNameById(effect);
+	public String getActionTypeNameById(int type) {
+		return playerRepository.getActionTypeNameById(type);
+	}
+
+	public int getNowActionType(int loginedMemberId) {
+		return playerRepository.getNowActionType(loginedMemberId);
 	}
 }
