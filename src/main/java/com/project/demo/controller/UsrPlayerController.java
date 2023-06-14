@@ -14,6 +14,7 @@ import com.project.demo.service.PlayerService;
 import com.project.demo.util.Util;
 import com.project.demo.vo.Equipment;
 import com.project.demo.vo.Player;
+import com.project.demo.vo.Reply;
 import com.project.demo.vo.ResultData;
 import com.project.demo.vo.Rq;
 
@@ -84,5 +85,26 @@ public class UsrPlayerController {
 		model.addAttribute("equipments", equipments);
 		
 		return "usr/player/battle";
+	}
+	
+	@RequestMapping("/usr/player/moveLocation")
+	@ResponseBody
+	public String moveLocation(int memberId, int location) {
+		playerService.moveLocation(rq.getLoginedMemberId(), location);
+		
+		return playerService.getLocationNameById(location);
+	}
+	
+	@RequestMapping("/usr/player/getNowLocation")
+	@ResponseBody
+	public ResultData<Player> getNowLocation(int id) {
+		
+		Player player = playerService.getPlayerByMemberId(id);
+		
+		if(player == null) {
+			return ResultData.from("F-1", "해당 플레이어는 존재하지 않습니다.");
+		}
+		
+		return ResultData.from("S-1", "플레이어 정보 조회 성공", "player", player);
 	}
 }

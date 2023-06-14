@@ -36,4 +36,12 @@ private PlayerRepository playerRepository;
 	public Player getPlayerByMemberId(int memberId) {
 		return playerRepository.getPlayerByMemberId(memberId);
 	}
+
+	public void moveLocation(int loginedMemberId, int location) {
+		playerRepository.moveLocation(loginedMemberId, location);
+	}
+
+	public String getLocationNameById(int location) {
+		return playerRepository.getLocationNameById(location);
+	}
 }

@@ -157,7 +157,22 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	width: 100%
 }
 
+.mybtn {
+	color: black;
+	font-size: 14px;
+	border: 2px solid gray;
+	border-radius: 0.75rem;
+	background-color: white;
+	padding-left: 5px;
+	padding-right: 5px;
+	font-weight: 700;
+}
 
+.num {
+	font-size: 16px;
+	color: green;
+	font-weight: 700;
 
+}
 
 

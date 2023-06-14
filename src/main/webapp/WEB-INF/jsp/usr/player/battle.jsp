@@ -3,9 +3,28 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp" %>
+
+	<script>
+		function locationMove(memberId, lo) {
+			var memberId = memberId;
+			var location = lo.value;
+			var locationName = "";
+
+			 $.ajax({
+				    url:"../player/moveLocation?memberId="+memberId+"&location="+location,
+				    type:"get",
+				    datatype:"text",
+			    	success : function(data) {
+			    		 $("#nowLocation").html("현재 위치 : " + data);
+			        }
+			  });
+			}	
+	</script>
+	
+	
 	<section class="mt-8 bg-black text-white h-screen">
 		<div class="container mx-auto text-center">
-			<div class="mb-20 text-2xl">현재 위치 : </div>
+			<div class="mb-20 text-2xl" id="nowLocation">현재 위치 : ${rq.player.lname }</div>
 				<div class="text-xl flex" style="height: 420px;">
 					<div style="border: 2px solid white; width: 45%; height: 100%;" >
 						<div>
@@ -78,37 +97,51 @@
 						</div>
 					</div>
 					
-					<div class="ml-2" style="border: 2px solid white; width: 20%" >
-						<div>
-							<ul style="border: 2px solid white">
-								<li>
-									아이템 목록
-								</li>
-							</ul>
-							<ul class="text-left p-1">
-								<li>
-									약초
-								</li>
-								<li>
-									구급상자
-								</li>
-							</ul>
+						<div class="ml-2" style="border: 2px solid white; width: 20%" >
+							<div>
+								<ul style="border: 2px solid white">
+									<li>
+										아이템 목록
+									</li>
+								</ul>
+								<ul class="text-left p-1">
+									<li>
+										<span>
+											약초
+											<b class="text-red-400">
+												(5)
+											</b>
+											<font class="num">
+												수량 10
+											</font>
+										</span>
+										<button class="mybtn">
+											사용
+										</button>
+										<button class="mybtn">
+											버림
+										</button>
+									</li>
+									<li>
+										<button>구급상자</button>
+									</li>
+								</ul>
+							</div>
 						</div>
-					</div>
 					
 					<div class="ml-2" style="border: 2px solid white; width: 20%" >
 						<div>
 							<ul style="border: 2px solid white">
-								<li>
-									위치 이동 : <select class="text-black" name="location" >
-													<option value="1">컨테이너 창고</option>
-													<option value="2">헬기착륙장</option>
-													<option value="3">폐병원</option>
-													<option value="4">폐공원</option>
-													<option value="5">유적지</option>
-													<option value="6">신전</option>
-												</select>
-								</li>
+									<li>
+										위치 이동 : <select class="text-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
+														<option value="1">컨테이너 창고</option>
+														<option value="2">헬기착륙장</option>
+														<option value="3">폐병원</option>
+														<option value="4">폐공원</option>
+														<option value="5">유적지</option>
+														<option value="6">신전</option>
+													</select>
+									</li>
 							</ul>
 							<ul>
 								<li class="flex justify-center">

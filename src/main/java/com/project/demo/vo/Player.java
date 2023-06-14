@@ -33,4 +33,5 @@ public class Player {
 	private int deathStatus;
 	private String deathDate;
 	private int actionType;
+	private String lname;
 }
