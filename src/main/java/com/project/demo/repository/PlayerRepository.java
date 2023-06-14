@@ -80,4 +80,18 @@ public interface PlayerRepository {
 				WHERE id = #{location};
 			""")
 	public String getLocationNameById(int location);
+	
+	@Update("""
+			UPDATE player
+				SET actionType = #{effect}
+				WHERE memberId = #{loginedMemberId};
+			""")
+	public void changeActiveEffect(int loginedMemberId, int effect);
+	
+	@Select("""
+			SELECT TypeName
+				FROM actionType
+				WHERE id = #{effect};
+			""")
+	public String getActionTypeNameById(int effect);
 }

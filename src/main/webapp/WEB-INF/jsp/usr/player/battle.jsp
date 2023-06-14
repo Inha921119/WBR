@@ -9,16 +9,33 @@
 			var memberId = memberId;
 			var location = lo.value;
 			var locationName = "";
-
-			 $.ajax({
-				    url:"../player/moveLocation?memberId="+memberId+"&location="+location,
-				    type:"get",
-				    datatype:"text",
-			    	success : function(data) {
-			    		 $("#nowLocation").html("현재 위치 : " + data);
-			        }
-			  });
-			}	
+	
+			$.ajax({
+					url:"../player/moveLocation?memberId="+memberId+"&location="+location,
+					type:"get",
+					datatype:"text",
+					success : function(data) {
+						$("#nowLocation").html("현재 위치 : " + data);
+						$("#notify").append("<p>" + data + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					}
+				});
+			 
+			}
+		function active_effect(memberId, ef) {
+			var memberId = memberId;
+			var effect = ef.value;
+			
+			$.ajax({
+				url:"../player/changeActiveEffect?memberId="+memberId+"&effect="+effect,
+				type:"get",
+				datatype:"text",
+				success : function(data) {
+					$("#notify").append("<p>행동유형을 " + data + "(으)로 변경했다.</p><p>이제 무엇을 하지?</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+				}
+			});
+		}
 	</script>
 	
 	
@@ -91,8 +108,8 @@
 																</c:choose></li>
 								</ul>
 							</div>
-							<ul class="text-left ml-2" style="border-top: 1px solid white; height: 10%;">
-								<li>스킬 </li>
+							<ul class="text-left" style="border-top: 1px solid white; height: 10%;">
+								<li class="ml-2">스킬</li>
 							</ul>
 						</div>
 					</div>
@@ -134,12 +151,12 @@
 							<ul style="border: 2px solid white">
 									<li>
 										위치 이동 : <select class="text-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
-														<option value="1">컨테이너 창고</option>
-														<option value="2">헬기착륙장</option>
-														<option value="3">폐병원</option>
-														<option value="4">폐공원</option>
-														<option value="5">유적지</option>
-														<option value="6">신전</option>
+														<option value="1" <c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너 창고</option>
+														<option value="2" <c:if test="${rq.player.lname eq '헬기착륙장'}">selected</c:if>>헬기착륙장</option>
+														<option value="3" <c:if test="${rq.player.lname eq '폐병원'}">selected</c:if>>폐병원</option>
+														<option value="4" <c:if test="${rq.player.lname eq '폐공원'}">selected</c:if>>폐공원</option>
+														<option value="5" <c:if test="${rq.player.lname eq '유적지'}">selected</c:if>>유적지</option>
+														<option value="6" <c:if test="${rq.player.lname eq '신전'}">selected</c:if>>신전</option>
 													</select>
 									</li>
 							</ul>
@@ -176,22 +193,22 @@
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-2">
 										<li class="mb-2">
-											<button class="active">기본</button>
+											<button class="active" value="1" onclick="active_effect(${rq.getLoginedMemberId() },this)">기본</button>
 										</li>
 										<li class="mb-2">
-											<button class="active">선제공격</button>
+											<button class="active" value="2" onclick="active_effect(${rq.getLoginedMemberId() },this)">선제공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active">방어태세</button>
+											<button class="active" value="3" onclick="active_effect(${rq.getLoginedMemberId() },this)">방어태세</button>
 										</li>
 										<li class="mb-2">
-											<button class="active">주변탐색</button>
+											<button class="active" value="4" onclick="active_effect(${rq.getLoginedMemberId() },this)">주변탐색</button>
 										</li>
 										<li class="mb-2">
-											<button class="active">사주경계</button>
+											<button class="active" value="5" onclick="active_effect(${rq.getLoginedMemberId() },this)">사주경계</button>
 										</li>
 										<li>
-											<button class="active">은밀기동</button>
+											<button class="active" value="6" onclick="active_effect(${rq.getLoginedMemberId() },this)">은밀기동</button>
 										</li>
 									</ul>
 								</li>
@@ -200,13 +217,10 @@
 					</div>
 				</div>
 				
-				<div class="alert-section mt-2">
-					<div>알림창</div>
-					<div style="border: 1px solid white"></div>
+				<div class="mt-2" style="border: 2px solid white; width: 100%;">알림창</div>
+				<div class="alert-section" id="alert-section">
 					<ul class="h-40">
-						<li class="text-left ml-2">
-							지금은 무엇을 하지?
-						</li>
+						<li class="text-left ml-2" id="notify"><p>지금은 무엇을 하지?</p></li>
 					</ul>
 				</div>
 		</div>

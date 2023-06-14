@@ -38,13 +38,13 @@ CREATE TABLE player(
 	defencePoint INT UNSIGNED NOT NULL DEFAULT 10,
 	hitRate INT UNSIGNED NOT NULL DEFAULT 30,
 	missRate INT UNSIGNED NOT NULL DEFAULT 0,
-	findEnemyRate INT UNSIGNED NOT NULL DEFAULT 20,
+	findEnemyRate INT NOT NULL DEFAULT 0,
 	findItemRate INT UNSIGNED NOT NULL DEFAULT 20,
 	inventoryPoint INT UNSIGNED NOT NULL DEFAULT 0,
 	killPoint INT UNSIGNED NOT NULL DEFAULT 0,
 	deathStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '사망여부 (사망 전 = 0, 사망 후 = 1)',
 	deathDate DATETIME COMMENT '사망 날짜',
-	actionType INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '행동유형 (기본행동 = 0, 탐색위주 = 1, 사주경계 = 2, 은밀행동 = 3)'
+	actionType INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '행동유형 (기본행동 = 1, 탐색위주 = 2, 사주경계 = 3, 은밀행동 = 4)'
 	nowLocation INT UNSIGNED NOT NULL DEFAULT 0,
 );
 

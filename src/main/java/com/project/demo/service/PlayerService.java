@@ -44,4 +44,12 @@ private PlayerRepository playerRepository;
 	public String getLocationNameById(int location) {
 		return playerRepository.getLocationNameById(location);
 	}
+
+	public void changeActiveEffect(int loginedMemberId, int effect) {
+		playerRepository.changeActiveEffect(loginedMemberId, effect);
+	}
+
+	public String getActionTypeNameById(int effect) {
+		return playerRepository.getActionTypeNameById(effect);
+	}
 }

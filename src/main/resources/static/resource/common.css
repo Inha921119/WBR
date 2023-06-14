@@ -152,9 +152,15 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	border-radius: 0.75rem;
 	width: 100%
 }
+.active:hover {
+	background-color: gray;
+}
 .alert-section {
-	border: 2px solid white;
-	width: 100%
+	border-left: 2px solid white;
+	border-right: 2px solid white;
+	border-bottom: 2px solid white;
+	width: 100%;
+	overflow-y: scroll;
 }
 
 .mybtn {
@@ -167,12 +173,12 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 	padding-right: 5px;
 	font-weight: 700;
 }
+.mybtn:hover {
+	background-color: gray;
+}
 
 .num {
 	font-size: 16px;
 	color: green;
 	font-weight: 700;
-
 }
-
-

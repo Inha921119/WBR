@@ -107,4 +107,12 @@ public class UsrPlayerController {
 		
 		return ResultData.from("S-1", "플레이어 정보 조회 성공", "player", player);
 	}
+	
+	@RequestMapping("/usr/player/changeActiveEffect")
+	@ResponseBody
+	public String changeActiveEffect(int memberId, int effect) {
+		playerService.changeActiveEffect(rq.getLoginedMemberId(), effect);
+		
+		return playerService.getActionTypeNameById(effect);
+	}
 }
