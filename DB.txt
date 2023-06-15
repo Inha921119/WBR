@@ -236,3 +236,108 @@ CREATE TABLE equipment(
 );
 
 DESC equipment
+
+# actionType 테이블 생성
+CREATE TABLE actionType(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	TypeName VARCHAR(20) NOT NULL
+);
+
+# location 데이터 추가
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '기본';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '선제공격';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '방어태세';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '주변탐색';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '사주경계';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '은밀기동';
+		
+SELECT * FROM actionType
+SELECT * FROM player
+
+# inventory 테이블 생성
+CREATE TABLE inventory(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	itemId INT UNSIGNED NOT NULL,
+	quantity INT UNSIGNED NOT NULL
+);
+
+# inventory 데이터 추가
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 1
+		, itemId = 1
+		, quantity = 5;
+
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 1
+		, itemId = 2
+		, quantity = 3;
+
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 1
+		, itemId = 51
+		, quantity = 6;
+						
+SELECT * FROM inventory
+SELECT * FROM item
+
+SELECT iv.*
+	, ic.category
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	FROM inventory AS iv
+	INNER JOIN item AS i
+	ON iv.itemId = i.itemCode
+	INNER JOIN itemCategory AS ic
+	ON i.itemCode = ic.itemCode
+	WHERE iv.playerId = 1;

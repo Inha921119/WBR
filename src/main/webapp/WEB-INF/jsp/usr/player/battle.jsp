@@ -3,8 +3,28 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp" %>
-
 	<script>
+		function searchAround() {
+			
+			$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+			$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+			
+			/* var memberId = memberId;
+			var location = lo.value;
+			var locationName = "";
+	
+			$.ajax({
+					url:"../player/moveLocation?memberId="+memberId+"&location="+location,
+					type:"get",
+					datatype:"text",
+					success : function(data) {
+						$("#nowLocation").html("현재 위치 : " + data);
+						$("#notify").append("<p>" + data + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					}
+				}); */
+			 
+			}
 		function locationMove(memberId, lo) {
 			var memberId = memberId;
 			var location = lo.value;
@@ -124,7 +144,16 @@
 									<li class="flex">
 										<span>스킬</span>
 										<div class="ml-10" id="skill-list">
-											<span id="active-effect">기본</span>
+											<span id="active-effect">
+												<c:choose>
+													<c:when test="${rq.player.actionType == '1'}">기본</c:when>
+													<c:when test="${rq.player.actionType == '2'}">선제공격</c:when>
+													<c:when test="${rq.player.actionType == '3'}">방어태세</c:when>
+													<c:when test="${rq.player.actionType == '4'}">주변탐색</c:when>
+													<c:when test="${rq.player.actionType == '5'}">사주경계</c:when>
+													<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
+												</c:choose>
+											</span>
 										</div>
 									</li>
 								</ul>
@@ -132,7 +161,7 @@
 						</div>
 					</div>
 					
-						<div class="ml-2" style="border: 2px solid white; width: 20%; position:relative;" >
+						<div class="ml-2" style="border: 2px solid white; width: 23%; position:relative;" >
 							<div>
 								<ul style="border: 2px solid white">
 									<li>
@@ -142,8 +171,32 @@
 								<ul class="text-left p-1">
 									<c:forEach var="inventory" items="${inventory }">
 									<li>
-										<span>
+										<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
+												<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
+												<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
+												<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
+												<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
 											${inventory.name }
+											<c:if test="${inventory.increseHP != 0}">
+												<b class="text-red-400 text-base">
+													(${inventory.increseHP })
+												</b>
+											</c:if>
+											<c:if test="${inventory.increseSP != 0}">
+												<b class="text-yellow-400 text-base">
+													(${inventory.increseSP })
+												</b>
+											</c:if>
+											<c:if test="${inventory.increseAttackPoint != 0}">
+												<b class="text-base" style="color: #ff0000">
+													(${inventory.increseAttackPoint })
+												</b>
+											</c:if>
+											<c:if test="${inventory.increseDefencePoint != 0}">
+												<b class="text-base" style="color: #0000ff">
+													(${inventory.increseDefencePoint })
+												</b>
+											</c:if>
 											<c:if test="${inventory.recoveryHP != 0}">
 												<b class="text-red-400 text-base">
 													(${inventory.recoveryHP })
@@ -154,13 +207,40 @@
 													(${inventory.recoverySP })
 												</b>
 											</c:if>
-											<font class="text-sm font-bold mr-2" style="color: green;">
-												수량 : ${inventory.quantity }
-											</font>
+											<c:if test="${inventory.category eq '사용' 
+														|| inventory.category eq '기타'}">
+												<font class="text-sm font-bold mr-2" style="color: green;">
+													수량 : ${inventory.quantity }
+												</font>
+											</c:if>
+											<c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+												<font class="text-sm font-bold mr-2" style="color: pink;">
+														내구도 : ${inventory.durabilityPoint }
+												</font>
+											</c:if>
 										</span>
-										<button class="mybtn">
-											<span>사용</span>
-										</button>
+										<c:if test="${inventory.category eq '사용' 
+														|| inventory.category eq '기타'}">
+											<button class="mybtn">
+												<span>사용</span>
+											</button>
+										</c:if>
+										<c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+											<button class="mybtn">
+												<span>장착</span>
+											</button>
+										</c:if>
+										
 										<button class="mybtn">
 											<span>버림</span>
 										</button>
@@ -170,7 +250,7 @@
 							</div>
 						</div>
 					
-					<div class="ml-2" style="border: 2px solid white; width: 20%; position:relative;" >
+					<div class="ml-2" style="border: 2px solid white; width: 17%; position:relative;" >
 						<div>
 							<ul style="border: 2px solid white">
 									<li>
@@ -188,7 +268,7 @@
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-10">
 										<li class="mb-2">
-											<button class="active">탐색</button>
+											<button class="active" onclick="searchAround()">탐색</button>
 										</li>
 										<li class="mb-2">
 											<button class="active">조합법 연구</button>
@@ -250,3 +330,50 @@
 		</div>
 	</section>
 <%@ include file="../common/foot.jsp" %>
+
+<%-- 연구중
+onmouseover="pop('<font>${inventory.name }</font>
+												<br>종류 <font color=dcdcdc>${inventory.category}</font>
+												<br><c:if test="${inventory.category eq '사용'}">
+														<c:if test="${inventory.recoveryHP != 0}">
+															체력회복 <font color=dcdcdc>${inventory.recoveryHP} </font>
+														</c:if>
+														<c:if test="${inventory.recoverySP != 0}">
+															스테미나회복 <font color=dcdcdc>${inventory.recoverySP} </font>
+														</c:if>
+													</c:if>
+												<br><c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+														공격력 <font color=dcdcdc>${inventory.increseAttackPoint} </font>
+													</c:if>
+												<br><c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+														방어력 <font color=dcdcdc>${inventory.increseDefencePoint} </font>
+													</c:if>
+												<br><c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+														적중률 <font color=dcdcdc>${inventory.increseHitRate} </font>
+													</c:if>
+												<br><c:if test="${inventory.category eq '무기' 
+														|| inventory.category eq '머리'
+														|| inventory.category eq '상의'
+														|| inventory.category eq '하의'
+														|| inventory.category eq '팔'
+														|| inventory.category eq '신발'}">
+														회피율 <font color=dcdcdc>${inventory.increseMissRate} </font>
+													</c:if>
+													','black','20','')" 
+												onmouseout="kill()"  --%>
+												

@@ -38,5 +38,3 @@ $('.popUp-exam').click(function(){
 	let openUrl = '/usr/home/popUp';
 	window.open(openUrl, 'pop', popOption);
 })
-
-
