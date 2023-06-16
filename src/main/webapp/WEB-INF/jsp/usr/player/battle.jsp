@@ -108,35 +108,51 @@
 									<li>적중률 : ${rq.player.hitRate } %</li>
 									<li>회피율 : ${rq.player.missRate } %</li>
 								</ul>
-								<ul style="width: 40%;">
-									<li class="equip" style="width: 50%">[왼손] : <c:choose>
-																					<c:when test="${equipments[0].usedItemCode != 999}">${equipments[0].name }</c:when>
-																					<c:otherwise>없음</c:otherwise>
-																				</c:choose></li>
-									<li class="equip">[오른손] : <c:choose>
-																	<c:when test="${equipments[1].usedItemCode != 999}">${equipments[1].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
-									<li class="equip">[머리] : <c:choose>
-																	<c:when test="${equipments[2].usedItemCode != 999}">${equipments[2].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
-									<li class="equip">[상의] : <c:choose>
-																	<c:when test="${equipments[3].usedItemCode != 999}">${equipments[3].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
-									<li class="equip">[하의] : <c:choose>
-																	<c:when test="${equipments[4].usedItemCode != 999}">${equipments[4].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
-									<li class="equip">[팔] : <c:choose>
-																	<c:when test="${equipments[5].usedItemCode != 999}">${equipments[5].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
-									<li class="equip">[신발] : <c:choose>
-																	<c:when test="${equipments[6].usedItemCode != 999}">${equipments[6].name }</c:when>
-																	<c:otherwise>없음</c:otherwise>
-																</c:choose></li>
+								<ul style="width: 50%;">
+									<c:forEach var="equipment" items="${equipments }">
+										<li class="equip" style="width: 100%">[${equipment.category }] : <c:choose>
+																						<c:when test="${equipment.usedItemCode != 999}">
+																							<span <c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
+																									<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
+																									<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
+																									<c:if test="${equipment.rarity == '4' }">style='color: #fc008f;'</c:if>
+																									<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>>
+																								${equipment.name }
+																								<c:if test="${equipment.increseHP != 0}">
+																									<b class="text-red-400 text-base">
+																										(${equipment.increseHP })
+																									</b>
+																								</c:if>
+																								<c:if test="${equipment.increseSP != 0}">
+																									<b class="text-yellow-400 text-base">
+																										(${equipment.increseSP })
+																									</b>
+																								</c:if>
+																								<c:if test="${equipment.increseAttackPoint != 0}">
+																									<b class="text-base" style="color: #ff0000">
+																										(${equipment.increseAttackPoint })
+																									</b>
+																								</c:if>
+																								<c:if test="${equipment.increseDefencePoint != 0}">
+																									<b class="text-base" style="color: #0000ff">
+																										(${equipment.increseDefencePoint })
+																									</b>
+																								</c:if>
+																								<c:if test="${equipment.category eq '무기' 
+																											|| equipment.category eq '머리'
+																											|| equipment.category eq '상의'
+																											|| equipment.category eq '하의'
+																											|| equipment.category eq '팔'
+																											|| equipment.category eq '신발'}">
+																									<font class="text-sm font-bold mr-2" style="color: pink;">
+																											내구도 : ${equipment.durabilityPoint }
+																									</font>
+																								</c:if>
+																							</span>
+																						</c:when>
+																						<c:otherwise>없음</c:otherwise>
+																					</c:choose></li>
+																				</c:forEach>
 								</ul>
 							</div>
 							<div class="text-left absolute overflow-y-scroll" style="border-top: 1px solid white; width:100%; height: 18.5%;">

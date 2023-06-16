@@ -13,9 +13,15 @@ public class Equipment {
 	private String updateDate;
 	private int playerId;
 	private int usedItemCode;
+	private int rarity;
 	private int usedItemDP;
 	private String name;
 	private String category;
 	private int increseHP;
 	private int decreseHP;
+	private int increseSP;
+	private int decreseSP;
+	private int increseAttackPoint;
+	private int increseDefencePoint;
+	private int durabilityPoint;
 }
