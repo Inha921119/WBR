@@ -56,4 +56,8 @@ private PlayerRepository playerRepository;
 	public int getNowActionType(int loginedMemberId) {
 		return playerRepository.getNowActionType(loginedMemberId);
 	}
+
+	public void doChangeStatus(int memberId, String statName, int num, int oe) {
+		playerRepository.doChangeStatus(memberId, statName, num, oe);
+	}
 }

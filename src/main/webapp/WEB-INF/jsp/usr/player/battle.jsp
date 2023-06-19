@@ -8,21 +8,6 @@
 			
 			$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
 			$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-			
-			/* var memberId = memberId;
-			var location = lo.value;
-			var locationName = "";
-	
-			$.ajax({
-					url:"../player/moveLocation?memberId="+memberId+"&location="+location,
-					type:"get",
-					datatype:"text",
-					success : function(data) {
-						$("#nowLocation").html("현재 위치 : " + data);
-						$("#notify").append("<p>" + data + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					}
-				}); */
 			 
 			}
 		function locationMove(memberId, lo) {
@@ -69,6 +54,23 @@
 				}
 			});
 		}
+		function show_NewStatus(memberId) {
+			var memberId = memberId;
+			
+			$.ajax({
+				url:"../player/showStatus?memberId="+memberId,
+				type:"get",
+				datatype:"text",
+				success : function(data) {
+					$("#hp").text("체력 : " + data.hp + " / " + data.maxHp);
+					$("#sp").text("스테미나 : " + data.sp + " / " + data.maxSp);
+					$("#attack").text("공격력 : " + data.attackPoint + "(" + data.increseAttackPoint + ")");
+					$("#defence").text("방어력 : " + data.defencePoint + "(" + data.increseDefencePoint + ")");
+					$("#hit").text("적중률 : " + data.hitRate + "(" + data.increseHitRate + ")");
+					$("#miss").text("회피율 : " + data.missRate + "(" + data.increseMissRate + ")");
+				}
+			});
+		}
 	</script>
 	
 	
@@ -95,18 +97,12 @@
 											<ul><li class="text-green-500">경험치 : ${rq.player.exp } / ${rq.player.maxExp }</li></ul>
 										</div>
 									</li>
-									<c:set var ="sumIncreseHP" value = "0" />
-									<c:set var ="sumDecreseHP" value = "0" />
-									<c:forEach var="equipment" items="${equipments }" varStatus="status">     
-										<c:set var="sumIncreseHP" value="${sumIncreseHP + equipment.increseHP}"/>
-										<c:set var="sumDecreseHP" value="${sumDecreseHP + equipment.decreseHP}"/>
-									</c:forEach>
-									<li class="text-red-400">체력 : ${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</li>
-									<li class="text-yellow-400">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
-									<li>공격력 : ${rq.player.attackPoint }</li>
-									<li>방어력 : ${rq.player.defencePoint }</li>
-									<li>적중률 : ${rq.player.hitRate } %</li>
-									<li>회피율 : ${rq.player.missRate } %</li>
+									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</li>
+									<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
+									<li id="attack">공격력 : ${rq.player.attackPoint }</li>
+									<li id="defence">방어력 : ${rq.player.defencePoint }</li>
+									<li id="hit">적중률 : ${rq.player.hitRate } %</li>
+									<li id="miss">회피율 : ${rq.player.missRate } %</li>
 								</ul>
 								<ul style="width: 50%;">
 									<c:forEach var="equipment" items="${equipments }">
@@ -313,22 +309,22 @@
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-2">
 										<li class="mb-2">
-											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
+											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">기본</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
+											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">선제공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
+											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">방어태세</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
+											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">주변탐색</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
+											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">사주경계</button>
 										</li>
 										<li>
-											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
+											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">은밀기동</button>
 										</li>
 									</ul>
 								</li>

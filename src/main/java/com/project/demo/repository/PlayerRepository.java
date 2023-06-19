@@ -48,9 +48,13 @@ public interface PlayerRepository {
 				, p.sp
 				, p.maxSp
 				, p.attackPoint
+				, p.increseAttackPoint
 				, p.defencePoint
+				, p.increseDefencePoint
 				, p.hitRate
+				, p.increseHitRate
 				, p.missRate
+				, p.increseMissRate
 				, p.findEnemyRate
 				, p.findItemRate
 				, p.inventoryPoint
@@ -101,4 +105,136 @@ public interface PlayerRepository {
 				WHERE memberId = #{loginedMemberId};
 			""")
 	public int getNowActionType(int loginedMemberId);
+
+	@Update("""
+			<script>
+			UPDATE player
+				<set>
+					<if test="oe == 0">
+						<choose>
+							<when test="statName == 'level'">
+								level = level + #{num}
+							</when>
+							<when test="statName == 'exp'">
+								exp = exp + #{num}
+							</when>
+							<when test="statName == 'maxExp'">
+								maxExp = maxExp + #{num}
+							</when>
+							<when test="statName == 'hp'">
+								hp = hp + #{num}
+							</when>
+							<when test="statName == 'maxHp'">
+								maxHp = maxHp + #{num}
+							</when>
+							<when test="statName == 'sp'">
+								sp = sp + #{num}
+							</when>
+							<when test="statName == 'maxSp'">
+								maxSp = maxSp + #{num}
+							</when>
+							<when test="statName == 'attackPoint'">
+								attackPoint = attackPoint + #{num}
+							</when>
+							<when test="statName == 'increseAttackPoint'">
+								increseAttackPoint = increseAttackPoint + #{num}
+							</when>
+							<when test="statName == 'defencePoint'">
+								defencePoint = defencePoint + #{num}
+							</when>
+							<when test="statName == 'increseDefencePoint'">
+								increseDefencePoint = increseDefencePoint + #{num}
+							</when>
+							<when test="statName == 'hitRate'">
+								hitRate = hitRate + #{num}
+							</when>
+							<when test="statName == 'increseHitRate'">
+								increseHitRate = increseHitRate + #{num}
+							</when>
+							<when test="statName == 'missRate'">
+								missRate = missRate + #{num}
+							</when>
+							<when test="statName == 'increseMissRate'">
+								increseMissRate = increseMissRate + #{num}
+							</when>
+							<when test="statName == 'findEnemyRate'">
+								findEnemyRate = findEnemyRate + #{num}
+							</when>
+							<when test="statName == 'findItemRate'">
+								findItemRate = findItemRate + #{num}
+							</when>
+							<when test="statName == 'inventoryPoint'">
+								inventoryPoint = inventoryPoint + #{num}
+							</when>
+							<when test="statName == 'killPoint'">
+								killPoint = killPoint + #{num}
+							</when>
+						</choose>
+					</if>
+					<if test="oe == 1">
+						<choose>
+							<when test="statName == 'level'">
+								level = level - #{num}
+							</when>
+							<when test="statName == 'exp'">
+								exp = exp - #{num}
+							</when>
+							<when test="statName == 'maxExp'">
+								maxExp = maxExp - #{num}
+							</when>
+							<when test="statName == 'hp'">
+								hp = hp - #{num}
+							</when>
+							<when test="statName == 'maxHp'">
+								maxHp = maxHp - #{num}
+							</when>
+							<when test="statName == 'sp'">
+								sp = sp - #{num}
+							</when>
+							<when test="statName == 'maxSp'">
+								maxSp = maxSp - #{num}
+							</when>
+							<when test="statName == 'attackPoint'">
+								attackPoint = attackPoint - #{num}
+							</when>
+							<when test="statName == 'increseAttackPoint'">
+								increseAttackPoint = increseAttackPoint - #{num}
+							</when>
+							<when test="statName == 'defencePoint'">
+								defencePoint = defencePoint - #{num}
+							</when>
+							<when test="statName == 'increseDefencePoint'">
+								increseDefencePoint = increseDefencePoint - #{num}
+							</when>
+							<when test="statName == 'hitRate'">
+								hitRate = hitRate - #{num}
+							</when>
+							<when test="statName == 'increseHitRate'">
+								increseHitRate = increseHitRate - #{num}
+							</when>
+							<when test="statName == 'missRate'">
+								missRate = missRate - #{num}
+							</when>
+							<when test="statName == 'increseMissRate'">
+								increseMissRate = increseMissRate - #{num}
+							</when>
+							<when test="statName == 'findEnemyRate'">
+								findEnemyRate = findEnemyRate - #{num}
+							</when>
+							<when test="statName == 'findItemRate'">
+								findItemRate = findItemRate - #{num}
+							</when>
+							<when test="statName == 'inventoryPoint'">
+								inventoryPoint = inventoryPoint - #{num}
+							</when>
+							<when test="statName == 'killPoint'">
+								killPoint = killPoint - #{num}
+							</when>
+						</choose>
+					</if>
+				</set>
+				WHERE memberId = #{memberId};
+			</script>
+			""")
+	public void doChangeStatus(int memberId, String statName, int num, int oe);
 }

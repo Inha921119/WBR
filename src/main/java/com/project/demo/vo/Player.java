@@ -23,9 +23,13 @@ public class Player {
 	private int sp;
 	private int maxSp;
 	private int attackPoint;
+	private int increseAttackPoint;
 	private int defencePoint;
+	private int increseDefencePoint;
 	private int hitRate;
+	private int increseHitRate;
 	private int missRate;
+	private int increseMissRate;
 	private int findEnemyRate;
 	private int findItemRate;
 	private int inventoryPoint;

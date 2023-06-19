@@ -95,15 +95,83 @@ public class UsrPlayerController {
 	@RequestMapping("/usr/player/moveLocation")
 	@ResponseBody
 	public String moveLocation(int memberId, int location) {
-		playerService.moveLocation(rq.getLoginedMemberId(), location);
+		playerService.moveLocation(memberId, location);
 		
 		return playerService.getLocationNameById(location);
+	}
+	
+	@RequestMapping("/usr/player/showStatus")
+	@ResponseBody
+	public Player showStatus(int memberId) {
+		return playerService.getPlayerByMemberId(memberId);
 	}
 	
 	@RequestMapping("/usr/player/changeActionType")
 	@ResponseBody
 	public String changeActionType(int memberId, int type) {
-		playerService.changeActionType(rq.getLoginedMemberId(), type);
+		int nowActionType = playerService.getNowActionType(memberId);
+		
+		if (nowActionType != type) {
+			switch (nowActionType) {
+			case 1:
+				break;
+			case 2:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 5, 1);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 0);
+				playerService.doChangeStatus(memberId, "increseHitRate", 10, 1);
+				playerService.doChangeStatus(memberId, "increseMissRate", 5, 0);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 10, 1);
+				break;
+			case 3:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 3, 0);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 1);
+				break;
+			case 4:
+				playerService.doChangeStatus(memberId, "findEnemyRate", 20, 1);
+				playerService.doChangeStatus(memberId, "findItemRate", 20, 1);
+				break;
+			case 5:
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 1);
+				playerService.doChangeStatus(memberId, "increseMissRate", 10, 1);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 10, 1);
+				break;
+			case 6:
+				playerService.doChangeStatus(memberId, "increseMissRate", 20, 1);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 30, 1);
+				break;
+			}
+			switch (type) {
+			case 1:
+				break;
+			case 2:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 5, 0);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 1);
+				playerService.doChangeStatus(memberId, "increseHitRate", 10, 0);
+				playerService.doChangeStatus(memberId, "increseMissRate", 5, 1);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 10, 0);
+				break;
+			case 3:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 3, 1);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 0);
+				break;
+			case 4:
+				playerService.doChangeStatus(memberId, "findEnemyRate", 20, 0);
+				playerService.doChangeStatus(memberId, "findItemRate", 20, 0);
+				break;
+			case 5:
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 5, 0);
+				playerService.doChangeStatus(memberId, "increseMissRate", 10, 0);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 10, 0);
+				break;
+			case 6:
+				playerService.doChangeStatus(memberId, "increseMissRate", 20, 0);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 30, 0);
+				break;
+			}
+			
+
+			playerService.changeActionType(memberId, type);
+		}
 		
 		return playerService.getActionTypeNameById(type);
 	}
@@ -111,6 +179,6 @@ public class UsrPlayerController {
 	@RequestMapping("/usr/player/getNowActionType")
 	@ResponseBody
 	public int getNowActionType(int memberId) {
-		return playerService.getNowActionType(rq.getLoginedMemberId());
+		return playerService.getNowActionType(memberId);
 	}
 }
