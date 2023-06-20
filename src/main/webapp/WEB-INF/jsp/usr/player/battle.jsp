@@ -35,6 +35,7 @@
 				url:"../player/getNowActionType?memberId="+memberId,
 				type:"get",
 				datatype:"text",
+				async: false,
 				success : function(data) {
 					if (data == type) {
 						$("#notify").append("<p>이미 적용중인 행동유형입니다.</p><p>이제 무엇을 하지?</p>");
@@ -44,6 +45,7 @@
 							url:"../player/changeActionType?memberId="+memberId+"&type="+type,
 							type:"get",
 							datatype:"text",
+							async: false,
 							success : function(data) {
 								$("#active-effect").text(data);
 								$("#notify").append("<p>행동유형을 " + data + "(으)로 변경했다.</p><p>이제 무엇을 하지?</p>");
@@ -53,7 +55,9 @@
 					}
 				}
 			});
+			show_NewStatus(memberId);
 		}
+		
 		function show_NewStatus(memberId) {
 			var memberId = memberId;
 			
@@ -61,13 +65,58 @@
 				url:"../player/showStatus?memberId="+memberId,
 				type:"get",
 				datatype:"text",
+				async: false,
 				success : function(data) {
 					$("#hp").text("체력 : " + data.hp + " / " + data.maxHp);
 					$("#sp").text("스테미나 : " + data.sp + " / " + data.maxSp);
-					$("#attack").text("공격력 : " + data.attackPoint + "(" + data.increseAttackPoint + ")");
-					$("#defence").text("방어력 : " + data.defencePoint + "(" + data.increseDefencePoint + ")");
-					$("#hit").text("적중률 : " + data.hitRate + "(" + data.increseHitRate + ")");
-					$("#miss").text("회피율 : " + data.missRate + "(" + data.increseMissRate + ")");
+					$("#attack").text("공격력 : " + data.attackPoint + "  (" + data.increseAttackPoint + ")");
+					$("#defence").text("방어력 : " + data.defencePoint + "  (" + data.increseDefencePoint + ")");
+					$("#hit").text("적중 : " + data.hitRate + "  (" + data.increseHitRate + ")");
+					$("#miss").text("회피 : " + data.missRate + "  (" + data.increseMissRate + ")");
+				}
+			});
+		}
+		
+		function useItem(playerId, itemId, scount) {
+			var playerId = playerId;
+			var itemId = itemId;
+			var scount = scount;
+			
+			$.ajax({
+				url:"../player/useItem?playerId="+playerId+"&itemId="+itemId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					$("#quan-" + scount).text("수량 : " + data.quantity);
+					if (data.itemId <= 50) {
+						$("#notify").append("<p>" + data.name + "을(를) 사용하여 체력이 " + data.recoveryHP + " 회복되었다</p>");
+					}else if (data.itemId > 50) {
+						$("#notify").append("<p>" + data.name + "을(를) 사용하여 스테미나가 " + data.recoverySP + " 회복되었다</p>");
+					}
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+				}
+			});
+		}
+		
+		function equipItem(playerId, itemId, scount) {
+			var playerId = playerId;
+			var itemId = itemId;
+			var scount = scount;
+			
+			$.ajax({
+				url:"../player/equipItem?playerId="+playerId+"&itemId="+itemId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					$("#quan-" + scount).text("수량 : " + data.quantity);
+					if (data.itemId <= 50) {
+						$("#notify").append("<p>" + data.name + "을(를) 사용하여 체력이 " + data.recoveryHP + " 회복되었다</p>");
+					}else if (data.itemId > 50) {
+						$("#notify").append("<p>" + data.name + "을(를) 사용하여 스테미나가 " + data.recoverySP + " 회복되었다</p>");
+					}
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 				}
 			});
 		}
@@ -99,10 +148,10 @@
 									</li>
 									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</li>
 									<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
-									<li id="attack">공격력 : ${rq.player.attackPoint }</li>
-									<li id="defence">방어력 : ${rq.player.defencePoint }</li>
-									<li id="hit">적중률 : ${rq.player.hitRate } %</li>
-									<li id="miss">회피율 : ${rq.player.missRate } %</li>
+									<li id="attack">공격력 : ${rq.player.attackPoint }  (${rq.player.increseAttackPoint })</li>
+									<li id="defence">방어력 : ${rq.player.defencePoint }  (${rq.player.increseDefencePoint })</li>
+									<li id="hit">적중 : ${rq.player.hitRate }  (${rq.player.increseHitRate })</li>
+									<li id="miss">회피 : ${rq.player.missRate }  (${rq.player.increseMissRate })</li>
 								</ul>
 								<ul style="width: 50%;">
 									<c:forEach var="equipment" items="${equipments }">
@@ -181,81 +230,83 @@
 									</li>
 								</ul>
 								<ul class="text-left p-1">
-									<c:forEach var="inventory" items="${inventory }">
+									<c:forEach var="inventory" items="${inventory }" varStatus="status">
 									<li>
-										<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
-												<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
-												<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
-												<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
-												<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
-											${inventory.name }
-											<c:if test="${inventory.increseHP != 0}">
-												<b class="text-red-400 text-base">
-													(${inventory.increseHP })
-												</b>
-											</c:if>
-											<c:if test="${inventory.increseSP != 0}">
-												<b class="text-yellow-400 text-base">
-													(${inventory.increseSP })
-												</b>
-											</c:if>
-											<c:if test="${inventory.increseAttackPoint != 0}">
-												<b class="text-base" style="color: #ff0000">
-													(${inventory.increseAttackPoint })
-												</b>
-											</c:if>
-											<c:if test="${inventory.increseDefencePoint != 0}">
-												<b class="text-base" style="color: #0000ff">
-													(${inventory.increseDefencePoint })
-												</b>
-											</c:if>
-											<c:if test="${inventory.recoveryHP != 0}">
-												<b class="text-red-400 text-base">
-													(${inventory.recoveryHP })
-												</b>
-											</c:if>
-											<c:if test="${inventory.recoverySP != 0}">
-												<b class="text-yellow-400 text-base">
-													(${inventory.recoverySP })
-												</b>
-											</c:if>
+										<c:if test="${inventory.quantity != 0 }">
+											<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
+													<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
+													<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
+													<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
+													<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
+												${inventory.name }
+												<c:if test="${inventory.increseHP != 0}">
+													<b class="text-red-400 text-base">
+														(${inventory.increseHP })
+													</b>
+												</c:if>
+												<c:if test="${inventory.increseSP != 0}">
+													<b class="text-yellow-400 text-base">
+														(${inventory.increseSP })
+													</b>
+												</c:if>
+												<c:if test="${inventory.increseAttackPoint != 0}">
+													<b class="text-base" style="color: #ff0000">
+														(${inventory.increseAttackPoint })
+													</b>
+												</c:if>
+												<c:if test="${inventory.increseDefencePoint != 0}">
+													<b class="text-base" style="color: #0000ff">
+														(${inventory.increseDefencePoint })
+													</b>
+												</c:if>
+												<c:if test="${inventory.recoveryHP != 0}">
+													<b class="text-red-400 text-base">
+														(${inventory.recoveryHP })
+													</b>
+												</c:if>
+												<c:if test="${inventory.recoverySP != 0}">
+													<b class="text-yellow-400 text-base">
+														(${inventory.recoverySP })
+													</b>
+												</c:if>
+												<c:if test="${inventory.category eq '사용' 
+															|| inventory.category eq '기타'}">
+													<font class="text-sm font-bold mr-2" style="color: green;" id="quan-${status.count }">
+														수량 : ${inventory.quantity }
+													</font>
+												</c:if>
+												<c:if test="${inventory.category eq '무기' 
+															|| inventory.category eq '머리'
+															|| inventory.category eq '상의'
+															|| inventory.category eq '하의'
+															|| inventory.category eq '팔'
+															|| inventory.category eq '신발'}">
+													<font class="text-sm font-bold mr-2" style="color: pink;">
+															내구도 : ${inventory.durabilityPoint }
+													</font>
+												</c:if>
+											</span>
 											<c:if test="${inventory.category eq '사용' 
-														|| inventory.category eq '기타'}">
-												<font class="text-sm font-bold mr-2" style="color: green;">
-													수량 : ${inventory.quantity }
-												</font>
+															|| inventory.category eq '기타'}">
+												<button class="mybtn" onclick="useItem(${rq.player.id}, ${inventory.itemId }, ${status.count })">
+													<span>사용</span>
+												</button>
 											</c:if>
 											<c:if test="${inventory.category eq '무기' 
-														|| inventory.category eq '머리'
-														|| inventory.category eq '상의'
-														|| inventory.category eq '하의'
-														|| inventory.category eq '팔'
-														|| inventory.category eq '신발'}">
-												<font class="text-sm font-bold mr-2" style="color: pink;">
-														내구도 : ${inventory.durabilityPoint }
-												</font>
+															|| inventory.category eq '머리'
+															|| inventory.category eq '상의'
+															|| inventory.category eq '하의'
+															|| inventory.category eq '팔'
+															|| inventory.category eq '신발'}">
+												<button class="mybtn">
+													<span>장착</span>
+												</button>
 											</c:if>
-										</span>
-										<c:if test="${inventory.category eq '사용' 
-														|| inventory.category eq '기타'}">
+											
 											<button class="mybtn">
-												<span>사용</span>
+												<span>버림</span>
 											</button>
 										</c:if>
-										<c:if test="${inventory.category eq '무기' 
-														|| inventory.category eq '머리'
-														|| inventory.category eq '상의'
-														|| inventory.category eq '하의'
-														|| inventory.category eq '팔'
-														|| inventory.category eq '신발'}">
-											<button class="mybtn">
-												<span>장착</span>
-											</button>
-										</c:if>
-										
-										<button class="mybtn">
-											<span>버림</span>
-										</button>
 									</li>
 									</c:forEach>
 								</ul>
@@ -309,22 +360,22 @@
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-2">
 										<li class="mb-2">
-											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">기본</button>
+											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">선제공격</button>
+											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">방어태세</button>
+											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">주변탐색</button>
+											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">사주경계</button>
+											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
 										</li>
 										<li>
-											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this); show_NewStatus(${rq.getLoginedMemberId() })">은밀기동</button>
+											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
 										</li>
 									</ul>
 								</li>

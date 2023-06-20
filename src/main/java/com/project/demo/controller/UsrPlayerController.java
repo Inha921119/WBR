@@ -114,6 +114,12 @@ public class UsrPlayerController {
 		if (nowActionType != type) {
 			switch (nowActionType) {
 			case 1:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 0, 0);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 0, 0);
+				playerService.doChangeStatus(memberId, "increseHitRate", 0, 0);
+				playerService.doChangeStatus(memberId, "increseMissRate", 0, 0);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 0, 0);
+				playerService.doChangeStatus(memberId, "findItemRate", 0, 0);
 				break;
 			case 2:
 				playerService.doChangeStatus(memberId, "increseAttackPoint", 5, 1);
@@ -142,6 +148,12 @@ public class UsrPlayerController {
 			}
 			switch (type) {
 			case 1:
+				playerService.doChangeStatus(memberId, "increseAttackPoint", 0, 0);
+				playerService.doChangeStatus(memberId, "increseDefencePoint", 0, 0);
+				playerService.doChangeStatus(memberId, "increseHitRate", 0, 0);
+				playerService.doChangeStatus(memberId, "increseMissRate", 0, 0);
+				playerService.doChangeStatus(memberId, "findEnemyRate", 0, 0);
+				playerService.doChangeStatus(memberId, "findItemRate", 0, 0);
 				break;
 			case 2:
 				playerService.doChangeStatus(memberId, "increseAttackPoint", 5, 0);
@@ -168,8 +180,6 @@ public class UsrPlayerController {
 				playerService.doChangeStatus(memberId, "findEnemyRate", 30, 0);
 				break;
 			}
-			
-
 			playerService.changeActionType(memberId, type);
 		}
 		
@@ -180,5 +190,13 @@ public class UsrPlayerController {
 	@ResponseBody
 	public int getNowActionType(int memberId) {
 		return playerService.getNowActionType(memberId);
+	}
+	@RequestMapping("/usr/player/useItem")
+	@ResponseBody
+	public Inventory useItem(int playerId, int itemId) {
+		
+		inventoryService.useItem(playerId, itemId);
+		
+		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
 }

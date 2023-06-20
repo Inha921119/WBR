@@ -21,4 +21,12 @@ public class InventoryService {
 	public List<Inventory> getInventoryById(int playerId) {
 		return inventoryRepository.getInventoryById(playerId);
 	}
+
+	public Inventory getInventoryItemByItemId(int playerId, int itemId) {
+		return inventoryRepository.getInventoryItemByItemId(playerId, itemId);
+	}
+
+	public void useItem(int playerId, int itemId) {
+		inventoryRepository.useItem(playerId, itemId);
+	}
 }
