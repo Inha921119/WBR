@@ -29,4 +29,5 @@ public class InventoryService {
 	public void useItem(int playerId, int itemId) {
 		inventoryRepository.useItem(playerId, itemId);
 	}
+
 }

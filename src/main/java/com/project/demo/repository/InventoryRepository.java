@@ -95,4 +95,5 @@ public interface InventoryRepository {
 				AND itemId = #{itemId};
 			""")
 	public void useItem(int playerId, int itemId);
+	
 }

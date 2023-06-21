@@ -199,4 +199,14 @@ public class UsrPlayerController {
 		
 		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
+	@RequestMapping("/usr/player/equipItem")
+	@ResponseBody
+	public List<Equipment> equipItem(int playerId, int itemId) {
+		
+		inventoryService.useItem(playerId, itemId);
+		
+		equipmentService.equipItem(playerId, itemId);
+		
+		return equipmentService.getEquipmentById(playerId);
+	}
 }

@@ -81,6 +81,7 @@
 			var playerId = playerId;
 			var itemId = itemId;
 			var scount = scount;
+			var quan = 1
 			
 			$.ajax({
 				url:"../player/useItem?playerId="+playerId+"&itemId="+itemId,
@@ -89,12 +90,16 @@
 				async: false,
 				success : function(data) {
 					$("#quan-" + scount).text("수량 : " + data.quantity);
+					quan = data.quantity;
 					if (data.itemId <= 50) {
 						$("#notify").append("<p>" + data.name + "을(를) 사용하여 체력이 " + data.recoveryHP + " 회복되었다</p>");
 					}else if (data.itemId > 50) {
 						$("#notify").append("<p>" + data.name + "을(를) 사용하여 스테미나가 " + data.recoverySP + " 회복되었다</p>");
 					}
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					if (data.quantity == 0) {
+				    	$('#itemList').load(location.href+' #itemList');
+				    }
 				}
 			});
 		}
@@ -110,12 +115,17 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					$("#quan-" + scount).text("수량 : " + data.quantity);
-					if (data.itemId <= 50) {
-						$("#notify").append("<p>" + data.name + "을(를) 사용하여 체력이 " + data.recoveryHP + " 회복되었다</p>");
-					}else if (data.itemId > 50) {
-						$("#notify").append("<p>" + data.name + "을(를) 사용하여 스테미나가 " + data.recoverySP + " 회복되었다</p>");
+					for (var i in data) {
+						$("#ename-" + i).text(data[i].name);
+						$("#eiHP-" + i).text("(" + data[i].increseHP + ")");
+						$("#eiSP-" + i).text("(" + data[i].increseSP + ")");
+						$("#eiAP-" + i).text("(" + data[i].increseAttackPoint + ")");
+						$("#eiDP-" + i).text("(" + data[i].increseDefencePoint + ")");
+						$("#eDP-" + i).text("(" + data[i].durabilityPoint + ")");
 					}
+					$('#itemList').load(location.href+' #itemList');
+				    $('#equipmentList').load(location.href+' #equipmentList');
+					$("#notify").append("<p>장비를 장착하였다</p>");
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 				}
 			});
@@ -154,32 +164,34 @@
 									<li id="miss">회피 : ${rq.player.missRate }  (${rq.player.increseMissRate })</li>
 								</ul>
 								<ul style="width: 50%;">
-									<c:forEach var="equipment" items="${equipments }">
+									<li><ul id="equipmentList">
+									<c:forEach var="equipment" items="${equipments }" varStatus="status">
 										<li class="equip" style="width: 100%">[${equipment.category }] : <c:choose>
 																						<c:when test="${equipment.usedItemCode != 999}">
 																							<span <c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
 																									<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
 																									<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
 																									<c:if test="${equipment.rarity == '4' }">style='color: #fc008f;'</c:if>
-																									<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>>
+																									<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>
+																									id="ename-${status.index }">
 																								${equipment.name }
 																								<c:if test="${equipment.increseHP != 0}">
-																									<b class="text-red-400 text-base">
+																									<b class="text-red-400 text-base" id="eiHP-${status.index }">
 																										(${equipment.increseHP })
 																									</b>
 																								</c:if>
 																								<c:if test="${equipment.increseSP != 0}">
-																									<b class="text-yellow-400 text-base">
+																									<b class="text-yellow-400 text-base" id="eiSP-${status.index }">
 																										(${equipment.increseSP })
 																									</b>
 																								</c:if>
 																								<c:if test="${equipment.increseAttackPoint != 0}">
-																									<b class="text-base" style="color: #ff0000">
+																									<b class="text-base" style="color: #ff0000" id="eiAP-${status.index }">
 																										(${equipment.increseAttackPoint })
 																									</b>
 																								</c:if>
 																								<c:if test="${equipment.increseDefencePoint != 0}">
-																									<b class="text-base" style="color: #0000ff">
+																									<b class="text-base" style="color: #0000ff" id="eiDP-${status.index }">
 																										(${equipment.increseDefencePoint })
 																									</b>
 																								</c:if>
@@ -189,7 +201,7 @@
 																											|| equipment.category eq '하의'
 																											|| equipment.category eq '팔'
 																											|| equipment.category eq '신발'}">
-																									<font class="text-sm font-bold mr-2" style="color: pink;">
+																									<font class="text-sm font-bold mr-2" style="color: pink;" id="eDP-${status.index }">
 																											내구도 : ${equipment.durabilityPoint }
 																									</font>
 																								</c:if>
@@ -198,6 +210,8 @@
 																						<c:otherwise>없음</c:otherwise>
 																					</c:choose></li>
 																				</c:forEach>
+																			</ul>
+																		</li>
 								</ul>
 							</div>
 							<div class="text-left absolute overflow-y-scroll" style="border-top: 1px solid white; width:100%; height: 18.5%;">
@@ -222,14 +236,14 @@
 						</div>
 					</div>
 					
-						<div class="ml-2" style="border: 2px solid white; width: 23%; position:relative;" >
+						<div class="ml-2" style="border: 2px solid white; width: 23%; position:relative;">
 							<div>
 								<ul style="border: 2px solid white">
 									<li>
 										아이템 목록
 									</li>
 								</ul>
-								<ul class="text-left p-1">
+								<ul class="text-left p-1"  id="itemList">
 									<c:forEach var="inventory" items="${inventory }" varStatus="status">
 									<li>
 										<c:if test="${inventory.quantity != 0 }">
@@ -298,7 +312,7 @@
 															|| inventory.category eq '하의'
 															|| inventory.category eq '팔'
 															|| inventory.category eq '신발'}">
-												<button class="mybtn">
+												<button class="mybtn" onclick="equipItem(${rq.player.id}, ${inventory.itemId }, ${status.count })">
 													<span>장착</span>
 												</button>
 											</c:if>
