@@ -27,8 +27,12 @@ public class EquipmentService {
 		return equipmentRepository.getEquipmentById(playerId);
 	}
 
-	public void equipItem(int playerId, int itemId) {
-		equipmentRepository.equipItem(playerId, itemId);
+	public void equipItem(int playerId, int itemId, int categoryNum) {
+		equipmentRepository.equipItem(playerId, itemId, categoryNum);
 		
+	}
+
+	public void equipOff(int playerId, int categoryNum) {
+		equipmentRepository.equipOff(playerId, categoryNum);
 	}
 }

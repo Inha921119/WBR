@@ -77,7 +77,8 @@
 			});
 		}
 		
-		function useItem(playerId, itemId, scount) {
+		function useItem(memberId, playerId, itemId, scount) {
+			var memberId = memberId;
 			var playerId = playerId;
 			var itemId = itemId;
 			var scount = scount;
@@ -102,9 +103,11 @@
 				    }
 				}
 			});
+			show_NewStatus(memberId);
 		}
 		
-		function equipItem(playerId, itemId, scount) {
+		function equipItem(memberId, playerId, itemId, scount) {
+			var memberId = memberId;
 			var playerId = playerId;
 			var itemId = itemId;
 			var scount = scount;
@@ -129,6 +132,36 @@
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 				}
 			});
+			show_NewStatus(memberId);
+		}
+		
+		function equipOff(memberId, playerId, itemId, scount) {
+			var memberId = memberId;
+			var playerId = playerId;
+			var itemId = itemId;
+			var scount = scount;
+			
+			$.ajax({
+				url:"../player/equipOff?playerId="+playerId+"&itemId="+itemId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					for (var i in data) {
+						$("#ename-" + i).text(data[i].name);
+						$("#eiHP-" + i).text("(" + data[i].increseHP + ")");
+						$("#eiSP-" + i).text("(" + data[i].increseSP + ")");
+						$("#eiAP-" + i).text("(" + data[i].increseAttackPoint + ")");
+						$("#eiDP-" + i).text("(" + data[i].increseDefencePoint + ")");
+						$("#eDP-" + i).text("(" + data[i].durabilityPoint + ")");
+					}
+					$('#itemList').load(location.href+' #itemList');
+				    $('#equipmentList').load(location.href+' #equipmentList');
+					$("#notify").append("<p>장비를 해제하였다</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+				}
+			});
+			show_NewStatus(memberId);
 		}
 	</script>
 	
@@ -143,7 +176,7 @@
 								<li>스테이터스</li>
 							</ul>
 							<div class="flex" style="width: 100%;">
-								<ul style="width: 50%;">
+								<ul style="width: 50%;" id="status">
 									<li class="flex mb-2 mt-2" >
 										<div style="width: 40%">
 											<ul>
@@ -167,7 +200,7 @@
 									<li><ul id="equipmentList">
 									<c:forEach var="equipment" items="${equipments }" varStatus="status">
 										<li class="equip" style="width: 100%">[${equipment.category }] : <c:choose>
-																						<c:when test="${equipment.usedItemCode != 999}">
+																						<c:when test="${equipment.usedItemCode < 990}">
 																							<span <c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
 																									<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
 																									<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
@@ -205,6 +238,9 @@
 																											내구도 : ${equipment.durabilityPoint }
 																									</font>
 																								</c:if>
+																								<button class="mybtn" onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${status.index })">
+																									<span>해제</span>
+																								</button>
 																							</span>
 																						</c:when>
 																						<c:otherwise>없음</c:otherwise>
@@ -302,7 +338,7 @@
 											</span>
 											<c:if test="${inventory.category eq '사용' 
 															|| inventory.category eq '기타'}">
-												<button class="mybtn" onclick="useItem(${rq.player.id}, ${inventory.itemId }, ${status.count })">
+												<button class="mybtn" onclick="useItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
 													<span>사용</span>
 												</button>
 											</c:if>
@@ -312,7 +348,7 @@
 															|| inventory.category eq '하의'
 															|| inventory.category eq '팔'
 															|| inventory.category eq '신발'}">
-												<button class="mybtn" onclick="equipItem(${rq.player.id}, ${inventory.itemId }, ${status.count })">
+												<button class="mybtn" onclick="equipItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
 													<span>장착</span>
 												</button>
 											</c:if>
@@ -331,7 +367,7 @@
 						<div>
 							<ul style="border: 2px solid white">
 									<li>
-										위치 이동 : <select class="text-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
+										위치 이동 : <select class="text-black border-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
 														<option value="1" <c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너 창고</option>
 														<option value="2" <c:if test="${rq.player.lname eq '헬기착륙장'}">selected</c:if>>헬기착륙장</option>
 														<option value="3" <c:if test="${rq.player.lname eq '폐병원'}">selected</c:if>>폐병원</option>

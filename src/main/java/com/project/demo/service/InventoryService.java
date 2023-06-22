@@ -30,4 +30,16 @@ public class InventoryService {
 		inventoryRepository.useItem(playerId, itemId);
 	}
 
+	public int checkExistItem(int playerId, int itemId) {
+		return inventoryRepository.checkExistItem(playerId, itemId);
+	}
+
+	public void addItem(int playerId, int itemId) {
+		inventoryRepository.addItem(playerId, itemId);
+	}
+
+	public void getItem(int playerId, int itemId) {
+		inventoryRepository.getItem(playerId, itemId);
+	}
+
 }

@@ -13,6 +13,7 @@ public class Equipment {
 	private String updateDate;
 	private int playerId;
 	private int usedItemCode;
+	private int itemCode;
 	private int rarity;
 	private int usedItemDP;
 	private String name;

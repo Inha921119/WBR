@@ -13,6 +13,8 @@ public class ItemVO {
 	private String updateDate;
 	private int itemCode;
 	private String name;
+	private String category;
+	private int categoryNum;
 	private int rarity;
 	private int useType;
 	private int useHP;

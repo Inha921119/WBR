@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.demo.service.EquipmentService;
 import com.project.demo.service.InventoryService;
+import com.project.demo.service.ItemVOService;
 import com.project.demo.service.MemberService;
 import com.project.demo.service.PlayerService;
 import com.project.demo.util.Util;
 import com.project.demo.vo.Equipment;
 import com.project.demo.vo.Inventory;
+import com.project.demo.vo.ItemVO;
 import com.project.demo.vo.Player;
 import com.project.demo.vo.ResultData;
 import com.project.demo.vo.Rq;
@@ -24,14 +26,16 @@ public class UsrPlayerController {
 	
 	private PlayerService playerService;
 	private MemberService memberService;
+	private ItemVOService itemVOService;
 	private EquipmentService equipmentService;
 	private InventoryService inventoryService;
 	private Rq rq;
 	
 	@Autowired
-	public UsrPlayerController(PlayerService playerService, MemberService memberService, EquipmentService equipmentService, InventoryService inventoryService, Rq rq) {
+	public UsrPlayerController(PlayerService playerService, MemberService memberService, ItemVOService itemVOService, EquipmentService equipmentService, InventoryService inventoryService, Rq rq) {
 		this.playerService = playerService;
 		this.memberService = memberService;
+		this.itemVOService = itemVOService;
 		this.equipmentService = equipmentService;
 		this.inventoryService = inventoryService;
 		this.rq = rq;
@@ -199,13 +203,63 @@ public class UsrPlayerController {
 		
 		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
+	
 	@RequestMapping("/usr/player/equipItem")
 	@ResponseBody
 	public List<Equipment> equipItem(int playerId, int itemId) {
 		
+		ItemVO item = itemVOService.getItemByCode(itemId);
+		
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getIncreseDefencePoint(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getDecreseDefencePoint(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", item.getIncreseHitRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", item.getDecreseHitRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", item.getIncreseMissRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", item.getDecreseMissRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", item.getIncreseFindEnemyRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", item.getDecreseFindEnemyRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getIncreseFindItemRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 1);
+		
 		inventoryService.useItem(playerId, itemId);
 		
-		equipmentService.equipItem(playerId, itemId);
+		equipmentService.equipItem(playerId, itemId, item.getCategoryNum());
+		
+		return equipmentService.getEquipmentById(playerId);
+	}
+	
+	@RequestMapping("/usr/player/equipOff")
+	@ResponseBody
+	public List<Equipment> equipOff(int playerId, int itemId) {
+		
+		ItemVO item = itemVOService.getItemByCode(itemId);
+		
+		System.out.println(item);
+		
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getIncreseDefencePoint(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getDecreseDefencePoint(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", item.getIncreseHitRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", item.getDecreseHitRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", item.getIncreseMissRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", item.getDecreseMissRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", item.getIncreseFindEnemyRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", item.getDecreseFindEnemyRate(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getIncreseFindItemRate(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 0);
+		
+		int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
+		
+		if (chkExistItem == 1) {
+			inventoryService.getItem(playerId, itemId);
+		}else {
+			inventoryService.addItem(playerId, itemId);
+		}
+		
+		equipmentService.equipOff(playerId, item.getCategoryNum());
 		
 		return equipmentService.getEquipmentById(playerId);
 	}
