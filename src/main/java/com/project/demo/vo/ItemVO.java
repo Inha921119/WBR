@@ -17,6 +17,7 @@ public class ItemVO {
 	private int categoryNum;
 	private int rarity;
 	private int useType;
+	private int useHand;
 	private int useHP;
 	private int increseHP;
 	private int decreseHP;

@@ -28,6 +28,7 @@ public interface EquipmentRepository {
 				, i.name
 				, i.rarity
 				, i.useType
+				, i.useHand
 				, i.useHP
 				, i.recoveryHP
 				, i.increseHP
@@ -66,11 +67,12 @@ public interface EquipmentRepository {
 			INNER JOIN item AS i
 			ON e.usedItemCode = i.itemCode
 				SET e.usedItemCode = #{itemId}
-					, e.usedItemDP = i.durabilityPoint
+					, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE itemCode = #{itemId})
 					WHERE e.playerId = #{playerId}
-					AND i.categoryNum = #{categoryNum};
+					AND i.categoryNum = #{categoryNum}
+					AND e.id != #{equipId};
 			""")
-	public void equipItem(int playerId, int itemId, int categoryNum);
+	public void equipItem(int playerId, int itemId, int categoryNum, int equipId);
 	
 	@Update("""
 			UPDATE equipment AS e

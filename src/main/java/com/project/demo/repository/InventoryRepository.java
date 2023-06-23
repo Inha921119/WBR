@@ -19,6 +19,7 @@ public interface InventoryRepository {
 				, i.name
 				, i.rarity
 				, i.useType
+				, i.useHand
 				, i.useHP
 				, i.recoveryHP
 				, i.increseHP
@@ -58,6 +59,7 @@ public interface InventoryRepository {
 				, i.name
 				, i.rarity
 				, i.useType
+				, i.usehand
 				, i.useHP
 				, i.recoveryHP
 				, i.increseHP

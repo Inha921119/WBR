@@ -106,6 +106,31 @@
 			show_NewStatus(memberId);
 		}
 		
+		function deleteItem(memberId, playerId, itemId, scount) {
+			var memberId = memberId;
+			var playerId = playerId;
+			var itemId = itemId;
+			var scount = scount;
+			var quan = 1
+			
+			$.ajax({
+				url:"../player/deleteItem?playerId="+playerId+"&itemId="+itemId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					$("#quan-" + scount).text("수량 : " + data.quantity);
+					quan = data.quantity;
+					$("#notify").append("<p>" + data.name + "을(를) 버렸다</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					if (data.quantity == 0) {
+				    	$('#itemList').load(location.href+' #itemList');
+				    }
+				}
+			});
+			show_NewStatus(memberId);
+		}
+		
 		function equipItem(memberId, playerId, itemId, scount) {
 			var memberId = memberId;
 			var playerId = playerId;
@@ -353,7 +378,7 @@
 												</button>
 											</c:if>
 											
-											<button class="mybtn">
+											<button class="mybtn" onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
 												<span>버림</span>
 											</button>
 										</c:if>

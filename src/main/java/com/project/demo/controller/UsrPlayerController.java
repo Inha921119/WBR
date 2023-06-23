@@ -204,6 +204,15 @@ public class UsrPlayerController {
 		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
 	
+	@RequestMapping("/usr/player/deleteItem")
+	@ResponseBody
+	public Inventory deleteItem(int playerId, int itemId) {
+		
+		inventoryService.useItem(playerId, itemId);
+		
+		return inventoryService.getInventoryItemByItemId(playerId, itemId);
+	}
+	
 	@RequestMapping("/usr/player/equipItem")
 	@ResponseBody
 	public List<Equipment> equipItem(int playerId, int itemId) {
@@ -223,9 +232,10 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getIncreseFindItemRate(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 1);
 		
+		
 		inventoryService.useItem(playerId, itemId);
 		
-		equipmentService.equipItem(playerId, itemId, item.getCategoryNum());
+		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId);
 		
 		return equipmentService.getEquipmentById(playerId);
 	}
