@@ -42,4 +42,12 @@ public class InventoryService {
 		inventoryRepository.getItem(playerId, itemId);
 	}
 
+	public void useEquip(int playerId, int itemId, int invenId) {
+		inventoryRepository.useEquip(playerId, itemId, invenId);		
+	}
+
+	public Inventory getInventoryItemById(int invenId) {
+		return inventoryRepository.getInventoryItemById(invenId);
+	}
+
 }

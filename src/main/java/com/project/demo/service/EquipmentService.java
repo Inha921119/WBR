@@ -32,7 +32,14 @@ public class EquipmentService {
 		
 	}
 
-	public void equipOff(int playerId, int categoryNum) {
-		equipmentRepository.equipOff(playerId, categoryNum);
+	public void equipOff(int playerId, int categoryNum, int equipId) {
+		equipmentRepository.equipOff(playerId, categoryNum, equipId);
+	}
+
+	public int getMaxEquipIdByItemId(int playerId, int categoryNum) {
+		return equipmentRepository.getMaxEquipIdByItemId(playerId, categoryNum);
+	}
+	public int getMinEquipIdByItemId(int playerId, int categoryNum) {
+		return equipmentRepository.getMinEquipIdByItemId(playerId, categoryNum);
 	}
 }

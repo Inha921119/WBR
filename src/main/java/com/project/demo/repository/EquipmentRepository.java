@@ -63,25 +63,58 @@ public interface EquipmentRepository {
 
 
 	@Update("""
-			UPDATE equipment AS e
-			INNER JOIN item AS i
-			ON e.usedItemCode = i.itemCode
-				SET e.usedItemCode = #{itemId}
-					, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE itemCode = #{itemId})
-					WHERE e.playerId = #{playerId}
-					AND i.categoryNum = #{categoryNum}
-					AND e.id != #{equipId};
+			<script>
+				UPDATE equipment AS e
+				INNER JOIN item AS i
+				ON e.usedItemCode = i.itemCode
+					<set>
+						e.usedItemCode = #{itemId}
+						, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE itemCode = #{itemId})
+					</set>
+						WHERE e.playerId = #{playerId}
+						AND i.categoryNum = #{categoryNum}
+						<if test="equipId != 0">
+							AND e.id = #{equipId};
+						</if>
+			</script>
 			""")
 	public void equipItem(int playerId, int itemId, int categoryNum, int equipId);
 	
 	@Update("""
-			UPDATE equipment AS e
-			INNER JOIN item AS i
-			ON e.usedItemCode = i.itemCode
-				SET e.usedItemCode = (SELECT itemCode FROM item WHERE categoryNum = #{categoryNum} AND itemCode > 990)
-					, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE categoryNum = #{categoryNum} AND itemCode > 990)
-					WHERE e.playerId = #{playerId}
-					AND i.categoryNum = #{categoryNum};
+			<script>
+				UPDATE equipment AS e
+				INNER JOIN item AS i
+				ON e.usedItemCode = i.itemCode
+					<set>
+						e.usedItemCode = (SELECT itemCode FROM item WHERE categoryNum = #{categoryNum} AND itemCode > 990)
+						, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE categoryNum = #{categoryNum} AND itemCode > 990)
+					</set>
+						WHERE e.playerId = #{playerId}
+						AND i.categoryNum = #{categoryNum}
+						<if test="equipId != 0">
+								AND e.id = #{equipId};
+						</if>
+			</script>
 			""")
-	public void equipOff(int playerId, int categoryNum);
+	public void equipOff(int playerId, int categoryNum, int equipId);
+	
+	@Select("""
+			SELECT MAX(e.id)
+				FROM equipment AS e
+				INNER JOIN item AS i
+				ON e.usedItemCode = i.itemCode
+				WHERE e.playerId = #{playerId}
+				AND i.categoryNum = #{categoryNum};
+			""")
+	public int getMaxEquipIdByItemId(int playerId, int categoryNum);
+	
+	@Select("""
+			SELECT MIN(id)
+				FROM equipment AS e
+				INNER JOIN item AS i
+				ON e.usedItemCode = i.itemCode
+				WHERE e.playerId = #{playerId}
+				AND i.categoryNum = #{categoryNum};
+			""")
+	public int getMinEquipIdByItemId(int playerId, int categoryNum);
 }

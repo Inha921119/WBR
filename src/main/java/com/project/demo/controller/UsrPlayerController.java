@@ -199,16 +199,44 @@ public class UsrPlayerController {
 	@ResponseBody
 	public Inventory useItem(int playerId, int itemId) {
 		
+		ItemVO item = itemVOService.getItemByCode(itemId);
+		Player player = playerService.getPlayerById(playerId);
+		
+		if (player.getHp() + item.getRecoveryHP() >= player.getMaxHp()) {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getHp(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getMaxHp(), 0);
+		} else {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", item.getRecoveryHP(), 0); 
+		}
+		
+		if (player.getSp() + item.getRecoverySP() >= player.getMaxSp()) {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getSp(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getMaxSp(), 0);
+		} else {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", item.getRecoverySP(), 0);
+		}
+		
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getIncreseHP(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getIncreseSP(), 0);
+		
 		inventoryService.useItem(playerId, itemId);
 		
-		return inventoryService.getInventoryItemByItemId(playerId, itemId);
+		Inventory inventory = inventoryService.getInventoryItemByItemId(playerId, itemId);
+		
+		return inventory;
 	}
 	
 	@RequestMapping("/usr/player/deleteItem")
 	@ResponseBody
-	public Inventory deleteItem(int playerId, int itemId) {
+	public Inventory deleteItem(int playerId, int itemId, int invenId) {
 		
-		inventoryService.useItem(playerId, itemId);
+		ItemVO item = itemVOService.getItemByCode(itemId);
+		
+		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
+			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
+		} else {
+			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
+		}
 		
 		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
@@ -219,7 +247,29 @@ public class UsrPlayerController {
 		
 		ItemVO item = itemVOService.getItemByCode(itemId);
 		
-		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 0);
+		List<Equipment> equipItems = equipmentService.getEquipmentById(playerId);
+		
+		int equipId = 0;
+		int invenId = 0;
+		
+		if (item.getCategoryNum() == 2) {
+			
+			if (equipItems.get(0).getUsedItemCode() == itemId ) {
+				equipId = equipItems.get(1).getId();
+			} else {
+				equipId = equipItems.get(0).getId();
+			}
+			if (equipItems.get(1).getUsedItemCode() == itemId) {
+				equipId = equipItems.get(0).getId();
+			}
+			
+			if (item.getUseHand() == 2) {
+				equipId = 0;
+			}
+		}
+		
+		// 아이템에 따른 능력치 변경
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 0); 
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 1);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getIncreseDefencePoint(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getDecreseDefencePoint(), 1);
@@ -232,21 +282,30 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getIncreseFindItemRate(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 1);
 		
+		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
+			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
+		} else {
+			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
+		}
 		
-		inventoryService.useItem(playerId, itemId);
+		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId); // DB가서 장비아이템 코드 변경(실제 장착)
 		
-		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId);
+		equipItems = equipmentService.getEquipmentById(playerId);
 		
-		return equipmentService.getEquipmentById(playerId);
+		return equipItems;
 	}
 	
 	@RequestMapping("/usr/player/equipOff")
 	@ResponseBody
-	public List<Equipment> equipOff(int playerId, int itemId) {
+	public List<Equipment> equipOff(int playerId, int itemId, int equipId) {
 		
 		ItemVO item = itemVOService.getItemByCode(itemId);
 		
-		System.out.println(item);
+		List<Equipment> equipItems = equipmentService.getEquipmentById(playerId);
+		
+		if (item.getUseHand() == 2) {
+			equipId = 0;
+		}
 		
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 1);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 0);
@@ -263,14 +322,52 @@ public class UsrPlayerController {
 		
 		int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
 		
-		if (chkExistItem == 1) {
-			inventoryService.getItem(playerId, itemId);
-		}else {
+		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
 			inventoryService.addItem(playerId, itemId);
+		} else {
+			if (chkExistItem == 1) {
+				inventoryService.getItem(playerId, itemId);
+			}else {
+				inventoryService.addItem(playerId, itemId);
+			}
 		}
 		
-		equipmentService.equipOff(playerId, item.getCategoryNum());
+		equipmentService.equipOff(playerId, item.getCategoryNum(), equipId);
 		
-		return equipmentService.getEquipmentById(playerId);
+		equipItems = equipmentService.getEquipmentById(playerId);
+		
+		return equipItems;
+	}
+	
+	@RequestMapping("/usr/player/getPlayerByMemberId")
+	@ResponseBody
+	public Player getPlayerByMemberId(int memberId) {
+		
+		return playerService.getPlayerByMemberId(memberId);
+	}
+	
+	@RequestMapping("/usr/player/heal")
+	@ResponseBody
+	public Player healHP(int memberId, int healSec, int type) {
+		
+		Player player = playerService.getPlayerByMemberId(memberId);
+		
+		if (type == 0) {
+			if (player.getHp() + healSec >= player.getMaxHp()) {
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getHp(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getMaxHp(), 0);
+			} else {
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", healSec, 0); 
+			}
+		} else if (type == 1 ) {
+			if (player.getSp() + healSec >= player.getMaxSp()) {
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", player.getSp(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", player.getMaxSp(), 0);
+			} else {
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", healSec, 0); 
+			}
+		}
+		
+		return player;
 	}
 }

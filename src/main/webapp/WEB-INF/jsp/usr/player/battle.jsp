@@ -4,6 +4,12 @@
 <c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp" %>
 	<script>
+	
+		originalForm = null;
+		originalId = null;
+		
+		var timer = null;
+		
 		function searchAround() {
 			
 			$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
@@ -106,15 +112,16 @@
 			show_NewStatus(memberId);
 		}
 		
-		function deleteItem(memberId, playerId, itemId, scount) {
+		function deleteItem(memberId, playerId, itemId, invenId, scount) {
 			var memberId = memberId;
 			var playerId = playerId;
 			var itemId = itemId;
+			var invenId = invenId;
 			var scount = scount;
 			var quan = 1
 			
 			$.ajax({
-				url:"../player/deleteItem?playerId="+playerId+"&itemId="+itemId,
+				url:"../player/deleteItem?playerId="+playerId+"&itemId="+itemId+"&invenId="+invenId,
 				type:"get",
 				datatype:"text",
 				async: false,
@@ -123,9 +130,7 @@
 					quan = data.quantity;
 					$("#notify").append("<p>" + data.name + "을(를) 버렸다</p>");
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					if (data.quantity == 0) {
-				    	$('#itemList').load(location.href+' #itemList');
-				    }
+				    $('#itemList').load(location.href+' #itemList');
 				}
 			});
 			show_NewStatus(memberId);
@@ -160,14 +165,15 @@
 			show_NewStatus(memberId);
 		}
 		
-		function equipOff(memberId, playerId, itemId, scount) {
+		function equipOff(memberId, playerId, itemId, equipId, scount) {
 			var memberId = memberId;
 			var playerId = playerId;
 			var itemId = itemId;
+			var equipId = equipId;
 			var scount = scount;
 			
 			$.ajax({
-				url:"../player/equipOff?playerId="+playerId+"&itemId="+itemId,
+				url:"../player/equipOff?playerId="+playerId+"&itemId="+itemId+"&equipId="+equipId,
 				type:"get",
 				datatype:"text",
 				async: false,
@@ -187,6 +193,98 @@
 				}
 			});
 			show_NewStatus(memberId);
+		}
+		function heal(memberId, sec, type) {
+			var memberId = memberId;
+			var healSec = sec;
+			var type = type;
+			
+			$.ajax({
+				url:"../player/heal?memberId="+memberId+"&healSec="+sec+"&type="+type,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if (type == 0) {
+						$("#notify").append("<p>체력을 " + healSec + "만큼 회복하였다</p>");
+					}else if (type == 1) {
+						$("#notify").append("<p>스테미나를 " + healSec + "만큼 회복하였다</p>");
+					}
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					}
+			});
+			show_NewStatus(memberId);
+		}
+		
+		function heal_form(memberId, type) {
+			
+			var oldTime = Date.now();
+			
+			var type = type;
+			
+			var sec = 0;
+			
+			if(originalForm != null) {
+				healHP_cancle();
+			}
+			
+			$.get('../player/getPlayerByMemberId', {
+				memberId : memberId,
+			}, function(data){
+				
+				let actionTab = $('#actionTab');
+				
+				originalForm = actionTab.html();
+				
+				timer = setInterval(() => {
+				var currentTime = Date.now();
+			    // 경과한 밀리초 가져오기
+			    var diff = currentTime - oldTime;
+			    
+			    // 초(second) 단위 변환하기
+			    sec = Math.floor(diff / 1000);
+			    
+			    // HTML에 문자열 넣기
+			    document.querySelector('#currentTime').innerHTML = `\${sec}초 경과`;
+			    if (type == 0) {
+			    	document.querySelector('#healButton').innerHTML = `<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>`;
+			    } else if (type == 1) {
+			    	document.querySelector('#healButton').innerHTML = `<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>`;
+			    }
+				    
+				}, 1000);	
+			
+			 	
+			 	let addHtml = `
+					<ul>
+						<li class="flex justify-center">
+							<ul class="active-list ml-2 mr-2 mt-10">
+									<li class="text-red-400 text-center"><span>체력을 회복중입니다.</span></li>
+									<li class="text-yellow-400 text-center"><span>스테미나를 회복중입니다.</span></li>
+								<li><span class="text-red-400" id="currentTime">\${sec}초 경과</span></li>
+								<li class="flex mb-2" id="healButton">
+							    	<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>
+							    	<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>
+								</li>
+							</ul>
+						</li>
+					</ul>`;
+				
+				actionTab.empty().html("");
+				actionTab.append(addHtml);
+			}, 'json');
+		}	
+		
+		function heal_cancle() {
+			
+			let actionTab = $('#actionTab');
+			actionTab.html(originalForm);
+			
+			originalForm = null;
+		}
+		
+		function stopTimer() {
+			  clearInterval(timer);
 		}
 	</script>
 	
@@ -263,7 +361,7 @@
 																											내구도 : ${equipment.durabilityPoint }
 																									</font>
 																								</c:if>
-																								<button class="mybtn" onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${status.index })">
+																								<button class="mybtn" onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${equipment.id }, ${status.index })">
 																									<span>해제</span>
 																								</button>
 																							</span>
@@ -378,7 +476,7 @@
 												</button>
 											</c:if>
 											
-											<button class="mybtn" onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
+											<button class="mybtn" onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${inventory.id }, ${status.count })">
 												<span>버림</span>
 											</button>
 										</c:if>
@@ -389,7 +487,7 @@
 						</div>
 					
 					<div class="ml-2" style="border: 2px solid white; width: 17%; position:relative;" >
-						<div>
+						<div id="actionTab">
 							<ul style="border: 2px solid white">
 									<li>
 										위치 이동 : <select class="text-black border-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
@@ -415,8 +513,8 @@
 											<button class="active">스킬 습득</button>
 										</li>
 										<li class="flex mb-2">
-											<button class="active text-red-400" style="width:50%">치료</button>
-											<button class="active text-yellow-400" style="width:50%">휴식</button>
+											<button class="active text-red-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 0)"><span>치료</span></button>
+											<button class="active text-yellow-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 1)"><span>휴식</span></button>
 										</li>
 									</ul>
 								</li>

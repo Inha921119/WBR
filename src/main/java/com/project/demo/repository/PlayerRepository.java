@@ -237,4 +237,11 @@ public interface PlayerRepository {
 			</script>
 			""")
 	public void doChangeStatus(int memberId, String statName, int num, int oe);
+	
+	@Select("""
+			SELECT *
+				FROM player
+				WHERE id = #{playerId};
+			""")
+	public Player getPlayerById(int playerId);
 }

@@ -19,9 +19,11 @@ public class ItemVO {
 	private int useType;
 	private int useHand;
 	private int useHP;
+	private int recoveryHP;
 	private int increseHP;
 	private int decreseHP;
 	private int useSP;
+	private int recoverySP;
 	private int increseSP;
 	private int decreseSP;
 	private int increseAttackPoint;

@@ -60,4 +60,8 @@ private PlayerRepository playerRepository;
 	public void doChangeStatus(int memberId, String statName, int num, int oe) {
 		playerRepository.doChangeStatus(memberId, statName, num, oe);
 	}
+
+	public Player getPlayerById(int playerId) {
+		return playerRepository.getPlayerById(playerId);
+	}
 }
