@@ -219,10 +219,12 @@
 		function heal_form(memberId, type) {
 			
 			var oldTime = Date.now();
-			
 			var type = type;
-			
 			var sec = 0;
+			var typeName = "";
+			var typeStat = "";
+			var typeColor = "";
+			
 			
 			if(originalForm != null) {
 				healHP_cancle();
@@ -254,17 +256,25 @@
 				    
 				}, 1000);	
 			
+				if (type == 0) {
+					typeName = "치료";
+					typeStat = "체력";
+					typeColor = "red";
+			    } else if (type == 1) {
+			    	typeName = "휴식";
+					typeStat = "스테미나";
+					typeColor = "yellow";
+			    }
+				
 			 	
 			 	let addHtml = `
 					<ul>
 						<li class="flex justify-center">
 							<ul class="active-list ml-2 mr-2 mt-10">
-									<li class="text-red-400 text-center"><span>체력을 회복중입니다.</span></li>
-									<li class="text-yellow-400 text-center"><span>스테미나를 회복중입니다.</span></li>
-								<li><span class="text-red-400" id="currentTime">\${sec}초 경과</span></li>
+									<li class="text-\${typeColor}-400 text-center"><span>\${typeStat}을(를) 회복중입니다.</span></li>
+								<li><span class="text-\${typeColor}-400" id="currentTime">\${sec}초 경과</span></li>
 								<li class="flex mb-2" id="healButton">
-							    	<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>
-							    	<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>
+							    	<button class="active text-\${typeColor}-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>\${typeName}완료</span></button>
 								</li>
 							</ul>
 						</li>
