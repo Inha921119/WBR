@@ -88,7 +88,7 @@ public class UsrPlayerController {
 		Player player = playerService.getPlayerByMemberId(id);
 		
 		List<Equipment> equipments = equipmentService.getEquipmentById(player.getId());
-		List<Inventory> inventory = inventoryService.getInventoryById(player.getId());
+		List<Inventory> inventory = inventoryService.getInventoryByPlayerId(player.getId());
 		
 		model.addAttribute("equipments", equipments);
 		model.addAttribute("inventory", inventory);
@@ -344,6 +344,35 @@ public class UsrPlayerController {
 	public Player getPlayerByMemberId(int memberId) {
 		
 		return playerService.getPlayerByMemberId(memberId);
+	}
+	
+	@RequestMapping("/usr/player/getInventoryByPlayerId")
+	@ResponseBody
+	public List<Inventory> getInventoryByPlayerId(int playerId) {
+		
+		return inventoryService.getInventoryByPlayerId(playerId);
+	}
+	
+	@RequestMapping("/usr/player/getRecipeByPlayerId")
+	@ResponseBody
+	public List<ItemVO> getRecipeByPlayerId(int playerId) {
+		
+		List<Inventory> inventory = inventoryService.getInventoryUsefulItemByPlayerId(playerId);
+		
+		List<ItemVO> recipeList = null;
+		
+		int[] recipeItemNum;
+		recipeItemNum = new int[inventory.size()+1];
+		
+		for (int i = 0; i < inventory.size(); i++) {
+			recipeItemNum[i] = inventory.get(i).getItemId();
+		}
+		
+		System.out.println(recipeItemNum[0]);
+		System.out.println(recipeItemNum[1]);
+		System.out.println(recipeItemNum[2]);
+		
+		return itemVOService.getRecipeByItemCode(recipeItemNum[0], recipeItemNum[1], recipeItemNum[2]);
 	}
 	
 	@RequestMapping("/usr/player/heal")

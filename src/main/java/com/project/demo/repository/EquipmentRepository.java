@@ -52,6 +52,9 @@ public interface EquipmentRepository {
 				, i.durabilityPoint
 				, i.inventoryPoint
 				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
 				FROM equipment AS e
 				INNER JOIN item AS i
 				ON e.usedItemCode = i.itemCode

@@ -44,6 +44,9 @@ public interface InventoryRepository {
 				, i.durabilityPoint
 				, i.inventoryPoint
 				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
 				FROM inventory AS iv
 				INNER JOIN item AS i
 				ON iv.itemId = i.itemCode
@@ -51,7 +54,7 @@ public interface InventoryRepository {
 				ON i.categoryNum = ic.id
 				WHERE iv.playerId = #{playerId};
 			""")
-	List<Inventory> getInventoryById(int playerId);
+	List<Inventory> getInventoryByPlayerId(int playerId);
 
 	@Select("""
 			SELECT iv.*
@@ -84,6 +87,9 @@ public interface InventoryRepository {
 				, i.durabilityPoint
 				, i.inventoryPoint
 				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
 				FROM inventory AS iv
 				INNER JOIN item AS i
 				ON iv.itemId = i.itemCode
@@ -125,6 +131,9 @@ public interface InventoryRepository {
 				, i.durabilityPoint
 				, i.inventoryPoint
 				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
 				FROM inventory AS iv
 				INNER JOIN item AS i
 				ON iv.itemId = i.itemCode
@@ -182,5 +191,49 @@ public interface InventoryRepository {
 				AND itemId = #{itemId};
 			""")
 	public void getItem(int playerId, int itemId);
+	
+	@Select("""
+			SELECT iv.*
+				, ic.category
+				, i.categoryNum
+				, i.name
+				, i.rarity
+				, i.useType
+				, i.useHand
+				, i.useHP
+				, i.recoveryHP
+				, i.increseHP
+				, i.decreseHP
+				, i.useSP
+				, i.recoverySP
+				, i.increseSP
+				, i.decreseSP
+				, i.increseAttackPoint
+				, i.decreseAttackPoint
+				, i.increseDefencePoint
+				, i.decreseDefencePoint
+				, i.increseHitRate
+				, i.decreseHitRate
+				, i.increseMissRate
+				, i.decreseMissRate
+				, i.increseFindItemRate
+				, i.decreseFindItemRate
+				, i.increseFindEnemyRate
+				, i.decreseFindEnemyRate
+				, i.durabilityPoint
+				, i.inventoryPoint
+				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
+				FROM inventory AS iv
+				INNER JOIN item AS i
+				ON iv.itemId = i.itemCode
+				INNER JOIN itemCategory AS ic
+				ON i.categoryNum = ic.id
+				WHERE iv.playerId = #{playerId}
+				AND iv.quantity != 0;
+			""")
+	List<Inventory> getInventoryUsefulItemByPlayerId(int playerId);
 	
 }

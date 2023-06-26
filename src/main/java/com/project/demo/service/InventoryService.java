@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.project.demo.repository.InventoryRepository;
-import com.project.demo.vo.Equipment;
 import com.project.demo.vo.Inventory;
 
 @Service
@@ -18,8 +17,11 @@ public class InventoryService {
 		this.inventoryRepository = inventoryRepository;
 	}
 
-	public List<Inventory> getInventoryById(int playerId) {
-		return inventoryRepository.getInventoryById(playerId);
+	public List<Inventory> getInventoryByPlayerId(int playerId) {
+		return inventoryRepository.getInventoryByPlayerId(playerId);
+	}
+	public List<Inventory> getInventoryUsefulItemByPlayerId(int playerId) {
+		return inventoryRepository.getInventoryUsefulItemByPlayerId(playerId);
 	}
 
 	public Inventory getInventoryItemByItemId(int playerId, int itemId) {

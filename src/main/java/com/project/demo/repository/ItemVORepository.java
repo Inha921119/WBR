@@ -1,5 +1,7 @@
 package com.project.demo.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -21,4 +23,13 @@ public interface ItemVORepository {
 				WHERE itemCode = #{itemCode};
 			""")
 	public ItemVO getItemByCode(int itemCode);
+
+
+	@Select("""
+			SELECT *
+				FROM item
+				WHERE recipeItem1 = 204
+				AND recipeItem2 = 510;
+			""")
+	public List<ItemVO> getRecipeByItemCode(int recipeItem1, int recipeItem2, int recipeItem3);
 }

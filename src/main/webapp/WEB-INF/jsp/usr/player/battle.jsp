@@ -227,7 +227,7 @@
 			
 			
 			if(originalForm != null) {
-				healHP_cancle();
+				actionTab_cancle();
 			}
 			
 			$.get('../player/getPlayerByMemberId', {
@@ -249,9 +249,9 @@
 			    // HTML에 문자열 넣기
 			    document.querySelector('#currentTime').innerHTML = `\${sec}초 경과`;
 			    if (type == 0) {
-			    	document.querySelector('#healButton').innerHTML = `<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>`;
+			    	document.querySelector('#healButton').innerHTML = `<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>`;
 			    } else if (type == 1) {
-			    	document.querySelector('#healButton').innerHTML = `<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>`;
+			    	document.querySelector('#healButton').innerHTML = `<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>`;
 			    }
 				    
 				}, 1000);	
@@ -271,10 +271,10 @@
 					<ul>
 						<li class="flex justify-center">
 							<ul class="active-list ml-2 mr-2 mt-10">
-									<li class="text-\${typeColor}-400 text-center"><span>\${typeStat}을(를) 회복중입니다.</span></li>
+								<li class="text-\${typeColor}-400 text-center"><span>\${typeStat}을(를) 회복중입니다.</span></li>
 								<li><span class="text-\${typeColor}-400" id="currentTime">\${sec}초 경과</span></li>
 								<li class="flex mb-2" id="healButton">
-							    	<button class="active text-\${typeColor}-400" onclick="heal(\${memberId}, \${sec}, \${type}); heal_cancle(); stopTimer(\${timer})"><span>\${typeName}완료</span></button>
+							    	<button class="active text-\${typeColor}-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>\${typeName}완료</span></button>
 								</li>
 							</ul>
 						</li>
@@ -285,11 +285,44 @@
 			}, 'json');
 		}	
 		
-		function heal_cancle() {
+		function recipe_form(playerId) {
+			var playerId = playerId;
 			
+			if(originalForm != null) {
+				actionTab_cancle();
+			}
+			
+			$.get('../player/getRecipeByPlayerId', {
+				playerId : playerId,
+			}, function(data){
+				
+				let actionTab = $('#actionTab');
+				
+				originalForm = actionTab.html();
+				
+			 	let addHtml = `
+					<ul>
+						<li class="flex justify-center">
+							<ul class="active-list ml-2 mr-2 mt-10">
+								<li>\${data.name}</li>
+								<li class="flex mb-2">
+							    	<button class="active" onclick="actionTab_cancle()"><span>돌아가기</span></button>
+								</li>
+							</ul>
+						</li>
+					</ul>`;
+				
+				actionTab.empty().html("");
+				actionTab.append(addHtml);
+			}, 'json');
+		}	
+		
+		function actionTab_cancle() {
 			let actionTab = $('#actionTab');
 			actionTab.html(originalForm);
 			
+			$('#locationTab').load(location.href+' #locationTab');
+
 			originalForm = null;
 		}
 		
@@ -498,7 +531,7 @@
 					
 					<div class="ml-2" style="border: 2px solid white; width: 17%; position:relative;" >
 						<div id="actionTab">
-							<ul style="border: 2px solid white">
+							<ul style="border: 2px solid white" id="locationTab">
 									<li>
 										위치 이동 : <select class="text-black border-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
 														<option value="1" <c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너 창고</option>
@@ -517,7 +550,7 @@
 											<button class="active" onclick="searchAround()">탐색</button>
 										</li>
 										<li class="mb-2">
-											<button class="active">조합법 연구</button>
+											<button class="active" onclick="recipe_form(${rq.player.id})">조합법 연구</button>
 										</li>
 										<li class="flex mb-2">
 											<button class="active">스킬 습득</button>

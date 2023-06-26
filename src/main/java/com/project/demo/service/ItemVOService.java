@@ -1,5 +1,7 @@
 package com.project.demo.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,10 @@ public class ItemVOService {
 		ItemVO item = itemVORepository.getItemByCode(itemCode);
 		
 		return item;
+	}
+
+	public List<ItemVO> getRecipeByItemCode(int recipeItem1, int recipeItem2, int recipeItem3) {
+		return itemVORepository.getRecipeByItemCode(recipeItem1, recipeItem2, recipeItem3);
 	}
 	
 }
