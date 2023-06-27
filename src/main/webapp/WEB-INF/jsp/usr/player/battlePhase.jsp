@@ -243,45 +243,79 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					console.log(data);
 					$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 					}
 			});
 			show_NewStatus(memberId);
+			replace_battle(memberId);
 		}	
 		
-		function recipe_form(playerId) {
-			var playerId = playerId;
+		function action_skill_form(memberId, playerId1, playerId2) {
+			var memberId = memberId;
+			var playerId1 = playerId1;
+			var playerId2 = playerId2;
 			
 			if(originalForm != null) {
 				actionTab_cancle();
 			}
 			
-			$.get('../player/getRecipeByPlayerId', {
-				playerId : playerId,
+			$.get('../player/getSkillByPlayerId', {
+				playerId : playerId1,
 			}, function(data){
 				
 				let actionTab = $('#actionTab');
 				
 				originalForm = actionTab.html();
 				
-			 	let addHtml = `
+				let addHtml = `
 					<ul>
 						<li class="flex justify-center">
-							<ul class="active-list ml-2 mr-2 mt-10">
-								<li>\${data.name}</li>
-								<li class="flex mb-2">
-							    	<button class="active" onclick="actionTab_cancle()"><span>돌아가기</span></button>
-								</li>
-							</ul>
-						</li>
-					</ul>`;
+							<ul class="active-list ml-2 mr-2 mt-2">
+							<li class="flex justify-between text-xl mb-5"><span>스킬 목록</span></li>
+							<li><ul class="overflow-y-scroll h-64">`
+				
+			 	for(var i=0; i < data.length; i++) {
+			 		var skill = data[i];
+			 		var damage = skill.attackPoint + skill.increseAttackPoint;
+			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"<span class='text-sm text-red-400'>("+damage+")</span></span><button class='mybtn ml-2'>사용</button></li>";
+				}
+			 	
+			 	addHtml = addHtml + `</ul></li><li class="flex mb-2">
+					    	<button class="active mt-5" onclick="actionTab_cancle()"><span>돌아가기</span></button>
+							</li>
+						</ul>
+					</li>
+				</ul>`;
 				
 				actionTab.empty().html("");
 				actionTab.append(addHtml);
 			}, 'json');
 		}	
+		
+		function action_run(id, memberId2) {
+			var id = id;
+			var memberId = memberId2;
+			
+			$.ajax({
+				url:"../player/showStatus?memberId="+memberId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					$("#notify").append("<p>" + data.name + "에게서 도망쳤다.</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					}
+			});
+			replace_battle(id);
+			show_NewStatus(memberId);
+		}
+		
+		function replace_battle(id) {
+			var id = id;
+			var url = `/usr/player/battle?id=\${id}`;
+			location.replace(url);
+		}
 		
 		function actionTab_cancle() {
 			let actionTab = $('#actionTab');
@@ -397,6 +431,9 @@
 													<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
 												</c:choose>
 											</span>
+											<c:forEach var="skill1" items="${skills1}">
+												<span> / ${skill1.name}</span>
+											</c:forEach>
 										</div>
 									</li>
 								</ul>
@@ -473,7 +510,7 @@
 					
 					
 					<div class="ml-2" style="border: 2px solid white; width: 15%; position:relative;" >
-						<div>
+						<div id="actionTab">
 							<ul style="border: 2px solid white">
 								<li>
 									전투행동
@@ -486,13 +523,10 @@
 											<button class="active" onclick="action_attack(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" onclick="action_skill(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">스킬사용</button>
+											<button class="active" onclick="action_skill_form(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">스킬사용</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" onclick="action_item(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">아이템사용</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" onclick="action_run(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">도주</button>
+											<button class="active" onclick="action_run(${rq.getLoginedMemberId() }, ${player2.memberId })">도주</button>
 										</li>
 									</ul>
 								</li>

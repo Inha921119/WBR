@@ -20,8 +20,8 @@ public class InventoryService {
 	public List<Inventory> getInventoryByPlayerId(int playerId) {
 		return inventoryRepository.getInventoryByPlayerId(playerId);
 	}
-	public List<Inventory> getInventoryUsefulItemByPlayerId(int playerId) {
-		return inventoryRepository.getInventoryUsefulItemByPlayerId(playerId);
+	public List<Inventory> getInventoryUsefulItemCodeByPlayerId(int playerId) {
+		return inventoryRepository.getInventoryUsefulItemCodeByPlayerId(playerId);
 	}
 
 	public Inventory getInventoryItemByItemId(int playerId, int itemId) {

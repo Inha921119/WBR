@@ -31,8 +31,8 @@ public class ItemVOService {
 		return item;
 	}
 
-	public List<ItemVO> getRecipeByItemCode(int recipeItem1, int recipeItem2, int recipeItem3) {
-		return itemVORepository.getRecipeByItemCode(recipeItem1, recipeItem2, recipeItem3);
+	public List<ItemVO> getItemListRecipe() {
+		return itemVORepository.getItemListRecipe();
 	}
 	
 }

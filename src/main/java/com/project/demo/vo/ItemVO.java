@@ -44,4 +44,7 @@ public class ItemVO {
 	private int recipeItem1;
 	private int recipeItem2;
 	private int recipeItem3;
+	private String recipeItem1Name;
+	private String recipeItem2Name;
+	private String recipeItem3Name;
 }

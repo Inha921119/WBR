@@ -234,6 +234,6 @@ public interface InventoryRepository {
 				WHERE iv.playerId = #{playerId}
 				AND iv.quantity != 0;
 			""")
-	List<Inventory> getInventoryUsefulItemByPlayerId(int playerId);
+	List<Inventory> getInventoryUsefulItemCodeByPlayerId(int playerId);
 	
 }

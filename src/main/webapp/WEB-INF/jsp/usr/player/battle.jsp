@@ -285,15 +285,18 @@
 			}, 'json');
 		}	
 		
-		function getSkill_form(memberId, level) {
+		function getSkill_form(memberId, playerId, level, skillPoint) {
 			var memberId = memberId;
+			var playerId = playerId;
 			var level = level;
+			var skillPoint = skillPoint;
 			
 			if(originalForm != null) {
 				actionTab_cancle();
 			}
 			
 			$.get('../player/getSkillListByLv', {
+				memberId : memberId,
 				playerId : playerId,
 				level : level,
 			}, function(data){
@@ -305,15 +308,22 @@
 			 	let addHtml = `
 					<ul>
 						<li class="flex justify-center">
-							<ul class="active-list ml-2 mr-2 mt-10">
-								<li>\${data.name}</li>
-								<li class="flex mb-2">
-							    	<button class="active" onclick="actionTab_cancle()"><span>돌아가기</span></button>
-								</li>
-							</ul>
-						</li>
-					</ul>`;
+							<ul class="active-list ml-2 mr-2 mt-2">
+							<li class="flex justify-between text-xl text-blue-600 mb-5"><span>Point</span><span>\${skillPoint}</span></li>
+							<li><ul class="overflow-y-scroll h-64">`
 				
+			 	for(var i=0; i < data.length; i++) {
+			 		var skill = data[i];
+			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"</span>"+"<span class='text-sm'>Point : "+skill.needSkillPoint+"<button class='mybtn ml-2'>습득</button></span>"+"</li>";
+				}
+			 	
+			 	addHtml = addHtml + `</ul></li><li class="flex mb-2">
+					    	<button class="active mt-5" onclick="actionTab_cancle()"><span>돌아가기</span></button>
+							</li>
+						</ul>
+					</li>
+				</ul>`;
+					
 				actionTab.empty().html("");
 				actionTab.append(addHtml);
 			}, 'json');
@@ -334,13 +344,27 @@
 				
 				originalForm = actionTab.html();
 				
-			 	let addHtml = `
+				let addHtml = `
 					<ul>
 						<li class="flex justify-center">
-							<ul class="active-list ml-2 mr-2 mt-10">
-								<li>\${data.name}</li>
-								<li class="flex mb-2">
-							    	<button class="active" onclick="actionTab_cancle()"><span>돌아가기</span></button>
+							<ul class="active-list ml-2 mr-2 mt-2">
+							<li class="flex justify-between text-xl mb-5"><span>조합 가능한 아이템</span></li>
+							<li><ul class="overflow-y-scroll h-64">`
+				
+		 		if (data.length == 0) {
+		 			addHtml = addHtml + "<li class='flex justify-between'><span class='text-lg'>없음</span></li>";
+		 		} else{
+		 			for(var i=0; i < data.length; i++) {
+				 		var item = data[i];
+				 		if (item.recipeItem3 != 0) {
+				 			addHtml = addHtml + "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name + " + " + item.recipeItem3Name;
+				 		} else{
+					 		addHtml = addHtml + "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name;
+				 		}
+			 		}
+			 		addHtml = addHtml + `</span><span class='text-sm'><button class='mybtn ml-2'>조합</button></span></li>`
+				}
+			 		addHtml = addHtml + `</ul></li><li class="flex mb-2"><button class="active mt-5" onclick="actionTab_cancle()"><span>돌아가기</span></button>
 								</li>
 							</ul>
 						</li>
@@ -355,7 +379,7 @@
 			let actionTab = $('#actionTab');
 			actionTab.html(originalForm);
 			
-			$('#locationTab').load(location.href+' #locationTab');
+			$('#actionTab').load(location.href+' #actionTab');
 
 			originalForm = null;
 		}
@@ -465,6 +489,9 @@
 													<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
 												</c:choose>
 											</span>
+											<c:forEach var="skill" items="${skills}">
+												<span> / ${skill.name}</span>
+											</c:forEach>
 										</div>
 									</li>
 								</ul>
@@ -587,7 +614,7 @@
 											<button class="active" onclick="recipe_form(${rq.player.id})">조합법 연구</button>
 										</li>
 										<li class="flex mb-2">
-											<button class="active" onclick="getSkill_form(${rq.getLoginedMemberId() }, ${rq.player.level})">스킬 습득</button>
+											<button class="active" onclick="getSkill_form(${rq.getLoginedMemberId() }, ${rq.player.id}, ${rq.player.level}, ${rq.player.skillPoint})">스킬 습득</button>
 										</li>
 										<li class="flex mb-2">
 											<button class="active text-red-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 0)"><span>치료</span></button>

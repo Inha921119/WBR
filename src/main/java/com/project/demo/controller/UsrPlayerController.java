@@ -1,6 +1,6 @@
 package com.project.demo.controller;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,9 +94,11 @@ public class UsrPlayerController {
 		
 		List<Equipment> equipments = equipmentService.getEquipmentById(player.getId());
 		List<Inventory> inventory = inventoryService.getInventoryByPlayerId(player.getId());
+		List<Skill> skills = skillService.getSkillByPlayerId(player.getId());
 		
 		model.addAttribute("equipments", equipments);
 		model.addAttribute("inventory", inventory);
+		model.addAttribute("skills", skills);
 		
 		return "usr/player/battle";
 	}
@@ -109,14 +111,18 @@ public class UsrPlayerController {
 		
 		List<Equipment> equipments1 = equipmentService.getEquipmentById(player1.getId());
 		List<Inventory> inventory1 = inventoryService.getInventoryByPlayerId(player1.getId());
+		List<Skill> skills1 = skillService.getSkillByPlayerId(player1.getId());
 		List<Equipment> equipments2 = equipmentService.getEquipmentById(player2.getId());
 		List<Inventory> inventory2 = inventoryService.getInventoryByPlayerId(player2.getId());
+		List<Skill> skills2 = skillService.getSkillByPlayerId(player2.getId());
 		
 		model.addAttribute("equipments1", equipments1);
 		model.addAttribute("inventory1", inventory1);
+		model.addAttribute("skills1", skills1);
+		model.addAttribute("player1", player1);
 		model.addAttribute("equipments2", equipments2);
 		model.addAttribute("inventory2", inventory2);
-		model.addAttribute("player1", player1);
+		model.addAttribute("skills2", skills2);
 		model.addAttribute("player2", player2);
 		
 		return "usr/player/battlePhase";
@@ -223,9 +229,11 @@ public class UsrPlayerController {
 		Player player1 = playerService.getPlayerById(playerId1);
 		Player player2 = playerService.getPlayerById(playerId2);
 		
-		int damage = (player1.getAttackPoint()+player1.getIncreseAttackPoint())*((100-player2.getDefencePoint()-player2.getIncreseDefencePoint())/100);
+		double damageCalc = (double) ((double)player1.getAttackPoint()+(double)player1.getIncreseAttackPoint())*((100-(double)player2.getDefencePoint()-(double)player2.getIncreseDefencePoint())/100);
+		int damage = (int) damageCalc;
 		
 		playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+		playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
 		
 		return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
 	}
@@ -397,39 +405,43 @@ public class UsrPlayerController {
 	@ResponseBody
 	public List<ItemVO> getRecipeByPlayerId(int playerId) {
 		
-		List<Inventory> inventory = inventoryService.getInventoryUsefulItemByPlayerId(playerId);
+		List<Inventory> inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId);
+		List<ItemVO> itemRecipes = itemVOService.getItemListRecipe();
+		List<ItemVO> possibleMixItems = new ArrayList<ItemVO>();
 		
-		List<ItemVO> items = itemVOService.getItemList();
-		
-		int[] itemRecipe;
-		itemRecipe = new int[3];
-		
-		int[] recipeItemNum;
-		recipeItemNum = new int[inventory.size()+1];
-		
-		for (int i = 0; i < inventory.size(); i++) {
-			recipeItemNum[i] = inventory.get(i).getItemId();
-			System.out.println(recipeItemNum[i]);
-		}
-		
-		for (ItemVO i : items) {
-			itemRecipe[0] = i.getRecipeItem1();
-			itemRecipe[1] = i.getRecipeItem2();
-			itemRecipe[2] = i.getRecipeItem3();
-			
-			boolean foundAll = Arrays.asList(recipeItemNum).containsAll(Arrays.asList(itemRecipe));
-			
-			if (foundAll) {
-				System.out.println(i.getItemCode());
+		for (int i = 0; i < itemRecipes.size(); i++ ) {
+			for (int j = 0; j < inventory.size(); j++) {
+				if (itemRecipes.get(i).getRecipeItem1() == inventory.get(j).getItemId()) {
+					for (int k = 0; k < inventory.size(); k++) {
+						if (itemRecipes.get(i).getRecipeItem2() == inventory.get(k).getItemId()) {
+							if (itemRecipes.get(i).getRecipeItem3() == 0) {
+								possibleMixItems.add(itemRecipes.get(i));
+							} else {
+								for (int l = 0; l < inventory.size(); l++) {
+									if (itemRecipes.get(i).getRecipeItem3() == inventory.get(k).getItemId()) {
+										possibleMixItems.add(itemRecipes.get(i));
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		
-		return itemVOService.getRecipeByItemCode(recipeItemNum[0], recipeItemNum[1], recipeItemNum[2]);
+		return possibleMixItems;
+	}
+	
+	@RequestMapping("/usr/player/getSkillByPlayerId")
+	@ResponseBody
+	public List<Skill> getSkillByPlayerId(int playerId) {
+		
+		return skillService.getSkillByPlayerId(playerId);
 	}
 	
 	@RequestMapping("/usr/player/getSkillListByLv")
 	@ResponseBody
-	public List<Skill> getSkillListByLv(int memberId, int level) {
+	public List<Skill> getSkillListByLv(int memberId, int playerId, int level) {
 		
 		return skillService.getSkillListByLv(level);
 	}

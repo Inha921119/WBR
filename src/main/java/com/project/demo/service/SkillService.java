@@ -20,5 +20,9 @@ public class SkillService {
 	public List<Skill> getSkillListByLv(int level) {
 		return skillRepository.getSkillListByLv(level);
 	}
+
+	public List<Skill> getSkillByPlayerId(int playerId) {
+		return skillRepository.getSkillByPlayerId(playerId);
+	}
 	
 }

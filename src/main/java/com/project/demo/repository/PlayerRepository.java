@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.project.demo.vo.Player;
-import com.project.demo.vo.ResultData;
 
 @Mapper
 public interface PlayerRepository {
