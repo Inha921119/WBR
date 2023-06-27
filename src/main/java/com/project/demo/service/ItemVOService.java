@@ -17,9 +17,9 @@ public class ItemVOService {
 		this.itemVORepository = itemVORepository;
 	}
 	
-	public ItemVO getItemList() {
+	public List<ItemVO> getItemList() {
 		
-		ItemVO itemList = itemVORepository.getItemList();
+		List<ItemVO> itemList = itemVORepository.getItemList();
 		
 		return itemList;
 	}

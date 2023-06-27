@@ -41,4 +41,7 @@ public class ItemVO {
 	private int durabilityPoint;
 	private int inventoryPoint;
 	private int dropRate;
+	private int recipeItem1;
+	private int recipeItem2;
+	private int recipeItem3;
 }

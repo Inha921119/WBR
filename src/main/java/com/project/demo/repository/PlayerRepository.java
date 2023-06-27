@@ -41,6 +41,7 @@ public interface PlayerRepository {
 				, p.image
 				, p.gender
 				, p.level
+				, p.skillPoint
 				, p.exp
 				, p.maxExp
 				, p.hp
@@ -62,6 +63,7 @@ public interface PlayerRepository {
 				, p.deathStatus
 				, p.deathDate
 				, p.actionType
+				, p.nowLocation
 				, l.lname
 				FROM player AS p
 				INNER JOIN location AS l
@@ -244,4 +246,47 @@ public interface PlayerRepository {
 				WHERE id = #{playerId};
 			""")
 	public Player getPlayerById(int playerId);
+	
+	@Select("""
+			SELECT p.id
+				, p.regDate
+				, p.updateDate
+				, p.`name`
+				, p.memberId
+				, p.image
+				, p.gender
+				, p.level
+				, p.skillPoint
+				, p.exp
+				, p.maxExp
+				, p.hp
+				, p.maxHp
+				, p.sp
+				, p.maxSp
+				, p.attackPoint
+				, p.increseAttackPoint
+				, p.defencePoint
+				, p.increseDefencePoint
+				, p.hitRate
+				, p.increseHitRate
+				, p.missRate
+				, p.increseMissRate
+				, p.findEnemyRate
+				, p.findItemRate
+				, p.inventoryPoint
+				, p.killPoint
+				, p.deathStatus
+				, p.deathDate
+				, p.actionType
+				, p.nowLocation
+				, l.lname
+				FROM player AS p
+				INNER JOIN location AS l
+				ON p.nowlocation = l.id
+				WHERE p.nowLocation = #{nowLocation}
+				AND p.id != #{id}
+				ORDER BY RAND()
+				LIMIT 1;
+			""")
+	public Player getPlayerByLocation(int nowLocation, int id);
 }

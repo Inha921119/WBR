@@ -10,60 +10,7 @@
 		
 		var timer = null;
 		
-		function searchAround() {
-			
-			$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
-			$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-			 
-			}
-		function locationMove(memberId, lo) {
-			var memberId = memberId;
-			var location = lo.value;
-			var locationName = "";
-	
-			$.ajax({
-					url:"../player/moveLocation?memberId="+memberId+"&location="+location,
-					type:"get",
-					datatype:"text",
-					success : function(data) {
-						$("#nowLocation").html("현재 위치 : " + data);
-						$("#notify").append("<p>" + data + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					}
-				});
-			 
-			}
-		function action_type(memberId, ty) {
-			var memberId = memberId;
-			var type = ty.value;
-			
-			$.ajax({
-				url:"../player/getNowActionType?memberId="+memberId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					if (data == type) {
-						$("#notify").append("<p>이미 적용중인 행동유형입니다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					} else {
-						$.ajax({
-							url:"../player/changeActionType?memberId="+memberId+"&type="+type,
-							type:"get",
-							datatype:"text",
-							async: false,
-							success : function(data) {
-								$("#active-effect").text(data);
-								$("#notify").append("<p>행동유형을 " + data + "(으)로 변경했다.</p><p>이제 무엇을 하지?</p>");
-								$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-							}
-						});
-					}
-				}
-			});
-			show_NewStatus(memberId);
-		}
-		
+				
 		function show_NewStatus(memberId) {
 			var memberId = memberId;
 			
@@ -285,38 +232,23 @@
 			}, 'json');
 		}	
 		
-		function getSkill_form(memberId, level) {
+		function action_attack(memberId, playerId1, playerId2) {
 			var memberId = memberId;
-			var level = level;
+			var playerId1 = playerId1;
+			var playerId2 = playerId2;
 			
-			if(originalForm != null) {
-				actionTab_cancle();
-			}
-			
-			$.get('../player/getSkillListByLv', {
-				playerId : playerId,
-				level : level,
-			}, function(data){
-				
-				let actionTab = $('#actionTab');
-				
-				originalForm = actionTab.html();
-				
-			 	let addHtml = `
-					<ul>
-						<li class="flex justify-center">
-							<ul class="active-list ml-2 mr-2 mt-10">
-								<li>\${data.name}</li>
-								<li class="flex mb-2">
-							    	<button class="active" onclick="actionTab_cancle()"><span>돌아가기</span></button>
-								</li>
-							</ul>
-						</li>
-					</ul>`;
-				
-				actionTab.empty().html("");
-				actionTab.append(addHtml);
-			}, 'json');
+			$.ajax({
+				url:"../player/battlePhaseAttack?playerId1="+playerId1+"&playerId2="+playerId2,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					console.log(data);
+					$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					}
+			});
+			show_NewStatus(memberId);
 		}	
 		
 		function recipe_form(playerId) {
@@ -368,9 +300,9 @@
 	
 	<section class="mt-8 bg-black text-white h-screen">
 		<div class="container mx-auto text-center">
-			<div class="mb-20 text-2xl" id="nowLocation">현재 위치 : ${rq.player.lname }</div>
+			<div class="mb-20 text-4xl text-red-400" id="nowLocation">전투 발생</div>
 				<div class="text-xl flex" style="height: 420px;">
-					<div style="border: 2px solid white; width: 45%; position:relative;" >
+					<div style="border: 2px solid white; width: 40%; position:relative;" >
 						<div>
 							<ul style="border: 2px solid white; text-align: center;">
 								<li>스테이터스</li>
@@ -472,160 +404,95 @@
 						</div>
 					</div>
 					
-						<div class="ml-2" style="border: 2px solid white; width: 23%; position:relative;">
-							<div>
-								<ul style="border: 2px solid white">
-									<li>
-										아이템 목록
+					<div class="relative" style="width: 5%;"><span class="text-3xl" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">VS</span></div>
+					
+					<div style="border: 2px solid white; width: 40%; position:relative;" >
+						<div>
+							<ul style="border: 2px solid white; text-align: center;">
+								<li>스테이터스</li>
+							</ul>
+							<div class="flex" style="width: 100%;">
+								<ul style="width: 50%;" id="status">
+									<li class="flex mb-2 mt-2" >
+										<div style="width: 40%">
+											<ul>
+												<li><img class="ml-2" src="/resource/images/${player2.image }.jpg"/></li>
+											</ul>
+										</div>
+										<div class="mt-5" style="width: 70%">
+											<ul class="text-center"><li>이름 : ${player2.name }</li></ul>
+											<ul><li>Lv : 비공개</li></ul>	
+											<ul><li>살해 수 : ${player2.killPoint } 명</li></ul>
+										</div>
 									</li>
+									<li class="text-red-400" id="hp">체력 : 비공개</li>
+									<li class="text-yellow-400" id="sp">스테미나 : 비공개</li>
+									<li id="attack">공격력 : 비공개</li>
+									<li id="defence">방어력 : 비공개</li>
+									<li id="hit">적중 : 비공개</li>
+									<li id="miss">회피 : 비공개</li>
 								</ul>
-								<ul class="text-left p-1"  id="itemList">
-									<c:forEach var="inventory" items="${inventory }" varStatus="status">
-									<li>
-										<c:if test="${inventory.quantity != 0 }">
-											<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
-													<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
-													<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
-													<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
-													<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
-												${inventory.name }
-												<c:if test="${inventory.increseHP != 0}">
-													<b class="text-red-400 text-base">
-														(${inventory.increseHP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseSP != 0}">
-													<b class="text-yellow-400 text-base">
-														(${inventory.increseSP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseAttackPoint != 0}">
-													<b class="text-base" style="color: #ff0000">
-														(${inventory.increseAttackPoint })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseDefencePoint != 0}">
-													<b class="text-base" style="color: #0000ff">
-														(${inventory.increseDefencePoint })
-													</b>
-												</c:if>
-												<c:if test="${inventory.recoveryHP != 0}">
-													<b class="text-red-400 text-base">
-														(${inventory.recoveryHP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.recoverySP != 0}">
-													<b class="text-yellow-400 text-base">
-														(${inventory.recoverySP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.category eq '사용' 
-															|| inventory.category eq '기타'}">
-													<font class="text-sm font-bold mr-2" style="color: green;" id="quan-${status.count }">
-														수량 : ${inventory.quantity }
-													</font>
-												</c:if>
-												<c:if test="${inventory.category eq '무기' 
-															|| inventory.category eq '머리'
-															|| inventory.category eq '상의'
-															|| inventory.category eq '하의'
-															|| inventory.category eq '팔'
-															|| inventory.category eq '신발'}">
-													<font class="text-sm font-bold mr-2" style="color: pink;">
-															내구도 : ${inventory.durabilityPoint }
-													</font>
-												</c:if>
+								<ul style="width: 50%;">
+									<li><ul id="equipmentList">
+									<c:forEach var="equipment2" items="${equipments2 }" varStatus="status">
+										<li class="equip" style="width: 100%">[${equipment2.category }] : 
+																						<c:if test="${equipment2.category eq '무기' 
+																							|| equipment2.category eq '상의'}">
+																							<span id="ename-${status.index }">
+																								${equipment2.name }
+																							</span>
+																						</c:if>
+																						<c:if test="${equipment2.category eq '머리'
+																							|| equipment2.category eq '하의'
+																							|| equipment2.category eq '팔'
+																							|| equipment2.category eq '신발'}">
+																							<span id="ename-${status.index }">
+																								비공개
+																							</span>
+																						</c:if>
+																					</li>
+																				</c:forEach>
+																			</ul>
+																		</li>
+								</ul>
+							</div>
+							<div class="text-left absolute overflow-y-scroll" style="border-top: 1px solid white; width:100%; height: 18.5%;">
+								<ul class="ml-2">
+									<li class="flex">
+										<span>스킬</span>
+										<div class="ml-10" id="skill-list">
+											<span id="active-effect">
+												비공개
 											</span>
-											<c:if test="${inventory.category eq '사용' 
-															|| inventory.category eq '기타'}">
-												<button class="mybtn" onclick="useItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
-													<span>사용</span>
-												</button>
-											</c:if>
-											<c:if test="${inventory.category eq '무기' 
-															|| inventory.category eq '머리'
-															|| inventory.category eq '상의'
-															|| inventory.category eq '하의'
-															|| inventory.category eq '팔'
-															|| inventory.category eq '신발'}">
-												<button class="mybtn" onclick="equipItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
-													<span>장착</span>
-												</button>
-											</c:if>
-											
-											<button class="mybtn" onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${inventory.id }, ${status.count })">
-												<span>버림</span>
-											</button>
-										</c:if>
+										</div>
 									</li>
-									</c:forEach>
 								</ul>
 							</div>
 						</div>
-					
-					<div class="ml-2" style="border: 2px solid white; width: 17%; position:relative;" >
-						<div id="actionTab">
-							<ul style="border: 2px solid white" id="locationTab">
-									<li>
-										위치 이동 : <select class="text-black border-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
-														<option value="1" <c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너 창고</option>
-														<option value="2" <c:if test="${rq.player.lname eq '헬기착륙장'}">selected</c:if>>헬기착륙장</option>
-														<option value="3" <c:if test="${rq.player.lname eq '폐병원'}">selected</c:if>>폐병원</option>
-														<option value="4" <c:if test="${rq.player.lname eq '폐공원'}">selected</c:if>>폐공원</option>
-														<option value="5" <c:if test="${rq.player.lname eq '유적지'}">selected</c:if>>유적지</option>
-														<option value="6" <c:if test="${rq.player.lname eq '신전'}">selected</c:if>>신전</option>
-													</select>
-									</li>
-							</ul>
-							<ul>
-								<li class="flex justify-center">
-									<ul class="active-list ml-2 mr-2 mt-10">
-										<li class="mb-2">
-											<button class="active" onclick="searchAround()">탐색</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" onclick="recipe_form(${rq.player.id})">조합법 연구</button>
-										</li>
-										<li class="flex mb-2">
-											<button class="active" onclick="getSkill_form(${rq.getLoginedMemberId() }, ${rq.player.level})">스킬 습득</button>
-										</li>
-										<li class="flex mb-2">
-											<button class="active text-red-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 0)"><span>치료</span></button>
-											<button class="active text-yellow-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 1)"><span>휴식</span></button>
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</div>
 					</div>
+					
 					
 					<div class="ml-2" style="border: 2px solid white; width: 15%; position:relative;" >
 						<div>
 							<ul style="border: 2px solid white">
 								<li>
-									행동유형
+									전투행동
 								</li>
 							</ul>
 							<ul>
 								<li class="flex justify-center">
 									<ul class="active-list ml-2 mr-2 mt-2">
 										<li class="mb-2">
-											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
+											<button class="active" onclick="action_attack(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">공격</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
+											<button class="active" onclick="action_skill(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">스킬사용</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
+											<button class="active" onclick="action_item(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">아이템사용</button>
 										</li>
 										<li class="mb-2">
-											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
-										</li>
-										<li>
-											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
+											<button class="active" onclick="action_run(${rq.getLoginedMemberId() }, ${player1.id }, ${player2.id })">도주</button>
 										</li>
 									</ul>
 								</li>
@@ -637,7 +504,7 @@
 				<div class="mt-2" style="border: 2px solid white; width: 100%;">알림창</div>
 				<div class="alert-section" id="alert-section">
 					<ul class="h-40">
-						<li class="text-left ml-2" id="notify"><p>지금은 무엇을 하지?</p></li>
+						<li class="text-left ml-2" id="notify"><p>${player2.name }을(를) 발견했다.</p><p>무엇을 하지?</p></li>
 					</ul>
 				</div>
 		</div>

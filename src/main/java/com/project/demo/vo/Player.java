@@ -16,6 +16,7 @@ public class Player {
 	private String image;
 	private int gender;
 	private int level;
+	private int skillPoint;
 	private int exp;
 	private int maxExp;
 	private int hp;
@@ -37,5 +38,6 @@ public class Player {
 	private int deathStatus;
 	private String deathDate;
 	private int actionType;
+	private int nowLocation;
 	private String lname;
 }

@@ -64,4 +64,8 @@ private PlayerRepository playerRepository;
 	public Player getPlayerById(int playerId) {
 		return playerRepository.getPlayerById(playerId);
 	}
+
+	public Player getPlayerByLocation(int nowLocation, int id) {
+		return playerRepository.getPlayerByLocation(nowLocation, id);
+	}
 }

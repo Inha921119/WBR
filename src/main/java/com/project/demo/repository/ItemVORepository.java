@@ -14,7 +14,7 @@ public interface ItemVORepository {
 			SELECT *
 				FROM item;
 			""")
-	public ItemVO getItemList();
+	public List<ItemVO> getItemList();
 	
 	
 	@Select("""

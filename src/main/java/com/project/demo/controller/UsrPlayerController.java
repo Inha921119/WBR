@@ -1,5 +1,6 @@
 package com.project.demo.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import com.project.demo.service.InventoryService;
 import com.project.demo.service.ItemVOService;
 import com.project.demo.service.MemberService;
 import com.project.demo.service.PlayerService;
+import com.project.demo.service.SkillService;
 import com.project.demo.util.Util;
 import com.project.demo.vo.Equipment;
 import com.project.demo.vo.Inventory;
@@ -20,6 +22,7 @@ import com.project.demo.vo.ItemVO;
 import com.project.demo.vo.Player;
 import com.project.demo.vo.ResultData;
 import com.project.demo.vo.Rq;
+import com.project.demo.vo.Skill;
 
 @Controller
 public class UsrPlayerController {
@@ -29,15 +32,17 @@ public class UsrPlayerController {
 	private ItemVOService itemVOService;
 	private EquipmentService equipmentService;
 	private InventoryService inventoryService;
+	private SkillService skillService;
 	private Rq rq;
 	
 	@Autowired
-	public UsrPlayerController(PlayerService playerService, MemberService memberService, ItemVOService itemVOService, EquipmentService equipmentService, InventoryService inventoryService, Rq rq) {
+	public UsrPlayerController(PlayerService playerService, MemberService memberService, ItemVOService itemVOService, EquipmentService equipmentService, InventoryService inventoryService, SkillService skillService, Rq rq) {
 		this.playerService = playerService;
 		this.memberService = memberService;
 		this.itemVOService = itemVOService;
 		this.equipmentService = equipmentService;
 		this.inventoryService = inventoryService;
+		this.skillService = skillService;
 		this.rq = rq;
 	}
 
@@ -94,6 +99,27 @@ public class UsrPlayerController {
 		model.addAttribute("inventory", inventory);
 		
 		return "usr/player/battle";
+	}
+	
+	@RequestMapping("/usr/player/battlePhase")
+	public String showbattlePhase(Model model, int id) {
+		
+		Player player1 = playerService.getPlayerByMemberId(id);
+		Player player2 = playerService.getPlayerByLocation(player1.getNowLocation(), id);
+		
+		List<Equipment> equipments1 = equipmentService.getEquipmentById(player1.getId());
+		List<Inventory> inventory1 = inventoryService.getInventoryByPlayerId(player1.getId());
+		List<Equipment> equipments2 = equipmentService.getEquipmentById(player2.getId());
+		List<Inventory> inventory2 = inventoryService.getInventoryByPlayerId(player2.getId());
+		
+		model.addAttribute("equipments1", equipments1);
+		model.addAttribute("inventory1", inventory1);
+		model.addAttribute("equipments2", equipments2);
+		model.addAttribute("inventory2", inventory2);
+		model.addAttribute("player1", player1);
+		model.addAttribute("player2", player2);
+		
+		return "usr/player/battlePhase";
 	}
 	
 	@RequestMapping("/usr/player/moveLocation")
@@ -188,6 +214,20 @@ public class UsrPlayerController {
 		}
 		
 		return playerService.getActionTypeNameById(type);
+	}
+	
+	@RequestMapping("/usr/player/battlePhaseAttack")
+	@ResponseBody
+	public  ResultData<Player> battlePhaseAttack(int playerId1, int playerId2) {
+		
+		Player player1 = playerService.getPlayerById(playerId1);
+		Player player2 = playerService.getPlayerById(playerId2);
+		
+		int damage = (player1.getAttackPoint()+player1.getIncreseAttackPoint())*((100-player2.getDefencePoint()-player2.getIncreseDefencePoint())/100);
+		
+		playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+		
+		return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
 	}
 	
 	@RequestMapping("/usr/player/getNowActionType")
@@ -359,20 +399,39 @@ public class UsrPlayerController {
 		
 		List<Inventory> inventory = inventoryService.getInventoryUsefulItemByPlayerId(playerId);
 		
-		List<ItemVO> recipeList = null;
+		List<ItemVO> items = itemVOService.getItemList();
+		
+		int[] itemRecipe;
+		itemRecipe = new int[3];
 		
 		int[] recipeItemNum;
 		recipeItemNum = new int[inventory.size()+1];
 		
 		for (int i = 0; i < inventory.size(); i++) {
 			recipeItemNum[i] = inventory.get(i).getItemId();
+			System.out.println(recipeItemNum[i]);
 		}
 		
-		System.out.println(recipeItemNum[0]);
-		System.out.println(recipeItemNum[1]);
-		System.out.println(recipeItemNum[2]);
+		for (ItemVO i : items) {
+			itemRecipe[0] = i.getRecipeItem1();
+			itemRecipe[1] = i.getRecipeItem2();
+			itemRecipe[2] = i.getRecipeItem3();
+			
+			boolean foundAll = Arrays.asList(recipeItemNum).containsAll(Arrays.asList(itemRecipe));
+			
+			if (foundAll) {
+				System.out.println(i.getItemCode());
+			}
+		}
 		
 		return itemVOService.getRecipeByItemCode(recipeItemNum[0], recipeItemNum[1], recipeItemNum[2]);
+	}
+	
+	@RequestMapping("/usr/player/getSkillListByLv")
+	@ResponseBody
+	public List<Skill> getSkillListByLv(int memberId, int level) {
+		
+		return skillService.getSkillListByLv(level);
 	}
 	
 	@RequestMapping("/usr/player/heal")
