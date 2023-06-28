@@ -24,5 +24,13 @@ public class SkillService {
 	public List<Skill> getSkillByPlayerId(int playerId) {
 		return skillRepository.getSkillByPlayerId(playerId);
 	}
+
+	public void learnSkill(int playerId, int skillId) {
+		skillRepository.learnSkill(playerId, skillId);
+	}
+
+	public Skill getOneSkillById(int skillId) {
+		return skillRepository.getOneSkillById(skillId);
+	}
 	
 }

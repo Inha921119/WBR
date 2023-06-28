@@ -52,4 +52,12 @@ public class InventoryService {
 		return inventoryRepository.getInventoryItemById(invenId);
 	}
 
+	public void reviveEquip(int playerId, int itemId, int invenId) {
+		inventoryRepository.reviveEquip(playerId, itemId, invenId);				
+	}
+
+	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus) {
+		return inventoryRepository.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, delStatus);
+	}
+
 }

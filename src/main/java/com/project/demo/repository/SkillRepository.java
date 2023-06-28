@@ -2,6 +2,7 @@ package com.project.demo.repository;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -50,5 +51,21 @@ public interface SkillRepository {
 				WHERE playerId = #{playerId};
 			""")
 	List<Skill> getSkillByPlayerId(int playerId);
+
+	@Insert("""
+			INSERT INTO skill
+				SET regDate = NOW()
+					, updateDate = NOW()
+					, playerId = #{playerId}
+					, skillId = #{skillId};
+			""")
+	public void learnSkill(int playerId, int skillId);
+	
+	@Select("""
+			SELECT *
+				FROM skillList
+				WHERE id = #{skillId};
+			""")
+	public Skill getOneSkillById(int skillId);
 	
 }

@@ -282,11 +282,11 @@ public class UsrPlayerController {
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
 			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
+			return inventoryService.getInventoryItemById(inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
 		} else {
 			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
+			return inventoryService.getInventoryItemByItemId(playerId, itemId);
 		}
-		
-		return inventoryService.getInventoryItemByItemId(playerId, itemId);
 	}
 	
 	@RequestMapping("/usr/player/equipItem")
@@ -331,6 +331,7 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 1);
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
+			invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 1);
 			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
 		} else {
 			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
@@ -371,7 +372,7 @@ public class UsrPlayerController {
 		int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
-			inventoryService.addItem(playerId, itemId);
+			inventoryService.reviveEquip(playerId, itemId, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
 		} else {
 			if (chkExistItem == 1) {
 				inventoryService.getItem(playerId, itemId);
@@ -430,6 +431,23 @@ public class UsrPlayerController {
 		}
 		
 		return possibleMixItems;
+	}
+	
+	@RequestMapping("/usr/player/learnSkill")
+	@ResponseBody
+	public ResultData<List<Skill>> learnSkill(int playerId, int skillId) {
+		
+		Player player = playerService.getPlayerById(playerId);
+		Skill skill = skillService.getOneSkillById(skillId);
+		
+		skillService.learnSkill(playerId, skillId);
+		
+		if (player.getSkillPoint() < skill.getNeedSkillPoint()) {
+			return ResultData.from("F-1", "스킬포인트가 부족합니다.", "skillList", skillService.getSkillByPlayerId(playerId));
+		} else {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "skillPoint", player.getSkillPoint(), skill.getNeedSkillPoint());
+			return ResultData.from("S-1", "스킬을 배우는데 성공하였습니다.", "skillList", skillService.getSkillByPlayerId(playerId));
+		}
 	}
 	
 	@RequestMapping("/usr/player/getSkillByPlayerId")

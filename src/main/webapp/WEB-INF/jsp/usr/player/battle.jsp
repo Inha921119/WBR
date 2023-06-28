@@ -285,6 +285,26 @@
 			}, 'json');
 		}	
 		
+		function learnSkill(playerId, skillId) {
+			var playerId = playerId;
+			var skillId = skillId;
+			
+			$.ajax({
+				url:"../player/learnSkill?playerId="+playerId+"&skillId="+skillId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+				    $('#skill-list').load(location.href+' #skill-list');
+					$("#notify").append("<p>스킬을 배웠다</p>");
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+				}
+			});
+			show_NewStatus(memberId);
+		}
+		
+		
+		
 		function getSkill_form(memberId, playerId, level, skillPoint) {
 			var memberId = memberId;
 			var playerId = playerId;
@@ -314,7 +334,7 @@
 				
 			 	for(var i=0; i < data.length; i++) {
 			 		var skill = data[i];
-			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"</span>"+"<span class='text-sm'>Point : "+skill.needSkillPoint+"<button class='mybtn ml-2'>습득</button></span>"+"</li>";
+			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"</span>"+"<span class='text-sm'>Point : "+skill.needSkillPoint+"<button class='mybtn ml-2' onclick='learnSkill(" + playerId + "," + skill.id + "); actionTab_cancle();'>습득</button></span>"+"</li>";
 				}
 			 	
 			 	addHtml = addHtml + `</ul></li><li class="flex mb-2">
@@ -352,23 +372,39 @@
 							<li><ul class="overflow-y-scroll h-64">`
 				
 		 		if (data.length == 0) {
-		 			addHtml = addHtml + "<li class='flex justify-between'><span class='text-lg'>없음</span></li>";
+		 			addHtml = addHtml
+		 					+ `<li class='flex justify-between'>
+		 						<span class='text-lg'>없음</span>
+	 						</li>`;
 		 		} else{
 		 			for(var i=0; i < data.length; i++) {
 				 		var item = data[i];
 				 		if (item.recipeItem3 != 0) {
-				 			addHtml = addHtml + "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name + " + " + item.recipeItem3Name;
+				 			addHtml = addHtml
+				 					+ "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name + " + " + item.recipeItem3Name;
 				 		} else{
-					 		addHtml = addHtml + "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name;
+					 		addHtml = addHtml 
+					 				+ "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name;
 				 		}
 			 		}
-			 		addHtml = addHtml + `</span><span class='text-sm'><button class='mybtn ml-2'>조합</button></span></li>`
+			 		addHtml = addHtml
+			 				+ `</span>
+			 					<button class='mybtn ml-2 text-sm'>
+			 						<span>조합</span>
+		 						</button>
+	 						</li>`
 				}
-			 		addHtml = addHtml + `</ul></li><li class="flex mb-2"><button class="active mt-5" onclick="actionTab_cancle()"><span>돌아가기</span></button>
-								</li>
-							</ul>
-						</li>
-					</ul>`;
+			 		addHtml = addHtml
+			 				+ `</ul>
+			 				</li>
+			 				<li class="flex mb-2">
+			 					<button class="active mt-5" onclick="actionTab_cancle()">
+			 						<span>돌아가기</span>
+		 						</button>
+	 						</li>
+ 						</ul>
+					</li>
+				</ul>`;
 				
 				actionTab.empty().html("");
 				actionTab.append(addHtml);
@@ -509,7 +545,7 @@
 								<ul class="text-left p-1"  id="itemList">
 									<c:forEach var="inventory" items="${inventory }" varStatus="status">
 									<li>
-										<c:if test="${inventory.quantity != 0 }">
+										<c:if test="${inventory.quantity != 0 && inventory.delStatus != 0}">
 											<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
 													<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
 													<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
@@ -563,8 +599,7 @@
 													</font>
 												</c:if>
 											</span>
-											<c:if test="${inventory.category eq '사용' 
-															|| inventory.category eq '기타'}">
+											<c:if test="${inventory.category eq '사용'}">
 												<button class="mybtn" onclick="useItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
 													<span>사용</span>
 												</button>

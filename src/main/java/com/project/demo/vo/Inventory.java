@@ -26,4 +26,5 @@ public class Inventory {
 	private int increseHitRate;
 	private int increseMissRate;
 	private int durabilityPoint;
+	private int delStatus;
 }

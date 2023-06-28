@@ -2,7 +2,6 @@ package com.project.demo.repository;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -151,9 +150,12 @@ public interface InventoryRepository {
 			""")
 	public void useItem(int playerId, int itemId);
 	
-	@Delete("""
+	@Update("""
 			<script>
-				DELETE FROM inventory
+				UPDATE inventory
+					<set>
+						delStatus = 0
+					</set>
 					WHERE playerId = #{playerId}
 					AND itemId = #{itemId}
 					<if test="invenId != 0">
@@ -163,6 +165,22 @@ public interface InventoryRepository {
 			</script>
 			""")
 	public void useEquip(int playerId, int itemId, int invenId);
+	
+	@Update("""
+			<script>
+				UPDATE inventory
+					<set>
+						delStatus = 1
+					</set>
+						WHERE playerId = #{playerId}
+						AND itemId = #{itemId}
+						<if test="invenId != 0">
+							AND id = #{invenId}
+						</if>
+						LIMIT 1;
+			</script>
+			""")
+	public void reviveEquip(int playerId, int itemId, int invenId);
 	
 	@Select("""
 			SELECT EXISTS(
@@ -236,4 +254,20 @@ public interface InventoryRepository {
 			""")
 	List<Inventory> getInventoryUsefulItemCodeByPlayerId(int playerId);
 	
+	@Select("""
+			<script>
+				SELECT id
+					FROM inventory
+					WHERE itemId = #{itemId}
+					AND playerId = #{playerId}
+					<if test="delStatus == 0">
+						AND delStatus = 0
+					</if>
+					<if test="delStatus == 1">
+						AND delStatus = 1
+					</if>
+					LIMIT 1;
+			</script>
+			""")
+	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus);
 }
