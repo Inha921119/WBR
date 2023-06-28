@@ -116,6 +116,9 @@ public interface PlayerRepository {
 							<when test="statName == 'level'">
 								level = level + #{num}
 							</when>
+							<when test="statName == 'skillPoint'">
+								skillPoint = skillPoint + #{num}
+							</when>
 							<when test="statName == 'exp'">
 								exp = exp + #{num}
 							</when>
@@ -176,6 +179,9 @@ public interface PlayerRepository {
 						<choose>
 							<when test="statName == 'level'">
 								level = level - #{num}
+							</when>
+							<when test="statName == 'skillPoint'">
+								skillPoint = skillPoint - #{num}
 							</when>
 							<when test="statName == 'exp'">
 								exp = exp - #{num}

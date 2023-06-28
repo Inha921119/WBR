@@ -285,7 +285,8 @@
 			}, 'json');
 		}	
 		
-		function learnSkill(playerId, skillId) {
+		function learnSkill(memberId, playerId, skillId) {
+			var memberId = memberId;
 			var playerId = playerId;
 			var skillId = skillId;
 			
@@ -295,15 +296,18 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
+					console.log(data);
 				    $('#skill-list').load(location.href+' #skill-list');
-					$("#notify").append("<p>스킬을 배웠다</p>");
+				    if(data.success) {
+						$("#notify").append("<p>" + data.data1.name + "을(를) 배웠다</p>");
+				    }else {
+						$("#notify").append("<p>" + data.msg + "</p>");
+				    }
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 				}
 			});
 			show_NewStatus(memberId);
 		}
-		
-		
 		
 		function getSkill_form(memberId, playerId, level, skillPoint) {
 			var memberId = memberId;
@@ -334,7 +338,7 @@
 				
 			 	for(var i=0; i < data.length; i++) {
 			 		var skill = data[i];
-			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"</span>"+"<span class='text-sm'>Point : "+skill.needSkillPoint+"<button class='mybtn ml-2' onclick='learnSkill(" + playerId + "," + skill.id + "); actionTab_cancle();'>습득</button></span>"+"</li>";
+			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"</span>"+"<span class='text-sm'>Point : "+skill.needSkillPoint+"<button class='mybtn ml-2' onclick='learnSkill("+ memberId + "," + playerId + "," + skill.id + "); actionTab_cancle();'>습득</button></span>"+"</li>";
 				}
 			 	
 			 	addHtml = addHtml + `</ul></li><li class="flex mb-2">

@@ -17,8 +17,8 @@ public class SkillService {
 		this.skillRepository = skillRepository;
 	}
 
-	public List<Skill> getSkillListByLv(int level) {
-		return skillRepository.getSkillListByLv(level);
+	public List<Skill> getSkillListByPIdAndLv(int playerId, int level) {
+		return skillRepository.getSkillListByPIdAndLv(playerId, level);
 	}
 
 	public List<Skill> getSkillByPlayerId(int playerId) {

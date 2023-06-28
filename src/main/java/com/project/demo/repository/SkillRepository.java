@@ -14,9 +14,10 @@ public interface SkillRepository {
 	@Select("""
 			SELECT *
 				FROM skillList
-				WHERE needLearnLevel <= #{level};
+				WHERE needLearnLevel <= #{level}
+				AND id NOT IN (SELECT skillId FROM skill WHERE playerId = #{playerId})
 			""")
-	List<Skill> getSkillListByLv(int level);
+	List<Skill> getSkillListByPIdAndLv(int playerId, int level);
 	
 	@Select("""
 			SELECT s.*

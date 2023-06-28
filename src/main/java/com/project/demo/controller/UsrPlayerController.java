@@ -435,18 +435,18 @@ public class UsrPlayerController {
 	
 	@RequestMapping("/usr/player/learnSkill")
 	@ResponseBody
-	public ResultData<List<Skill>> learnSkill(int playerId, int skillId) {
+	public ResultData<Skill> learnSkill(int playerId, int skillId) {
 		
 		Player player = playerService.getPlayerById(playerId);
 		Skill skill = skillService.getOneSkillById(skillId);
 		
-		skillService.learnSkill(playerId, skillId);
 		
-		if (player.getSkillPoint() < skill.getNeedSkillPoint()) {
-			return ResultData.from("F-1", "스킬포인트가 부족합니다.", "skillList", skillService.getSkillByPlayerId(playerId));
+		if (player.getSkillPoint() >= skill.getNeedSkillPoint()) {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "skillPoint", skill.getNeedSkillPoint(), 1);
+			skillService.learnSkill(playerId, skillId);
+			return ResultData.from("S-1", "스킬을 배우는데 성공하였습니다.", "skillList", skillService.getOneSkillById(skillId));
 		} else {
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "skillPoint", player.getSkillPoint(), skill.getNeedSkillPoint());
-			return ResultData.from("S-1", "스킬을 배우는데 성공하였습니다.", "skillList", skillService.getSkillByPlayerId(playerId));
+			return ResultData.from("F-1", "스킬포인트가 부족합니다.", "skillList", skillService.getOneSkillById(skillId));
 		}
 	}
 	
@@ -461,7 +461,7 @@ public class UsrPlayerController {
 	@ResponseBody
 	public List<Skill> getSkillListByLv(int memberId, int playerId, int level) {
 		
-		return skillService.getSkillListByLv(level);
+		return skillService.getSkillListByPIdAndLv(playerId, level);
 	}
 	
 	@RequestMapping("/usr/player/heal")
