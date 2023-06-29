@@ -62,7 +62,50 @@ public interface EquipmentRepository {
 				ON i.categoryNum = ic.id
 				WHERE e.playerId = #{playerId};
 			""")
-	public List<Equipment> getEquipmentById(int playerId);
+	public List<Equipment> getEquipmentsByPlayerId(int playerId);
+	
+	@Select("""
+			SELECT e.*
+				, ic.category
+				, i.categoryNum
+				, i.name
+				, i.rarity
+				, i.useType
+				, i.useHand
+				, i.useHP
+				, i.recoveryHP
+				, i.increseHP
+				, i.decreseHP
+				, i.useSP
+				, i.recoverySP
+				, i.increseSP
+				, i.decreseSP
+				, i.increseAttackPoint
+				, i.decreseAttackPoint
+				, i.increseDefencePoint
+				, i.decreseDefencePoint
+				, i.increseHitRate
+				, i.decreseHitRate
+				, i.increseMissRate
+				, i.decreseMissRate
+				, i.increseFindItemRate
+				, i.decreseFindItemRate
+				, i.increseFindEnemyRate
+				, i.decreseFindEnemyRate
+				, i.durabilityPoint
+				, i.inventoryPoint
+				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
+				FROM equipment AS e
+				INNER JOIN item AS i
+				ON e.usedItemCode = i.itemCode
+				INNER JOIN itemCategory AS ic
+				ON i.categoryNum = ic.id
+				WHERE e.id = #{equipId};
+			""")
+	public Equipment getEquipmentById(int equipId);
 
 
 	@Update("""
@@ -112,7 +155,7 @@ public interface EquipmentRepository {
 	public int getMaxEquipIdByItemId(int playerId, int categoryNum);
 	
 	@Select("""
-			SELECT MIN(id)
+			SELECT MIN(e.id)
 				FROM equipment AS e
 				INNER JOIN item AS i
 				ON e.usedItemCode = i.itemCode

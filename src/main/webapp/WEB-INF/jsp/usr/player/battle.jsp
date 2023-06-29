@@ -296,7 +296,6 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					console.log(data);
 				    $('#skill-list').load(location.href+' #skill-list');
 				    if(data.success) {
 						$("#notify").append("<p>" + data.data1.name + "을(를) 배웠다</p>");

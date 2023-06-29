@@ -22,9 +22,13 @@ public class EquipmentService {
 		equipmentRepository.createEquipment(id);
 	}
 
-	public List<Equipment> getEquipmentById(int playerId) {
+	public List<Equipment> getEquipmentsByPlayerId(int playerId) {
 		
-		return equipmentRepository.getEquipmentById(playerId);
+		return equipmentRepository.getEquipmentsByPlayerId(playerId);
+	}
+	
+	public Equipment getEquipmentById(int equipId) {
+		return equipmentRepository.getEquipmentById(equipId);
 	}
 
 	public void equipItem(int playerId, int itemId, int categoryNum, int equipId) {
@@ -42,4 +46,6 @@ public class EquipmentService {
 	public int getMinEquipIdByItemId(int playerId, int categoryNum) {
 		return equipmentRepository.getMinEquipIdByItemId(playerId, categoryNum);
 	}
+
+	
 }

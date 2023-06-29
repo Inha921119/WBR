@@ -92,7 +92,7 @@ public class UsrPlayerController {
 		
 		Player player = playerService.getPlayerByMemberId(id);
 		
-		List<Equipment> equipments = equipmentService.getEquipmentById(player.getId());
+		List<Equipment> equipments = equipmentService.getEquipmentsByPlayerId(player.getId());
 		List<Inventory> inventory = inventoryService.getInventoryByPlayerId(player.getId());
 		List<Skill> skills = skillService.getSkillByPlayerId(player.getId());
 		
@@ -109,10 +109,10 @@ public class UsrPlayerController {
 		Player player1 = playerService.getPlayerByMemberId(id);
 		Player player2 = playerService.getPlayerByLocation(player1.getNowLocation(), id);
 		
-		List<Equipment> equipments1 = equipmentService.getEquipmentById(player1.getId());
+		List<Equipment> equipments1 = equipmentService.getEquipmentsByPlayerId(player1.getId());
 		List<Inventory> inventory1 = inventoryService.getInventoryByPlayerId(player1.getId());
 		List<Skill> skills1 = skillService.getSkillByPlayerId(player1.getId());
-		List<Equipment> equipments2 = equipmentService.getEquipmentById(player2.getId());
+		List<Equipment> equipments2 = equipmentService.getEquipmentsByPlayerId(player2.getId());
 		List<Inventory> inventory2 = inventoryService.getInventoryByPlayerId(player2.getId());
 		List<Skill> skills2 = skillService.getSkillByPlayerId(player2.getId());
 		
@@ -224,18 +224,132 @@ public class UsrPlayerController {
 	
 	@RequestMapping("/usr/player/battlePhaseAttack")
 	@ResponseBody
-	public  ResultData<Player> battlePhaseAttack(int playerId1, int playerId2) {
+	public  ResultData<Player> battlePhaseAttack(int playerId1, int playerId2, int skillId) {
 		
 		Player player1 = playerService.getPlayerById(playerId1);
 		Player player2 = playerService.getPlayerById(playerId2);
+		Skill skill = skillService.getOneSkillById(skillId);
+		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByItemId(playerId1, 2));
+		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByItemId(playerId1, 2));
 		
-		double damageCalc = (double) ((double)player1.getAttackPoint()+(double)player1.getIncreseAttackPoint())*((100-(double)player2.getDefencePoint()-(double)player2.getIncreseDefencePoint())/100);
-		int damage = (int) damageCalc;
+		double damageCalc = 0;
+		int damage = 0;
 		
-		playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-		playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-		
-		return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+		if (skillId == 0) {
+			damageCalc = (double) ((double)player1.getAttackPoint()+(double)player1.getIncreseAttackPoint())*((100-(double)player2.getDefencePoint()-(double)player2.getIncreseDefencePoint())/100);
+			damage = (int) damageCalc;
+			
+			if (player1.getSp() >= 20) {
+				playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+				playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+				return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+			} else {
+				return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+			}
+		} else {
+			damageCalc = (double) ((double)player1.getAttackPoint()+(double)player1.getIncreseAttackPoint()+(double)skill.getIncreseAttackPoint())*((100-(double)player2.getDefencePoint()-(double)player2.getIncreseDefencePoint())/100);
+			damage = (int) damageCalc;
+			
+			switch(skillId) {
+			case 1: case 2: // 총기
+				if(weapon1.getItemCode() == 152 || weapon1.getItemCode() == 153 || weapon2.getItemCode() == 152 || weapon2.getItemCode() == 153) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 3: case 4: // 활
+				if(weapon1.getItemCode() == 150 || weapon1.getItemCode() == 151 || weapon2.getItemCode() == 150 || weapon2.getItemCode() == 151) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 5: // 투척
+				if((weapon1.getItemCode() >= 201 && weapon1.getItemCode() <= 250) || (weapon2.getItemCode() >= 201 && weapon2.getItemCode() <= 250)) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 7: case 8: // 폭탄
+				if(weapon1.getItemCode() == 208 || weapon2.getItemCode() == 208) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 9: case 10: case 11: // 검, 단검
+				if((weapon1.getItemCode() >= 101 && weapon1.getItemCode() <= 106) || (weapon2.getItemCode() >= 101 && weapon2.getItemCode() <= 106)
+					|| weapon1.getItemCode() == 113 || weapon2.getItemCode() == 113 || weapon1.getItemCode() == 116 || weapon2.getItemCode() == 116
+					|| weapon1.getItemCode() == 118 || weapon2.getItemCode() == 118) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 12: case 13: case 14: // 둔기
+				if(weapon1.getItemCode() == 107 || weapon2.getItemCode() == 107 || weapon1.getItemCode() == 108 || weapon2.getItemCode() == 108
+					|| weapon1.getItemCode() == 111 || weapon2.getItemCode() == 111 || weapon1.getItemCode() == 112 || weapon2.getItemCode() == 112
+					|| weapon1.getItemCode() == 114 || weapon2.getItemCode() == 114 || weapon1.getItemCode() == 115 || weapon2.getItemCode() == 115
+					|| weapon1.getItemCode() == 117 || weapon2.getItemCode() == 117) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			case 15: case 16: case 17: // 주먹
+				if(weapon1.getItemCode() == 119 || weapon2.getItemCode() == 119) {
+					if (player1.getSp() >= skill.getUseSP()) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					} else {
+						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+					}
+				} else {
+					return ResultData.from("F-2", "현재 무기로는 사용할 수 없는 스킬입니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			default:
+				if (player1.getSp() >= skill.getUseSP()) {
+					playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+					playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+					return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+				} else {
+					return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
+				}
+			}
+		}
 	}
 	
 	@RequestMapping("/usr/player/getNowActionType")
@@ -295,7 +409,7 @@ public class UsrPlayerController {
 		
 		ItemVO item = itemVOService.getItemByCode(itemId);
 		
-		List<Equipment> equipItems = equipmentService.getEquipmentById(playerId);
+		List<Equipment> equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
 		int equipId = 0;
 		int invenId = 0;
@@ -339,7 +453,7 @@ public class UsrPlayerController {
 		
 		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId); // DB가서 장비아이템 코드 변경(실제 장착)
 		
-		equipItems = equipmentService.getEquipmentById(playerId);
+		equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
 		return equipItems;
 	}
@@ -350,7 +464,7 @@ public class UsrPlayerController {
 		
 		ItemVO item = itemVOService.getItemByCode(itemId);
 		
-		List<Equipment> equipItems = equipmentService.getEquipmentById(playerId);
+		List<Equipment> equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
 		if (item.getUseHand() == 2) {
 			equipId = 0;
@@ -383,7 +497,7 @@ public class UsrPlayerController {
 		
 		equipmentService.equipOff(playerId, item.getCategoryNum(), equipId);
 		
-		equipItems = equipmentService.getEquipmentById(playerId);
+		equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
 		return equipItems;
 	}

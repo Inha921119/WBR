@@ -236,20 +236,71 @@
 			var memberId = memberId;
 			var playerId1 = playerId1;
 			var playerId2 = playerId2;
+			var skillId = 0;
 			
 			$.ajax({
-				url:"../player/battlePhaseAttack?playerId1="+playerId1+"&playerId2="+playerId2,
+				url:"../player/battlePhaseAttack?playerId1="+playerId1+"&playerId2="+playerId2+"&skillId="+skillId,
 				type:"get",
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+					console.log(data);
+
+					if(data.success) {
+						$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+				    }else {
+						$("#notify").append("<p>" + data.msg + "</p>");
+						$("#notify").append("<p>강제로 도주합니다.</p>");
+				    }
+					$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
 					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 					}
 			});
 			show_NewStatus(memberId);
-			replace_battle(memberId);
-		}	
+			setTimeout(function() {
+				replace_battle(memberId); 
+				}, 3000);// 3초 후 실행
+		}
+		
+		function action_skill(memberId, playerId1, playerId2, skillId) {
+			var memberId = memberId;
+			var playerId1 = playerId1;
+			var playerId2 = playerId2;
+			var skillId = skillId;
+			var resultCode = "";
+			
+			$.ajax({
+				url:"../player/battlePhaseAttack?playerId1="+playerId1+"&playerId2="+playerId2+"&skillId="+skillId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					console.log(data);
+					if(data.success) {
+						$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+						$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					} else if(data.resultCode == "F-2") {
+						resultCode = data.resultCode;
+						$("#notify").append("<p>" + data.msg + "</p>");
+						$("#notify").append("<p>다른 행동을 선택해 주세요.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					} else {
+						$("#notify").append("<p>" + data.msg + "</p>");
+						$("#notify").append("<p>강제로 도주합니다.</p>");
+						$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+				    }
+				}
+			});
+			show_NewStatus(memberId);
+			if (resultCode != "F-2") {
+				setTimeout(function() {
+					replace_battle(memberId); 
+					}, 3000);// 3초 후 실행
+			}
+		}
+		
 		
 		function action_skill_form(memberId, playerId1, playerId2) {
 			var memberId = memberId;
@@ -278,7 +329,7 @@
 			 	for(var i=0; i < data.length; i++) {
 			 		var skill = data[i];
 			 		var damage = skill.attackPoint + skill.increseAttackPoint;
-			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"<span class='text-sm text-red-400'>("+damage+")</span></span><button class='mybtn ml-2'>사용</button></li>";
+			 		addHtml = addHtml + "<li class='flex justify-between'>"+"<span class='text-lg'>"+skill.name+"<span class='text-sm text-red-400'>("+damage+")</span></span><button class='mybtn ml-2' onclick='action_skill(" + memberId + ","  + playerId1 + ","  + playerId2 + "," + skill.id +")'>사용</button></li>";
 				}
 			 	
 			 	addHtml = addHtml + `</ul></li><li class="flex mb-2">
