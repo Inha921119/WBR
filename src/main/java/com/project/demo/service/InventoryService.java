@@ -36,16 +36,16 @@ public class InventoryService {
 		return inventoryRepository.checkExistItem(playerId, itemId);
 	}
 
-	public void addItem(int playerId, int itemId) {
-		inventoryRepository.addItem(playerId, itemId);
+	public void addItem(int playerId, int itemId, int quantity, int itemDP) {
+		inventoryRepository.addItem(playerId, itemId, quantity, itemDP);
 	}
 
 	public void getItem(int playerId, int itemId) {
 		inventoryRepository.getItem(playerId, itemId);
 	}
 
-	public void useEquip(int playerId, int itemId, int invenId) {
-		inventoryRepository.useEquip(playerId, itemId, invenId);		
+	public void useEquip(int playerId, int itemId, int invenId, int del) {
+		inventoryRepository.useEquip(playerId, itemId, invenId, del);		
 	}
 
 	public Inventory getInventoryItemById(int invenId) {

@@ -452,7 +452,7 @@
 											<ul><li class="text-green-500">경험치 : ${rq.player.exp } / ${rq.player.maxExp }</li></ul>
 										</div>
 									</li>
-									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</li>
+									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp}</li>
 									<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
 									<li id="attack">공격력 : ${rq.player.attackPoint }  (${rq.player.increseAttackPoint })</li>
 									<li id="defence">방어력 : ${rq.player.defencePoint }  (${rq.player.increseDefencePoint })</li>

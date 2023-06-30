@@ -30,213 +30,13 @@
 			});
 		}
 		
-		function useItem(memberId, playerId, itemId, scount) {
-			var memberId = memberId;
-			var playerId = playerId;
-			var itemId = itemId;
-			var scount = scount;
-			var quan = 1
-			
-			$.ajax({
-				url:"../player/useItem?playerId="+playerId+"&itemId="+itemId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					$("#quan-" + scount).text("수량 : " + data.quantity);
-					quan = data.quantity;
-					if (data.itemId <= 50) {
-						$("#notify").append("<p>" + data.name + "을(를) 사용하여 체력이 " + data.recoveryHP + " 회복되었다</p>");
-					}else if (data.itemId > 50) {
-						$("#notify").append("<p>" + data.name + "을(를) 사용하여 스테미나가 " + data.recoverySP + " 회복되었다</p>");
-					}
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					if (data.quantity == 0) {
-				    	$('#itemList').load(location.href+' #itemList');
-				    }
-				}
-			});
-			show_NewStatus(memberId);
-		}
-		
-		function deleteItem(memberId, playerId, itemId, invenId, scount) {
-			var memberId = memberId;
-			var playerId = playerId;
-			var itemId = itemId;
-			var invenId = invenId;
-			var scount = scount;
-			var quan = 1
-			
-			$.ajax({
-				url:"../player/deleteItem?playerId="+playerId+"&itemId="+itemId+"&invenId="+invenId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					$("#quan-" + scount).text("수량 : " + data.quantity);
-					quan = data.quantity;
-					$("#notify").append("<p>" + data.name + "을(를) 버렸다</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-				    $('#itemList').load(location.href+' #itemList');
-				}
-			});
-			show_NewStatus(memberId);
-		}
-		
-		function equipItem(memberId, playerId, itemId, scount) {
-			var memberId = memberId;
-			var playerId = playerId;
-			var itemId = itemId;
-			var scount = scount;
-			
-			$.ajax({
-				url:"../player/equipItem?playerId="+playerId+"&itemId="+itemId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					for (var i in data) {
-						$("#ename-" + i).text(data[i].name);
-						$("#eiHP-" + i).text("(" + data[i].increseHP + ")");
-						$("#eiSP-" + i).text("(" + data[i].increseSP + ")");
-						$("#eiAP-" + i).text("(" + data[i].increseAttackPoint + ")");
-						$("#eiDP-" + i).text("(" + data[i].increseDefencePoint + ")");
-						$("#eDP-" + i).text("(" + data[i].durabilityPoint + ")");
-					}
-					$('#itemList').load(location.href+' #itemList');
-				    $('#equipmentList').load(location.href+' #equipmentList');
-					$("#notify").append("<p>장비를 장착하였다</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-				}
-			});
-			show_NewStatus(memberId);
-		}
-		
-		function equipOff(memberId, playerId, itemId, equipId, scount) {
-			var memberId = memberId;
-			var playerId = playerId;
-			var itemId = itemId;
-			var equipId = equipId;
-			var scount = scount;
-			
-			$.ajax({
-				url:"../player/equipOff?playerId="+playerId+"&itemId="+itemId+"&equipId="+equipId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					for (var i in data) {
-						$("#ename-" + i).text(data[i].name);
-						$("#eiHP-" + i).text("(" + data[i].increseHP + ")");
-						$("#eiSP-" + i).text("(" + data[i].increseSP + ")");
-						$("#eiAP-" + i).text("(" + data[i].increseAttackPoint + ")");
-						$("#eiDP-" + i).text("(" + data[i].increseDefencePoint + ")");
-						$("#eDP-" + i).text("(" + data[i].durabilityPoint + ")");
-					}
-					$('#itemList').load(location.href+' #itemList');
-				    $('#equipmentList').load(location.href+' #equipmentList');
-					$("#notify").append("<p>장비를 해제하였다</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-				}
-			});
-			show_NewStatus(memberId);
-		}
-		function heal(memberId, sec, type) {
-			var memberId = memberId;
-			var healSec = sec;
-			var type = type;
-			
-			$.ajax({
-				url:"../player/heal?memberId="+memberId+"&healSec="+sec+"&type="+type,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					if (type == 0) {
-						$("#notify").append("<p>체력을 " + healSec + "만큼 회복하였다</p>");
-					}else if (type == 1) {
-						$("#notify").append("<p>스테미나를 " + healSec + "만큼 회복하였다</p>");
-					}
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					}
-			});
-			show_NewStatus(memberId);
-		}
-		
-		function heal_form(memberId, type) {
-			
-			var oldTime = Date.now();
-			var type = type;
-			var sec = 0;
-			var typeName = "";
-			var typeStat = "";
-			var typeColor = "";
-			
-			
-			if(originalForm != null) {
-				actionTab_cancle();
-			}
-			
-			$.get('../player/getPlayerByMemberId', {
-				memberId : memberId,
-			}, function(data){
-				
-				let actionTab = $('#actionTab');
-				
-				originalForm = actionTab.html();
-				
-				timer = setInterval(() => {
-				var currentTime = Date.now();
-			    // 경과한 밀리초 가져오기
-			    var diff = currentTime - oldTime;
-			    
-			    // 초(second) 단위 변환하기
-			    sec = Math.floor(diff / 1000);
-			    
-			    // HTML에 문자열 넣기
-			    document.querySelector('#currentTime').innerHTML = `\${sec}초 경과`;
-			    if (type == 0) {
-			    	document.querySelector('#healButton').innerHTML = `<button class="active text-red-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>치료완료</span></button>`;
-			    } else if (type == 1) {
-			    	document.querySelector('#healButton').innerHTML = `<button class="active text-yellow-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>휴식완료</span></button>`;
-			    }
-				    
-				}, 1000);	
-			
-				if (type == 0) {
-					typeName = "치료";
-					typeStat = "체력";
-					typeColor = "red";
-			    } else if (type == 1) {
-			    	typeName = "휴식";
-					typeStat = "스테미나";
-					typeColor = "yellow";
-			    }
-				
-			 	
-			 	let addHtml = `
-					<ul>
-						<li class="flex justify-center">
-							<ul class="active-list ml-2 mr-2 mt-10">
-								<li class="text-\${typeColor}-400 text-center"><span>\${typeStat}을(를) 회복중입니다.</span></li>
-								<li><span class="text-\${typeColor}-400" id="currentTime">\${sec}초 경과</span></li>
-								<li class="flex mb-2" id="healButton">
-							    	<button class="active text-\${typeColor}-400" onclick="heal(\${memberId}, \${sec}, \${type}); actionTab_cancle(); stopTimer(\${timer})"><span>\${typeName}완료</span></button>
-								</li>
-							</ul>
-						</li>
-					</ul>`;
-				
-				actionTab.empty().html("");
-				actionTab.append(addHtml);
-			}, 'json');
-		}	
-		
 		function action_attack(memberId, playerId1, playerId2) {
 			var memberId = memberId;
 			var playerId1 = playerId1;
 			var playerId2 = playerId2;
 			var skillId = 0;
+			var kill = 0;
+			var levelUp = 0;
 			
 			$.ajax({
 				url:"../player/battlePhaseAttack?playerId1="+playerId1+"&playerId2="+playerId2+"&skillId="+skillId,
@@ -244,23 +44,130 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					console.log(data);
-
 					if(data.success) {
-						$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
-				    }else {
+						if(data.data2.deathStatus == 1) {
+							kill = 1;
+							levelUp = data.numData2;
+							$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+							$("#notify").append("<p>" + data.data2.name + "이(가) " + data.data1.name + "의 공격으로 사망하였다.</p>");
+							if (levelUp == 1) {
+								$("#notify").append("<p>" + data.data1.name + "은(는) 레벨업을 하였다.</p>");
+								$("#notify").append("<p>스킬포인트 1을 얻었다.</p>");
+							}
+							$("#notify").append("<p>" + data.data2.name + "의 아이템을 습득할 수 있다.</p>");
+							
+							let actionTab = $('#actionTab');
+							let player2Status = $('#player2-status');
+							
+							let addHtml_player2status = `
+								<form action="../player/getEnemyItem" method="POST" name="get-enemy-items-form">
+									<input type="hidden" name="ids" value="1,2,0"/>
+								</form>
+								<ul style="border: 2px solid white">
+									<li>전리품 목록</li>
+								</ul>
+								<ul class="text-left overflow-y-scroll h-96">`
+								
+								for(var i=0; i < data.data3.length; i++) {
+									var inventory = data.data3[i];
+									
+									addHtml_player2status = addHtml_player2status
+															+ "<li> <input class='ml-2 get-enemy-items' type='checkbox' name='getEnemyItem_" + i + "' value='" + inventory.itemId + "," + inventory.quantity + "," + inventory.itemDP + "'>";
+															
+									if (inventory.rarity == 0){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: white;'>없음";
+									}
+									if (inventory.rarity == 1){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: white;'>";
+									}
+									if (inventory.rarity == 2){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #24b500;'>";
+									}
+									if (inventory.rarity == 3){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #0073ff;'>";
+									}
+									if (inventory.rarity == 4){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #fc008f;'>";
+									}
+									if (inventory.rarity == 5){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: gold;'>";
+									}
+									if (inventory.rarity != 0){
+										addHtml_player2status = addHtml_player2status + inventory.name;
+										if (inventory.categoryNum == 1 || inventory.categoryNum == 8){
+											addHtml_player2status = addHtml_player2status
+																	+ "<font class='text-sm font-bold mr-2' style='color: green;' id='quan-"
+																	+ i
+																	+ "'> 수량 : "
+																	+ inventory.quantity
+																	+ "</font>";
+										}
+										if (inventory.categoryNum != 1 && inventory.categoryNum != 8){
+											addHtml_player2status = addHtml_player2status
+																	+ "<font class='text-sm font-bold mr-2' style='color: pink;' id='itemDP-"
+																	+ i
+																	+ "'> 내구도 : "
+																	+ inventory.itemDP
+																	+ "</font>";
+										}
+									}
+									addHtml_player2status = addHtml_player2status + "</span></li>";
+								}
+								addHtml_player2status = addHtml_player2status + "</ul>";
+								
+							player2Status.empty().html("");
+							player2Status.append(addHtml_player2status);
+						 	
+							let addHtml_actionTab = `
+								<ul style="border: 2px solid white">
+									<li>전리품 습득</li>
+								</ul>
+								<ul>
+									<li class="flex justify-center">
+										<ul class="active-list ml-2 mr-2 mt-2">
+											<li class="mb-2">
+												<button class="active" onclick="btnGetEnemyItem();">습득</button>
+											</li>
+											<li class="mb-2">
+												<button class="active" onclick="action_run(${rq.getLoginedMemberId() }, ${player2.memberId }, ${player2.deathStatus })">그냥간다</button>
+											</li>
+										</ul>
+									</li>
+								</ul>`;
+										
+							actionTab.empty().html("");
+							actionTab.append(addHtml_actionTab);
+						} else {
+							$("#notify").append("<p>" + data.data2.name + "에게 " + data.numData1 + "의 데미지를 입혔다</p>");
+							$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						}
+				    } else {
 						$("#notify").append("<p>" + data.msg + "</p>");
 						$("#notify").append("<p>강제로 도주합니다.</p>");
+						$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 				    }
-					$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					}
+				}
 			});
 			show_NewStatus(memberId);
-			setTimeout(function() {
-				replace_battle(memberId); 
-				}, 3000);// 3초 후 실행
+			if (kill == 0) {
+				setTimeout(function() {
+					replace_battle(memberId); 
+					}, 3000);// 3초 후 실행
+			}
 		}
+		
+		function btnGetEnemyItem() {
+			const values = $('.get-enemy-items:checked').map((index, el) => el.value).toArray();
+			if (values.length == 0) {
+				alert('선택한 아이템이 없습니다');
+				return;
+			}
+			$('input[name=ids]').val(values.join(','));
+			$('form[name=get-enemy-items-form]').submit();
+		}
+		
 		
 		function action_skill(memberId, playerId1, playerId2, skillId) {
 			var memberId = memberId;
@@ -324,7 +231,7 @@
 						<li class="flex justify-center">
 							<ul class="active-list ml-2 mr-2 mt-2">
 							<li class="flex justify-between text-xl mb-5"><span>스킬 목록</span></li>
-							<li><ul class="overflow-y-scroll h-64">`
+							<li><ul class="overflow-y-scroll h-64">`;
 				
 			 	for(var i=0; i < data.length; i++) {
 			 		var skill = data[i];
@@ -344,9 +251,10 @@
 			}, 'json');
 		}	
 		
-		function action_run(id, memberId2) {
+		function action_run(id, memberId2, deathStatus) {
 			var id = id;
 			var memberId = memberId2;
+			var deathStatus = deathStatus;
 			
 			$.ajax({
 				url:"../player/showStatus?memberId="+memberId,
@@ -354,12 +262,33 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					$("#notify").append("<p>" + data.name + "에게서 도망쳤다.</p>");
-					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						if (deathStatus = 1) {
+							$("#notify").append("<p>승리를 만끽하며 돌아간다.</p>");
+							$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						} else {
+							$("#notify").append("<p>" + data.name + "에게서 도망쳤다.</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						}
 					}
 			});
-			replace_battle(id);
-			show_NewStatus(memberId);
+			if (deathStatus = 1) {
+				setTimeout(function() {
+					replace_battle(id);
+					}, 3000);// 3초 후 실행
+			} else {
+				replace_battle(id);
+			}
+			show_NewStatus(id);
+		}
+		
+		function getEnemyItem(form) {
+			console.log(form.size);
+			console.log(form.getEnemyItem_0.value);
+			console.log(form.getEnemyItem_1.value);
+			console.log(form.getEnemyItem_2.value);
+			
+			/* form.submit(); */
 		}
 		
 		function replace_battle(id) {
@@ -382,7 +311,6 @@
 		}
 	</script>
 	
-	
 	<section class="mt-8 bg-black text-white h-screen">
 		<div class="container mx-auto text-center">
 			<div class="mb-20 text-4xl text-red-400" id="nowLocation">전투 발생</div>
@@ -397,67 +325,64 @@
 									<li class="flex mb-2 mt-2" >
 										<div style="width: 40%">
 											<ul>
-												<li><img class="ml-2" src="/resource/images/${rq.player.image }.jpg"/></li>
+												<li><img class="ml-2" src="/resource/images/${player1.image }.jpg"/></li>
 											</ul>
 										</div>
 										<div class="mt-5" style="width: 70%">
-											<ul class="text-center"><li>이름 : ${rq.player.name }</li></ul>
-											<ul><li>Lv : ${rq.player.level }</li></ul>	
-											<ul><li class="text-green-500">경험치 : ${rq.player.exp } / ${rq.player.maxExp }</li></ul>
+											<ul class="text-center"><li>이름 : ${player1.name }</li></ul>
+											<ul><li>Lv : ${player1.level }</li></ul>	
+											<ul><li class="text-green-500">경험치 : ${player1.exp } / ${player1.maxExp }</li></ul>
 										</div>
 									</li>
-									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp + sumIncreseHP - sumDecreseHP}</li>
-									<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
-									<li id="attack">공격력 : ${rq.player.attackPoint }  (${rq.player.increseAttackPoint })</li>
-									<li id="defence">방어력 : ${rq.player.defencePoint }  (${rq.player.increseDefencePoint })</li>
-									<li id="hit">적중 : ${rq.player.hitRate }  (${rq.player.increseHitRate })</li>
-									<li id="miss">회피 : ${rq.player.missRate }  (${rq.player.increseMissRate })</li>
+									<li class="text-red-400" id="hp">체력 : ${player1.hp } / ${player1.maxHp}</li>
+									<li class="text-yellow-400" id="sp">스테미나 : ${player1.sp } / ${player1.maxSp }</li>
+									<li id="attack">공격력 : ${player1.attackPoint }  (${player1.increseAttackPoint })</li>
+									<li id="defence">방어력 : ${player1.defencePoint }  (${player1.increseDefencePoint })</li>
+									<li id="hit">적중 : ${player1.hitRate }  (${player1.increseHitRate })</li>
+									<li id="miss">회피 : ${player1.missRate }  (${player1.increseMissRate })</li>
 								</ul>
 								<ul style="width: 50%;">
 									<li><ul id="equipmentList">
-									<c:forEach var="equipment" items="${equipments }" varStatus="status">
-										<li class="equip" style="width: 100%">[${equipment.category }] : <c:choose>
-																						<c:when test="${equipment.usedItemCode < 990}">
-																							<span <c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
-																									<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
-																									<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
-																									<c:if test="${equipment.rarity == '4' }">style='color: #fc008f;'</c:if>
-																									<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>
+									<c:forEach var="equipment1" items="${equipments1 }" varStatus="status">
+										<li class="equip" style="width: 100%">[${equipment1.category }] : <c:choose>
+																						<c:when test="${equipment1.usedItemCode < 990}">
+																							<span <c:if test="${equipment1.rarity == '1' }">style='color: white;'</c:if>
+																									<c:if test="${equipment1.rarity == '2' }">style='color: #24b500;'</c:if>
+																									<c:if test="${equipment1.rarity == '3' }">style='color: #0073ff;'</c:if>
+																									<c:if test="${equipment1.rarity == '4' }">style='color: #fc008f;'</c:if>
+																									<c:if test="${equipment1.rarity == '5' }">style='color: gold;'</c:if>
 																									id="ename-${status.index }">
-																								${equipment.name }
-																								<c:if test="${equipment.increseHP != 0}">
+																								${equipment1.name }
+																								<c:if test="${equipment1.increseHP != 0}">
 																									<b class="text-red-400 text-base" id="eiHP-${status.index }">
-																										(${equipment.increseHP })
+																										(${equipment1.increseHP })
 																									</b>
 																								</c:if>
-																								<c:if test="${equipment.increseSP != 0}">
+																								<c:if test="${equipment1.increseSP != 0}">
 																									<b class="text-yellow-400 text-base" id="eiSP-${status.index }">
-																										(${equipment.increseSP })
+																										(${equipment1.increseSP })
 																									</b>
 																								</c:if>
-																								<c:if test="${equipment.increseAttackPoint != 0}">
+																								<c:if test="${equipment1.increseAttackPoint != 0}">
 																									<b class="text-base" style="color: #ff0000" id="eiAP-${status.index }">
-																										(${equipment.increseAttackPoint })
+																										(${equipment1.increseAttackPoint })
 																									</b>
 																								</c:if>
-																								<c:if test="${equipment.increseDefencePoint != 0}">
+																								<c:if test="${equipment1.increseDefencePoint != 0}">
 																									<b class="text-base" style="color: #0000ff" id="eiDP-${status.index }">
-																										(${equipment.increseDefencePoint })
+																										(${equipment1.increseDefencePoint })
 																									</b>
 																								</c:if>
-																								<c:if test="${equipment.category eq '무기' 
-																											|| equipment.category eq '머리'
-																											|| equipment.category eq '상의'
-																											|| equipment.category eq '하의'
-																											|| equipment.category eq '팔'
-																											|| equipment.category eq '신발'}">
+																								<c:if test="${equipment1.category eq '무기' 
+																											|| equipment1.category eq '머리'
+																											|| equipment1.category eq '상의'
+																											|| equipment1.category eq '하의'
+																											|| equipment1.category eq '팔'
+																											|| equipment1.category eq '신발'}">
 																									<font class="text-sm font-bold mr-2" style="color: pink;" id="eDP-${status.index }">
-																											내구도 : ${equipment.durabilityPoint }
+																											내구도 : ${equipment1.durabilityPoint }
 																									</font>
 																								</c:if>
-																								<button class="mybtn" onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${equipment.id }, ${status.index })">
-																									<span>해제</span>
-																								</button>
 																							</span>
 																						</c:when>
 																						<c:otherwise>없음</c:otherwise>
@@ -474,12 +399,12 @@
 										<div class="ml-10" id="skill-list">
 											<span id="active-effect">
 												<c:choose>
-													<c:when test="${rq.player.actionType == '1'}">기본</c:when>
-													<c:when test="${rq.player.actionType == '2'}">선제공격</c:when>
-													<c:when test="${rq.player.actionType == '3'}">방어태세</c:when>
-													<c:when test="${rq.player.actionType == '4'}">주변탐색</c:when>
-													<c:when test="${rq.player.actionType == '5'}">사주경계</c:when>
-													<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
+													<c:when test="${player1.actionType == '1'}">기본</c:when>
+													<c:when test="${player1.actionType == '2'}">선제공격</c:when>
+													<c:when test="${player1.actionType == '3'}">방어태세</c:when>
+													<c:when test="${player1.actionType == '4'}">주변탐색</c:when>
+													<c:when test="${player1.actionType == '5'}">사주경계</c:when>
+													<c:when test="${player1.actionType == '6'}">은밀기동</c:when>
 												</c:choose>
 											</span>
 											<c:forEach var="skill1" items="${skills1}">
@@ -495,7 +420,7 @@
 					<div class="relative" style="width: 5%;"><span class="text-3xl" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">VS</span></div>
 					
 					<div style="border: 2px solid white; width: 40%; position:relative;" >
-						<div>
+						<div id="player2-status">
 							<ul style="border: 2px solid white; text-align: center;">
 								<li>스테이터스</li>
 							</ul>

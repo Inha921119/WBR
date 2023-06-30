@@ -39,6 +39,18 @@ public class Util {
 					""", msg);
 	}
 
+	public static String jsLocateReplace(String uri) {
+		if (uri == null) {
+			uri = "";
+		}
+		
+		return Util.f("""
+				<script>
+					location.replace('%s');
+				</script>
+				""", uri);
+	}
+	
 	public static String jsReplace(String msg, String uri) {
 		
 		if (msg == null) {

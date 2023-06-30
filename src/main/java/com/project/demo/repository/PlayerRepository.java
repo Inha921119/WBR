@@ -294,4 +294,14 @@ public interface PlayerRepository {
 				LIMIT 1;
 			""")
 	public Player getPlayerByLocation(int nowLocation, int id);
+	
+	@Update("""
+			UPDATE player
+				SET deathStatus = #{num}
+					, deathDate = NOW()
+				WHERE memberId = #{memberId};
+			""")
+	public void changeDeathStatus(int memberId, int num);
+
+	public void getEnemyItem();
 }

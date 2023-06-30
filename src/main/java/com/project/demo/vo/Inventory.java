@@ -14,7 +14,9 @@ public class Inventory {
 	private int playerId;
 	private int itemId;
 	private int quantity;
+	private int itemDP;
 	private String category;
+	private int categoryNum;
 	private String name;
 	private int rarity;
 	private int increseAttackPoint;

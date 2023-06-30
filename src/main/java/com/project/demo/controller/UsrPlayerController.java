@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.demo.service.EquipmentService;
@@ -224,25 +225,37 @@ public class UsrPlayerController {
 	
 	@RequestMapping("/usr/player/battlePhaseAttack")
 	@ResponseBody
-	public  ResultData<Player> battlePhaseAttack(int playerId1, int playerId2, int skillId) {
+	public  ResultData battlePhaseAttack(int playerId1, int playerId2, int skillId) {
 		
 		Player player1 = playerService.getPlayerById(playerId1);
 		Player player2 = playerService.getPlayerById(playerId2);
+//		List<Inventory> player1Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId1);
+		List<Inventory> player2Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId2);
 		Skill skill = skillService.getOneSkillById(skillId);
 		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByItemId(playerId1, 2));
 		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByItemId(playerId1, 2));
 		
 		double damageCalc = 0;
 		int damage = 0;
+		int levelUp = 0;
 		
 		if (skillId == 0) {
 			damageCalc = (double) ((double)player1.getAttackPoint()+(double)player1.getIncreseAttackPoint())*((100-(double)player2.getDefencePoint()-(double)player2.getIncreseDefencePoint())/100);
 			damage = (int) damageCalc;
 			
 			if (player1.getSp() >= 20) {
-				playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-				playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-				return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+				if (player2.getHp() - damage <= 0) {
+					playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+					playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+					playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+					playerService.changeDeathStatus(player2.getMemberId(), 1);
+					levelUp = getExp(player1.getId(), 5);
+					return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+				} else {
+					playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+					playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+					return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+				}
 			} else {
 				return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 			}
@@ -352,11 +365,41 @@ public class UsrPlayerController {
 		}
 	}
 	
+	@RequestMapping("/usr/player/getEnemyItem")
+	@ResponseBody
+	public String getEnemyItem(@RequestParam(defaultValue = "") String ids) {
+		
+		if (Util.empty(ids)) {
+			return Util.jsHistoryBack("선택한 아이템이 없습니다");
+		}
+
+		List<Integer> itemIdQuanDPs = new ArrayList<>();
+
+		for (String idStr : ids.split(",")) {
+			itemIdQuanDPs.add(Integer.parseInt(idStr));
+		}
+		
+		int j = 0;
+		for (int i = 0; i < itemIdQuanDPs.size()/3; i++) {
+			int itemId = itemIdQuanDPs.get(i+j);
+			j++;
+			int quan = itemIdQuanDPs.get(i+j);
+			j++;
+			int itemDP = itemIdQuanDPs.get(i+j);
+			
+			inventoryService.addItem(playerService.getPlayerByMemberId(rq.getLoginedMemberId()).getId(), itemId, quan, itemDP);
+		}
+		
+
+		return Util.jsLocateReplace("battle?id="+rq.getLoginedMemberId());
+	}
+	
 	@RequestMapping("/usr/player/getNowActionType")
 	@ResponseBody
 	public int getNowActionType(int memberId) {
 		return playerService.getNowActionType(memberId);
 	}
+	
 	@RequestMapping("/usr/player/useItem")
 	@ResponseBody
 	public Inventory useItem(int playerId, int itemId) {
@@ -395,7 +438,7 @@ public class UsrPlayerController {
 		ItemVO item = itemVOService.getItemByCode(itemId);
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
-			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
+			inventoryService.useEquip(playerId, itemId, invenId, 0); // 장비 버림 : 0, 장착 : 1
 			return inventoryService.getInventoryItemById(inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
 		} else {
 			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
@@ -446,7 +489,7 @@ public class UsrPlayerController {
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
 			invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 1);
-			inventoryService.useEquip(playerId, itemId, invenId); // 아이템 갯수 깎
+			inventoryService.useEquip(playerId, itemId, invenId, 1); // 아이템 갯수 깎
 		} else {
 			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
 		}
@@ -491,7 +534,7 @@ public class UsrPlayerController {
 			if (chkExistItem == 1) {
 				inventoryService.getItem(playerId, itemId);
 			}else {
-				inventoryService.addItem(playerId, itemId);
+				inventoryService.addItem(playerId, itemId, -1, -1);
 			}
 		}
 		
@@ -601,5 +644,29 @@ public class UsrPlayerController {
 		}
 		
 		return player;
+	}
+	
+	public int getExp(int playerId, int exp) {
+		Player player = playerService.getPlayerById(playerId);
+		
+		if (player.getExp() + exp >= player.getMaxExp()) {
+			doLevelUp(playerId, exp);
+			return 1;
+		}else {
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "exp", exp, 0);
+			return 0;
+		}
+	}
+	
+	public void doLevelUp(int playerId, int exp) {
+		Player player = playerService.getPlayerById(playerId);
+		
+		int expCalc = player.getExp() + exp - player.getMaxExp();
+		
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "exp", player.getExp(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "exp", expCalc, 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxExp", 10, 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "level", 1, 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "skillPoint", 1, 0);
 	}
 }

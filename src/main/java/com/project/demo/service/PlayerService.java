@@ -60,6 +60,10 @@ private PlayerRepository playerRepository;
 	public void doChangeStatus(int memberId, String statName, int num, int oe) {
 		playerRepository.doChangeStatus(memberId, statName, num, oe);
 	}
+	
+	public void changeDeathStatus(int memberId, int num) {
+		playerRepository.changeDeathStatus(memberId, num);
+	}
 
 	public Player getPlayerById(int playerId) {
 		return playerRepository.getPlayerById(playerId);
@@ -67,5 +71,9 @@ private PlayerRepository playerRepository;
 
 	public Player getPlayerByLocation(int nowLocation, int id) {
 		return playerRepository.getPlayerByLocation(nowLocation, id);
+	}
+
+	public void getEnemyItem() {
+		playerRepository.getEnemyItem();
 	}
 }

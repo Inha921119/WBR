@@ -155,6 +155,9 @@ public interface InventoryRepository {
 				UPDATE inventory
 					<set>
 						delStatus = 0
+						<if test="del == 0">
+							, quantity = 0
+						</if>
 					</set>
 					WHERE playerId = #{playerId}
 					AND itemId = #{itemId}
@@ -164,7 +167,7 @@ public interface InventoryRepository {
 					LIMIT 1;
 			</script>
 			""")
-	public void useEquip(int playerId, int itemId, int invenId);
+	public void useEquip(int playerId, int itemId, int invenId, int del);
 	
 	@Update("""
 			<script>
@@ -193,14 +196,29 @@ public interface InventoryRepository {
 	int checkExistItem(int playerId, int itemId);
 
 	@Insert("""
+			<script>
 			INSERT INTO inventory
-				SET regDate = NOW()
+				<set>
+					regDate = NOW()
 					, updateDate = NOW()
 					, playerId = #{playerId}
 					, itemId = #{itemId}
-					, quantity = 1;
+					<if test="quantity == -1">
+						, quantity = 1
+					</if>
+					<if test="quantity != -1">
+						, quantity = #{quantity}
+					</if>
+					<if test="itemDP == -1">
+						, itemDP = 999;
+					</if>
+					<if test="itemDP != -1">
+						, itemDP = #{itemDP};
+					</if>
+				</set>
+			</script>
 			""")
-	public void addItem(int playerId, int itemId);
+	public void addItem(int playerId, int itemId, int quantity, int itemDP);
 
 	@Update("""
 			UPDATE inventory
