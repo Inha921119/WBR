@@ -40,14 +40,18 @@ public class InventoryService {
 		inventoryRepository.addItem(playerId, itemId, quantity, itemDP);
 	}
 
-	public void getItem(int playerId, int itemId) {
-		inventoryRepository.getItem(playerId, itemId);
+	public void getItem(int playerId, int itemId, int addQuan) {
+		inventoryRepository.getItem(playerId, itemId, addQuan);
 	}
 
 	public void useEquip(int playerId, int itemId, int invenId, int del) {
 		inventoryRepository.useEquip(playerId, itemId, invenId, del);		
 	}
 
+	public void changeEquipItem(int playerId, int oldEquipItemCode, int oldEquipDP) {
+		inventoryRepository.changeEquipItem(playerId, oldEquipItemCode, oldEquipDP);
+	}
+	
 	public Inventory getInventoryItemById(int invenId) {
 		return inventoryRepository.getInventoryItemById(invenId);
 	}
@@ -59,5 +63,6 @@ public class InventoryService {
 	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus) {
 		return inventoryRepository.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, delStatus);
 	}
+
 
 }

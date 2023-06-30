@@ -232,8 +232,8 @@ public class UsrPlayerController {
 //		List<Inventory> player1Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId1);
 		List<Inventory> player2Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId2);
 		Skill skill = skillService.getOneSkillById(skillId);
-		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByItemId(playerId1, 2));
-		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByItemId(playerId1, 2));
+		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByPlayerId(playerId1, 2));
+		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByPlayerId(playerId1, 2));
 		
 		double damageCalc = 0;
 		int damage = 0;
@@ -368,6 +368,7 @@ public class UsrPlayerController {
 	@RequestMapping("/usr/player/getEnemyItem")
 	@ResponseBody
 	public String getEnemyItem(@RequestParam(defaultValue = "") String ids) {
+		int playerId = playerService.getPlayerByMemberId(rq.getLoginedMemberId()).getId();
 		
 		if (Util.empty(ids)) {
 			return Util.jsHistoryBack("선택한 아이템이 없습니다");
@@ -379,17 +380,25 @@ public class UsrPlayerController {
 			itemIdQuanDPs.add(Integer.parseInt(idStr));
 		}
 		
-		int j = 0;
 		for (int i = 0; i < itemIdQuanDPs.size()/3; i++) {
-			int itemId = itemIdQuanDPs.get(i+j);
-			j++;
-			int quan = itemIdQuanDPs.get(i+j);
-			j++;
-			int itemDP = itemIdQuanDPs.get(i+j);
-			
-			inventoryService.addItem(playerService.getPlayerByMemberId(rq.getLoginedMemberId()).getId(), itemId, quan, itemDP);
-		}
+
+			int itemId = itemIdQuanDPs.get(i*3);
+			int quan = itemIdQuanDPs.get((i*3)+1);
+			int itemDP = itemIdQuanDPs.get((i*3)+2);
 		
+			if (itemVOService.getItemByCode(itemId).getCategoryNum() >= 2 && itemVOService.getItemByCode(itemId).getCategoryNum() <= 7) {
+				quan = -1;
+				inventoryService.addItem(playerId, itemId, quan, itemDP);
+			} else {
+				int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
+				itemDP = 0;
+				if(chkExistItem == 0) {
+					inventoryService.addItem(playerId, itemId, quan, itemDP);
+				} else {
+					inventoryService.getItem(playerId, itemId, quan);
+				}
+			}
+		}
 
 		return Util.jsLocateReplace("battle?id="+rq.getLoginedMemberId());
 	}
@@ -415,8 +424,8 @@ public class UsrPlayerController {
 		}
 		
 		if (player.getSp() + item.getRecoverySP() >= player.getMaxSp()) {
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getSp(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "hp", player.getMaxSp(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", player.getSp(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", player.getMaxSp(), 0);
 		} else {
 			playerService.doChangeStatus(rq.getLoginedMemberId(), "sp", item.getRecoverySP(), 0);
 		}
@@ -455,18 +464,29 @@ public class UsrPlayerController {
 		List<Equipment> equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
 		int equipId = 0;
+		int equipDP = 0;
+		int oldEquipItemCode = 0;
+		int oldEquipDP = 0;
 		int invenId = 0;
 		
 		if (item.getCategoryNum() == 2) {
-			
-			if (equipItems.get(0).getUsedItemCode() == itemId ) {
+			if (equipItems.get(0).getUsedItemCode() == 994){
+				equipId = equipItems.get(0).getId();
+				equipDP = equipItems.get(0).getDurabilityPoint();
+			} else if (equipItems.get(1).getUsedItemCode() == 994){
 				equipId = equipItems.get(1).getId();
-			} else {
+				equipDP = equipItems.get(1).getDurabilityPoint();
+			} else if (equipItems.get(0).getUsedItemCode() != 994 && equipItems.get(0).getUsedItemCode() != itemId) {
 				equipId = equipItems.get(0).getId();
-			}
-			if (equipItems.get(1).getUsedItemCode() == itemId) {
-				equipId = equipItems.get(0).getId();
-			}
+				equipDP = equipItems.get(0).getDurabilityPoint();
+				oldEquipItemCode = equipItems.get(0).getUsedItemCode();
+				oldEquipDP = equipItems.get(0).getUsedItemDP();
+			} else if (equipItems.get(1).getUsedItemCode() != 994) {
+				equipId = equipItems.get(1).getId();
+				equipDP = equipItems.get(1).getDurabilityPoint();
+				oldEquipItemCode = equipItems.get(1).getUsedItemCode();
+				oldEquipDP = equipItems.get(1).getUsedItemDP();
+			} 
 			
 			if (item.getUseHand() == 2) {
 				equipId = 0;
@@ -474,6 +494,10 @@ public class UsrPlayerController {
 		}
 		
 		// 아이템에 따른 능력치 변경
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getIncreseHP(), 0); 
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getDecreseHP(), 1);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getIncreseSP(), 0); 
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getDecreseSP(), 1);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 0); 
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 1);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getIncreseDefencePoint(), 0);
@@ -490,9 +514,32 @@ public class UsrPlayerController {
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
 			invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 1);
 			inventoryService.useEquip(playerId, itemId, invenId, 1); // 아이템 갯수 깎
-		} else {
-			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
-		}
+			
+			if (item.getCategoryNum() !=2) {
+				int eId = equipmentService.getMinEquipIdByPlayerId(playerId, item.getCategoryNum());
+				Equipment equip = equipmentService.getEquipmentById(eId);
+				oldEquipItemCode = equip.getUsedItemCode();
+				oldEquipDP = equip.getUsedItemDP();
+			}
+			
+			inventoryService.changeEquipItem(playerId, oldEquipItemCode, oldEquipDP); // 빠지는 장비 인벤토리에 받기
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHP(), 1); 
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHP(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseSP(), 1); 
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseSP(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseAttackPoint(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseAttackPoint(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseDefencePoint(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseDefencePoint(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHitRate(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHitRate(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseMissRate(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseMissRate(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindEnemyRate(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindEnemyRate(), 0);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindItemRate(), 1);
+			playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindItemRate(), 0);
+		} 
 		
 		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId); // DB가서 장비아이템 코드 변경(실제 장착)
 		
@@ -509,10 +556,16 @@ public class UsrPlayerController {
 		
 		List<Equipment> equipItems = equipmentService.getEquipmentsByPlayerId(playerId);
 		
+		int quan = -1;
+		int itemDP = -1;
+		
 		if (item.getUseHand() == 2) {
 			equipId = 0;
 		}
-		
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getIncreseHP(), 1); 
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getDecreseHP(), 0);
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getIncreseSP(), 1); 
+		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getDecreseSP(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getIncreseAttackPoint(), 1);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", item.getDecreseAttackPoint(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", item.getIncreseDefencePoint(), 1);
@@ -532,9 +585,9 @@ public class UsrPlayerController {
 			inventoryService.reviveEquip(playerId, itemId, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
 		} else {
 			if (chkExistItem == 1) {
-				inventoryService.getItem(playerId, itemId);
+				inventoryService.getItem(playerId, itemId, quan);
 			}else {
-				inventoryService.addItem(playerId, itemId, -1, -1);
+				inventoryService.addItem(playerId, itemId, quan, itemDP);
 			}
 		}
 		

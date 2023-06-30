@@ -152,7 +152,7 @@ public interface EquipmentRepository {
 				WHERE e.playerId = #{playerId}
 				AND i.categoryNum = #{categoryNum};
 			""")
-	public int getMaxEquipIdByItemId(int playerId, int categoryNum);
+	public int getMaxEquipIdByPlayerId(int playerId, int categoryNum);
 	
 	@Select("""
 			SELECT MIN(e.id)
@@ -162,5 +162,13 @@ public interface EquipmentRepository {
 				WHERE e.playerId = #{playerId}
 				AND i.categoryNum = #{categoryNum};
 			""")
-	public int getMinEquipIdByItemId(int playerId, int categoryNum);
+	public int getMinEquipIdByPlayerId(int playerId, int categoryNum);
+
+	@Select("""
+			SELECT *
+				FROM equipment
+				WHERE playerId = #{playerId}
+				AND usedItemCode = #{itemId};
+			""")
+	public Equipment getEquipByPIdAndItemId(int playerId, int itemId);
 }

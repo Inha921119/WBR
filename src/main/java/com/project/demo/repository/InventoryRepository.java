@@ -174,6 +174,22 @@ public interface InventoryRepository {
 				UPDATE inventory
 					<set>
 						delStatus = 1
+						, quantity = 1
+					</set>
+					WHERE playerId = #{playerId}
+					AND itemId = #{oldEquipItemCode}
+					AND itemDP = #{oldEquipDP}
+					AND delStatus = 0
+					LIMIT 1;
+			</script>
+			""")
+	public void changeEquipItem(int playerId, int oldEquipItemCode, int oldEquipDP);
+	
+	@Update("""
+			<script>
+				UPDATE inventory
+					<set>
+						delStatus = 1
 					</set>
 						WHERE playerId = #{playerId}
 						AND itemId = #{itemId}
@@ -193,7 +209,7 @@ public interface InventoryRepository {
 						AND itemId = #{itemId}
 					);
 			""")
-	int checkExistItem(int playerId, int itemId);
+	int checkExistItem(int playerId, int itemId); // 없 : 0, 있 : 1
 
 	@Insert("""
 			<script>
@@ -221,12 +237,21 @@ public interface InventoryRepository {
 	public void addItem(int playerId, int itemId, int quantity, int itemDP);
 
 	@Update("""
+			<script>
 			UPDATE inventory
-				SET quantity = quantity + 1
-				WHERE playerId = #{playerId}
-				AND itemId = #{itemId};
+				<set>
+					<if test="addQuan == -1">
+						quantity = quantity + 1
+					</if>
+					<if test="addQuan != -1">
+						quantity = quantity + #{addQuan}
+					</if>
+				</set>
+					WHERE playerId = #{playerId}
+					AND itemId = #{itemId};
+			</script>
 			""")
-	public void getItem(int playerId, int itemId);
+	public void getItem(int playerId, int itemId, int addQuan);
 	
 	@Select("""
 			SELECT iv.*

@@ -40,11 +40,15 @@ public class EquipmentService {
 		equipmentRepository.equipOff(playerId, categoryNum, equipId);
 	}
 
-	public int getMaxEquipIdByItemId(int playerId, int categoryNum) {
-		return equipmentRepository.getMaxEquipIdByItemId(playerId, categoryNum);
+	public int getMaxEquipIdByPlayerId(int playerId, int categoryNum) {
+		return equipmentRepository.getMaxEquipIdByPlayerId(playerId, categoryNum);
 	}
-	public int getMinEquipIdByItemId(int playerId, int categoryNum) {
-		return equipmentRepository.getMinEquipIdByItemId(playerId, categoryNum);
+	public int getMinEquipIdByPlayerId(int playerId, int categoryNum) {
+		return equipmentRepository.getMinEquipIdByPlayerId(playerId, categoryNum);
+	}
+
+	public Equipment getEquipByPIdAndItemId(int playerId, int itemId) {
+		return equipmentRepository.getEquipByPIdAndItemId(playerId, itemId);
 	}
 
 	
