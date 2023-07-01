@@ -143,19 +143,32 @@ public interface InventoryRepository {
 	Inventory getInventoryItemById(int invenId);
 
 	@Update("""
+			<script>
 			UPDATE inventory
-				SET quantity = quantity - 1
+				<set>
+					<if test="quan == 0">
+						quantity = 0
+					</if>
+					<if test="quan == 1">
+						quantity = quantity - #{quan}
+					</if>
+				</set>
 				WHERE playerId = #{playerId}
 				AND itemId = #{itemId};
+			</script>
 			""")
-	public void useItem(int playerId, int itemId);
+	public void useItem(int playerId, int itemId, int quan); // all : quan = 0, 1개 : quan = 1
 	
 	@Update("""
 			<script>
 				UPDATE inventory
 					<set>
-						delStatus = 0
 						<if test="del == 0">
+							delStatus = 0
+							, quantity = 0
+						</if>
+						<if test="del == 1"> 
+							delStatus = 1
 							, quantity = 0
 						</if>
 					</set>
@@ -167,7 +180,7 @@ public interface InventoryRepository {
 					LIMIT 1;
 			</script>
 			""")
-	public void useEquip(int playerId, int itemId, int invenId, int del);
+	public void useEquip(int playerId, int itemId, int invenId, int del); // del 1 : 장착, del 0 : 버림
 	
 	@Update("""
 			<script>
@@ -179,7 +192,7 @@ public interface InventoryRepository {
 					WHERE playerId = #{playerId}
 					AND itemId = #{oldEquipItemCode}
 					AND itemDP = #{oldEquipDP}
-					AND delStatus = 0
+					AND quantity = 0
 					LIMIT 1;
 			</script>
 			""")
@@ -189,7 +202,7 @@ public interface InventoryRepository {
 			<script>
 				UPDATE inventory
 					<set>
-						delStatus = 1
+						quantity = 1
 					</set>
 						WHERE playerId = #{playerId}
 						AND itemId = #{itemId}
@@ -304,13 +317,19 @@ public interface InventoryRepository {
 					WHERE itemId = #{itemId}
 					AND playerId = #{playerId}
 					<if test="delStatus == 0">
+						AND quantity = 0
 						AND delStatus = 0
 					</if>
 					<if test="delStatus == 1">
+						AND quantity = 0
+						AND delStatus = 1
+					</if>
+					<if test="delStatus == 2">
+						AND quantity = 1
 						AND delStatus = 1
 					</if>
 					LIMIT 1;
 			</script>
 			""")
-	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus);
+	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus);  // 0 버린거,  1 장착중인거, 2 인벤토리 존재하는거
 }

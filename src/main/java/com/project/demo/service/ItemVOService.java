@@ -26,9 +26,7 @@ public class ItemVOService {
 	
 	public ItemVO getItemByCode(int itemCode) {
 		
-		ItemVO item = itemVORepository.getItemByCode(itemCode);
-		
-		return item;
+		return itemVORepository.getItemByCode(itemCode);
 	}
 
 	public List<ItemVO> getItemListRecipe() {

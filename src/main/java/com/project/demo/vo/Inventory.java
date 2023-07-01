@@ -12,6 +12,7 @@ public class Inventory {
 	private String regDate;
 	private String updateDate;
 	private int playerId;
+	private int player2Id;
 	private int itemId;
 	private int quantity;
 	private int itemDP;

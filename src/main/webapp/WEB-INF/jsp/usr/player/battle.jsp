@@ -1,38 +1,67 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="WebBattleRoyale" />
-<%@ include file="../common/head.jsp" %>
-	<script>
+<c:set var="pageTitle" value="Battle" />
+<%@ include file="../common/head.jsp"%>
+<script>
 	
 		originalForm = null;
 		originalId = null;
 		
 		var timer = null;
 		
-		function searchAround() {
-			
-			$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
-			$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-			 
-			}
-		function locationMove(memberId, lo) {
+		function searchAround(memberId, playerId) {
 			var memberId = memberId;
-			var location = lo.value;
-			var locationName = "";
-	
+			var playerId = playerId;
+			
 			$.ajax({
-					url:"../player/moveLocation?memberId="+memberId+"&location="+location,
-					type:"get",
-					datatype:"text",
-					success : function(data) {
-						$("#nowLocation").html("현재 위치 : " + data);
-						$("#notify").append("<p>" + data + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
+				url:"../player/doSearchAround?playerId="+playerId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if (data.resultCode == "F-1") {
+						$("#notify").append("<p>스테미나가 부족합니다.</p>");
+						$("#notify").append("<p>스테미나를 채우고 행동해주세요.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					} else {
+						discoverEnemy(memberId, playerId);
+						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
 						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 					}
+				}
+			});
+			show_NewStatus(memberId);
+		}
+		
+		function locationMove(memberId, player1Id, lo) {
+			var memberId = memberId;
+			var player1Id = player1Id;
+			var locationNum = lo.value;
+			var locationName = "";
+			
+			$.ajax({
+					url:"../player/moveLocation?memberId="+memberId+"&location="+locationNum,
+					type:"get",
+					datatype:"text",
+					async: false,
+					success : function(data) {
+						if (data.resultCode == "F-1") {
+							$('#locationTab').load(location.href+' #locationTab');
+							$("#notify").append("<p>스테미나가 부족합니다.</p>");
+							$("#notify").append("<p>스테미나를 채우고 행동해주세요.</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						} else {
+							discoverEnemy(memberId, player1Id);
+							$("#nowLocation").html("현재 위치 : " + data.msg);
+							$("#notify").append("<p>" + data.msg + "(으)로 이동을 했다.</p><p>이제 무엇을 하지?</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						}
+					}
 				});
-			 
-			}
+			show_NewStatus(memberId);
+		}
+		
 		function action_type(memberId, ty) {
 			var memberId = memberId;
 			var type = ty.value;
@@ -79,6 +108,48 @@
 					$("#defence").text("방어력 : " + data.defencePoint + "  (" + data.increseDefencePoint + ")");
 					$("#hit").text("적중 : " + data.hitRate + "  (" + data.increseHitRate + ")");
 					$("#miss").text("회피 : " + data.missRate + "  (" + data.increseMissRate + ")");
+				}
+			});
+		}
+		
+		function discoverEnemy(memberId, player1Id) {
+			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
+			
+			var memberId = memberId;
+			var player1Id = player1Id;
+			var player1FindEnmey;
+			var player2FindEnmey;
+			var findRate;
+			
+			$.ajax({
+				url:"../player/doDiscoverEnemy?player1Id="+player1Id,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if(data.data2 == null) {
+						return;
+					}
+					
+					player1FindEnmey = data.data1.findEnemyRate;
+					player2FindEnmey = data.data2.findEnemyRate;
+					
+					if (player1FindEnmey > player2FindEnmey) {
+						findRate = player1FindEnmey + 50;
+						if (findRate >= ranNum) {
+							replace_battlePhase(data.data1.id);
+						}
+					} else if (player1FindEnmey < player2FindEnmey) {
+						findRate = player2FindEnmey + 50;
+						if (findRate >= ranNum) {
+							replace_battlePhase(data.data1.id);
+						}
+					} else {
+						findRate = player1FindEnmey + 50;
+						if (findRate >= ranNum) {
+							replace_battlePhase(data.data1.id);
+						}
+					}
 				}
 			});
 		}
@@ -414,6 +485,12 @@
 			}, 'json');
 		}	
 		
+		function replace_battlePhase(id) {
+			var id = id;
+			var url = `/usr/player/battlePhase?id=\${id}`;
+			location.replace(url);
+		}
+		
 		function actionTab_cancle() {
 			let actionTab = $('#actionTab');
 			actionTab.html(originalForm);
@@ -427,287 +504,315 @@
 			  clearInterval(timer);
 		}
 	</script>
-	
-	
-	<section class="mt-8 bg-black text-white h-screen">
-		<div class="container mx-auto text-center">
-			<div class="mb-20 text-2xl" id="nowLocation">현재 위치 : ${rq.player.lname }</div>
-				<div class="text-xl flex" style="height: 420px;">
-					<div style="border: 2px solid white; width: 45%; position:relative;" >
-						<div>
-							<ul style="border: 2px solid white; text-align: center;">
-								<li>스테이터스</li>
-							</ul>
-							<div class="flex" style="width: 100%;">
-								<ul style="width: 50%;" id="status">
-									<li class="flex mb-2 mt-2" >
-										<div style="width: 40%">
-											<ul>
-												<li><img class="ml-2" src="/resource/images/${rq.player.image }.jpg"/></li>
-											</ul>
-										</div>
-										<div class="mt-5" style="width: 70%">
-											<ul class="text-center"><li>이름 : ${rq.player.name }</li></ul>
-											<ul><li>Lv : ${rq.player.level }</li></ul>	
-											<ul><li class="text-green-500">경험치 : ${rq.player.exp } / ${rq.player.maxExp }</li></ul>
-										</div>
-									</li>
-									<li class="text-red-400" id="hp">체력 : ${rq.player.hp } / ${rq.player.maxHp}</li>
-									<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp } / ${rq.player.maxSp }</li>
-									<li id="attack">공격력 : ${rq.player.attackPoint }  (${rq.player.increseAttackPoint })</li>
-									<li id="defence">방어력 : ${rq.player.defencePoint }  (${rq.player.increseDefencePoint })</li>
-									<li id="hit">적중 : ${rq.player.hitRate }  (${rq.player.increseHitRate })</li>
-									<li id="miss">회피 : ${rq.player.missRate }  (${rq.player.increseMissRate })</li>
-								</ul>
-								<ul style="width: 50%;">
-									<li><ul id="equipmentList">
-									<c:forEach var="equipment" items="${equipments }" varStatus="status">
-										<li class="equip" style="width: 100%">[${equipment.category }] : <c:choose>
-																						<c:when test="${equipment.usedItemCode < 990}">
-																							<span <c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
-																									<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
-																									<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
-																									<c:if test="${equipment.rarity == '4' }">style='color: #fc008f;'</c:if>
-																									<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>
-																									id="ename-${status.index }">
-																								${equipment.name }
-																								<c:if test="${equipment.increseHP != 0}">
-																									<b class="text-red-400 text-base" id="eiHP-${status.index }">
-																										(${equipment.increseHP })
-																									</b>
-																								</c:if>
-																								<c:if test="${equipment.increseSP != 0}">
-																									<b class="text-yellow-400 text-base" id="eiSP-${status.index }">
-																										(${equipment.increseSP })
-																									</b>
-																								</c:if>
-																								<c:if test="${equipment.increseAttackPoint != 0}">
-																									<b class="text-base" style="color: #ff0000" id="eiAP-${status.index }">
-																										(${equipment.increseAttackPoint })
-																									</b>
-																								</c:if>
-																								<c:if test="${equipment.increseDefencePoint != 0}">
-																									<b class="text-base" style="color: #0000ff" id="eiDP-${status.index }">
-																										(${equipment.increseDefencePoint })
-																									</b>
-																								</c:if>
-																								<c:if test="${equipment.category eq '무기' 
+
+
+<section class="mt-8 bg-black text-white h-screen">
+	<div class="container mx-auto text-center">
+		<div class="mb-20 text-2xl" id="nowLocation">현재 위치 :
+			${rq.player.lname }</div>
+		<div class="text-xl flex" style="height: 420px;">
+			<div style="border: 2px solid white; width: 45%; position: relative;">
+				<div>
+					<ul style="border: 2px solid white; text-align: center;">
+						<li>스테이터스</li>
+					</ul>
+					<div class="flex" style="width: 100%;">
+						<ul style="width: 50%;" id="status">
+							<li class="flex mb-2 mt-2">
+								<div style="width: 40%">
+									<ul>
+										<li><img class="ml-2"
+											src="/resource/images/${rq.player.image }.jpg" /></li>
+									</ul>
+								</div>
+								<div class="mt-5" style="width: 70%">
+									<ul class="text-center">
+										<li>이름 : ${rq.player.name }</li>
+									</ul>
+									<ul>
+										<li>Lv : ${rq.player.level }</li>
+									</ul>
+									<ul>
+										<li class="text-green-500">경험치 : ${rq.player.exp } /
+											${rq.player.maxExp }</li>
+									</ul>
+								</div>
+							</li>
+							<li class="text-red-400" id="hp">체력 : ${rq.player.hp } /
+								${rq.player.maxHp}</li>
+							<li class="text-yellow-400" id="sp">스테미나 : ${rq.player.sp }
+								/ ${rq.player.maxSp }</li>
+							<li id="attack">공격력 : ${rq.player.attackPoint }
+								(${rq.player.increseAttackPoint })</li>
+							<li id="defence">방어력 : ${rq.player.defencePoint }
+								(${rq.player.increseDefencePoint })</li>
+							<li id="hit">적중 : ${rq.player.hitRate }
+								(${rq.player.increseHitRate })</li>
+							<li id="miss">회피 : ${rq.player.missRate }
+								(${rq.player.increseMissRate })</li>
+						</ul>
+						<ul style="width: 50%;">
+							<li><ul id="equipmentList">
+									<c:forEach var="equipment" items="${equipments }"
+										varStatus="status">
+										<li class="equip" style="width: 100%">[${equipment.category }]
+											: <c:choose>
+												<c:when test="${equipment.usedItemCode < 990}">
+													<span
+														<c:if test="${equipment.rarity == '1' }">style='color: white;'</c:if>
+														<c:if test="${equipment.rarity == '2' }">style='color: #24b500;'</c:if>
+														<c:if test="${equipment.rarity == '3' }">style='color: #0073ff;'</c:if>
+														<c:if test="${equipment.rarity == '4' }">style='color: #fc008f;'</c:if>
+														<c:if test="${equipment.rarity == '5' }">style='color: gold;'</c:if>
+														id="ename-${status.index }"> ${equipment.name } <c:if
+															test="${equipment.increseHP != 0}">
+															<b class="text-red-400 text-base"
+																id="eiHP-${status.index }"> (${equipment.increseHP })
+															</b>
+														</c:if> <c:if test="${equipment.increseSP != 0}">
+															<b class="text-yellow-400 text-base"
+																id="eiSP-${status.index }"> (${equipment.increseSP })
+															</b>
+														</c:if> <c:if test="${equipment.increseAttackPoint != 0}">
+															<b class="text-base" style="color: #ff0000"
+																id="eiAP-${status.index }">
+																(${equipment.increseAttackPoint }) </b>
+														</c:if> <c:if test="${equipment.increseDefencePoint != 0}">
+															<b class="text-base" style="color: #0000ff"
+																id="eiDP-${status.index }">
+																(${equipment.increseDefencePoint }) </b>
+														</c:if> <c:if
+															test="${equipment.category eq '무기' 
 																											|| equipment.category eq '머리'
 																											|| equipment.category eq '상의'
 																											|| equipment.category eq '하의'
 																											|| equipment.category eq '팔'
 																											|| equipment.category eq '신발'}">
-																									<font class="text-sm font-bold mr-2" style="color: pink;" id="eDP-${status.index }">
-																											내구도 : ${equipment.durabilityPoint }
-																									</font>
-																								</c:if>
-																								<button class="mybtn" onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${equipment.id }, ${status.index })">
-																									<span>해제</span>
-																								</button>
-																							</span>
-																						</c:when>
-																						<c:otherwise>없음</c:otherwise>
-																					</c:choose></li>
-																				</c:forEach>
-																			</ul>
-																		</li>
-								</ul>
-							</div>
-							<div class="text-left absolute overflow-y-scroll" style="border-top: 1px solid white; width:100%; height: 18.5%;">
-								<ul class="ml-2">
-									<li class="flex">
-										<span>스킬</span>
-										<div class="ml-10" id="skill-list">
-											<span id="active-effect">
-												<c:choose>
-													<c:when test="${rq.player.actionType == '1'}">기본</c:when>
-													<c:when test="${rq.player.actionType == '2'}">선제공격</c:when>
-													<c:when test="${rq.player.actionType == '3'}">방어태세</c:when>
-													<c:when test="${rq.player.actionType == '4'}">주변탐색</c:when>
-													<c:when test="${rq.player.actionType == '5'}">사주경계</c:when>
-													<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
-												</c:choose>
-											</span>
-											<c:forEach var="skill" items="${skills}">
-												<span> / ${skill.name}</span>
-											</c:forEach>
-										</div>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					
-						<div class="ml-2" style="border: 2px solid white; width: 23%; position:relative;">
-							<div>
-								<ul style="border: 2px solid white">
-									<li>
-										아이템 목록
-									</li>
-								</ul>
-								<ul class="text-left p-1"  id="itemList">
-									<c:forEach var="inventory" items="${inventory }" varStatus="status">
-									<li>
-										<c:if test="${inventory.quantity != 0 && inventory.delStatus != 0}">
-											<span <c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
-													<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
-													<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
-													<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
-													<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
-												${inventory.name }
-												<c:if test="${inventory.increseHP != 0}">
-													<b class="text-red-400 text-base">
-														(${inventory.increseHP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseSP != 0}">
-													<b class="text-yellow-400 text-base">
-														(${inventory.increseSP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseAttackPoint != 0}">
-													<b class="text-base" style="color: #ff0000">
-														(${inventory.increseAttackPoint })
-													</b>
-												</c:if>
-												<c:if test="${inventory.increseDefencePoint != 0}">
-													<b class="text-base" style="color: #0000ff">
-														(${inventory.increseDefencePoint })
-													</b>
-												</c:if>
-												<c:if test="${inventory.recoveryHP != 0}">
-													<b class="text-red-400 text-base">
-														(${inventory.recoveryHP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.recoverySP != 0}">
-													<b class="text-yellow-400 text-base">
-														(${inventory.recoverySP })
-													</b>
-												</c:if>
-												<c:if test="${inventory.category eq '사용' 
-															|| inventory.category eq '기타'}">
-													<font class="text-sm font-bold mr-2" style="color: green;" id="quan-${status.count }">
-														수량 : ${inventory.quantity }
-													</font>
-												</c:if>
-												<c:if test="${inventory.category eq '무기' 
-															|| inventory.category eq '머리'
-															|| inventory.category eq '상의'
-															|| inventory.category eq '하의'
-															|| inventory.category eq '팔'
-															|| inventory.category eq '신발'}">
-													<font class="text-sm font-bold mr-2" style="color: pink;">
-															내구도 : ${inventory.durabilityPoint }
-													</font>
-												</c:if>
-											</span>
-											<c:if test="${inventory.category eq '사용'}">
-												<button class="mybtn" onclick="useItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
-													<span>사용</span>
-												</button>
-											</c:if>
-											<c:if test="${inventory.category eq '무기' 
-															|| inventory.category eq '머리'
-															|| inventory.category eq '상의'
-															|| inventory.category eq '하의'
-															|| inventory.category eq '팔'
-															|| inventory.category eq '신발'}">
-												<button class="mybtn" onclick="equipItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
-													<span>장착</span>
-												</button>
-											</c:if>
-											
-											<button class="mybtn" onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${inventory.id }, ${status.count })">
-												<span>버림</span>
-											</button>
-										</c:if>
-									</li>
+															<font class="text-sm font-bold mr-2" style="color: pink;"
+																id="eDP-${status.index }"> 내구도 :
+																${equipment.durabilityPoint } </font>
+														</c:if>
+														<button class="mybtn"
+															onclick="equipOff(${rq.getLoginedMemberId() }, ${rq.player.id}, ${equipment.usedItemCode }, ${equipment.id }, ${status.index })">
+															<span>해제</span>
+														</button>
+													</span>
+												</c:when>
+												<c:otherwise>없음</c:otherwise>
+											</c:choose>
+										</li>
 									</c:forEach>
-								</ul>
-							</div>
-						</div>
-					
-					<div class="ml-2" style="border: 2px solid white; width: 17%; position:relative;" >
-						<div id="actionTab">
-							<ul style="border: 2px solid white" id="locationTab">
-									<li>
-										위치 이동 : <select class="text-black border-black" name="location" onchange="locationMove(${rq.getLoginedMemberId() }, this)">
-														<option value="1" <c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너 창고</option>
-														<option value="2" <c:if test="${rq.player.lname eq '헬기착륙장'}">selected</c:if>>헬기착륙장</option>
-														<option value="3" <c:if test="${rq.player.lname eq '폐병원'}">selected</c:if>>폐병원</option>
-														<option value="4" <c:if test="${rq.player.lname eq '폐공원'}">selected</c:if>>폐공원</option>
-														<option value="5" <c:if test="${rq.player.lname eq '유적지'}">selected</c:if>>유적지</option>
-														<option value="6" <c:if test="${rq.player.lname eq '신전'}">selected</c:if>>신전</option>
-													</select>
-									</li>
-							</ul>
-							<ul>
-								<li class="flex justify-center">
-									<ul class="active-list ml-2 mr-2 mt-10">
-										<li class="mb-2">
-											<button class="active" onclick="searchAround()">탐색</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" onclick="recipe_form(${rq.player.id})">조합법 연구</button>
-										</li>
-										<li class="flex mb-2">
-											<button class="active" onclick="getSkill_form(${rq.getLoginedMemberId() }, ${rq.player.id}, ${rq.player.level}, ${rq.player.skillPoint})">스킬 습득</button>
-										</li>
-										<li class="flex mb-2">
-											<button class="active text-red-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 0)"><span>치료</span></button>
-											<button class="active text-yellow-400" style="width:50%" onclick="heal_form(${rq.getLoginedMemberId() }, 1)"><span>휴식</span></button>
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</div>
+								</ul></li>
+						</ul>
 					</div>
-					
-					<div class="ml-2" style="border: 2px solid white; width: 15%; position:relative;" >
-						<div>
-							<ul style="border: 2px solid white">
-								<li>
-									행동유형
-								</li>
-							</ul>
-							<ul>
-								<li class="flex justify-center">
-									<ul class="active-list ml-2 mr-2 mt-2">
-										<li class="mb-2">
-											<button class="active" value="1" onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" value="2" onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" value="3" onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" value="4" onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
-										</li>
-										<li class="mb-2">
-											<button class="active" value="5" onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
-										</li>
-										<li>
-											<button class="active" value="6" onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
-										</li>
-									</ul>
-								</li>
-							</ul>
-						</div>
+					<div class="text-left absolute overflow-y-scroll"
+						style="border-top: 1px solid white; width: 100%; height: 18.5%;">
+						<ul class="ml-2">
+							<li class="flex"><span>스킬</span>
+								<div class="ml-10" id="skill-list">
+									<span id="active-effect"> <c:choose>
+											<c:when test="${rq.player.actionType == '1'}">기본</c:when>
+											<c:when test="${rq.player.actionType == '2'}">선제공격</c:when>
+											<c:when test="${rq.player.actionType == '3'}">방어태세</c:when>
+											<c:when test="${rq.player.actionType == '4'}">주변탐색</c:when>
+											<c:when test="${rq.player.actionType == '5'}">사주경계</c:when>
+											<c:when test="${rq.player.actionType == '6'}">은밀기동</c:when>
+										</c:choose>
+									</span>
+									<c:forEach var="skill" items="${skills}">
+										<span> / ${skill.name}</span>
+									</c:forEach>
+								</div></li>
+						</ul>
 					</div>
 				</div>
-				
-				<div class="mt-2" style="border: 2px solid white; width: 100%;">알림창</div>
-				<div class="alert-section" id="alert-section">
-					<ul class="h-40">
-						<li class="text-left ml-2" id="notify"><p>지금은 무엇을 하지?</p></li>
+			</div>
+
+			<div class="ml-2"
+				style="border: 2px solid white; width: 23%; position: relative;">
+				<div id="itemList">
+					<ul style="border: 2px solid white">
+						<li>아이템 목록</li>
+					</ul>
+					<ul class="text-left p-1 overflow-y-scroll h-96" >
+						<c:forEach var="inventory" items="${inventory }"
+							varStatus="status">
+							<li><c:if
+									test="${inventory.quantity >= 1 && inventory.delStatus == 1}">
+									<span
+										<c:if test="${inventory.rarity == '1' }">style='color: white;'</c:if>
+										<c:if test="${inventory.rarity == '2' }">style='color: #24b500;'</c:if>
+										<c:if test="${inventory.rarity == '3' }">style='color: #0073ff;'</c:if>
+										<c:if test="${inventory.rarity == '4' }">style='color: #fc008f;'</c:if>
+										<c:if test="${inventory.rarity == '5' }">style='color: gold;'</c:if>>
+										${inventory.name } <c:if test="${inventory.increseHP != 0}">
+											<b class="text-red-400 text-base"> (${inventory.increseHP })
+											</b>
+										</c:if> <c:if test="${inventory.increseSP != 0}">
+											<b class="text-yellow-400 text-base">
+												(${inventory.increseSP }) </b>
+										</c:if> <c:if test="${inventory.increseAttackPoint != 0}">
+											<b class="text-base" style="color: #ff0000">
+												(${inventory.increseAttackPoint }) </b>
+										</c:if> <c:if test="${inventory.increseDefencePoint != 0}">
+											<b class="text-base" style="color: #0000ff">
+												(${inventory.increseDefencePoint }) </b>
+										</c:if> <c:if test="${inventory.recoveryHP != 0}">
+											<b class="text-red-400 text-base">
+												(${inventory.recoveryHP }) </b>
+										</c:if> <c:if test="${inventory.recoverySP != 0}">
+											<b class="text-yellow-400 text-base">
+												(${inventory.recoverySP }) </b>
+										</c:if> <c:if
+											test="${inventory.category eq '사용' 
+															|| inventory.category eq '기타'}">
+											<font class="text-sm font-bold mr-2" style="color: green;"
+												id="quan-${status.count }"> 수량 : ${inventory.quantity }
+											</font>
+										</c:if> <c:if
+											test="${inventory.category eq '무기' 
+															|| inventory.category eq '머리'
+															|| inventory.category eq '상의'
+															|| inventory.category eq '하의'
+															|| inventory.category eq '팔'
+															|| inventory.category eq '신발'}">
+											<font class="text-sm font-bold mr-2" style="color: pink;">
+												내구도 : ${inventory.durabilityPoint } </font>
+										</c:if>
+									</span>
+									<c:if test="${inventory.category eq '사용'}">
+										<button class="mybtn"
+											onclick="useItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
+											<span>사용</span>
+										</button>
+									</c:if>
+									<c:if
+										test="${inventory.category eq '무기' 
+															|| inventory.category eq '머리'
+															|| inventory.category eq '상의'
+															|| inventory.category eq '하의'
+															|| inventory.category eq '팔'
+															|| inventory.category eq '신발'}">
+										<button class="mybtn"
+											onclick="equipItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${status.count })">
+											<span>장착</span>
+										</button>
+									</c:if>
+
+									<button class="mybtn"
+										onclick="deleteItem(${rq.getLoginedMemberId() }, ${rq.player.id}, ${inventory.itemId }, ${inventory.id }, ${status.count })">
+										<span>버림</span>
+									</button>
+								</c:if></li>
+						</c:forEach>
 					</ul>
 				</div>
+			</div>
+
+			<div class="ml-2"
+				style="border: 2px solid white; width: 17%; position: relative;">
+				<div id="actionTab">
+					<ul style="border: 2px solid white" id="locationTab">
+						<li>위치 이동 : <select class="text-black border-black"
+							name="location"
+							onchange="locationMove(${rq.getLoginedMemberId() }, ${rq.player.id }, this)">
+								<option value="1"
+									<c:if test="${rq.player.lname eq '컨테이너 창고'}">selected</c:if>>컨테이너
+									창고</option>
+								<option value="2"
+									<c:if test="${rq.player.lname eq '헬기착륙장'}">selected</c:if>>헬기착륙장</option>
+								<option value="3"
+									<c:if test="${rq.player.lname eq '폐병원'}">selected</c:if>>폐병원</option>
+								<option value="4"
+									<c:if test="${rq.player.lname eq '폐공원'}">selected</c:if>>폐공원</option>
+								<option value="5"
+									<c:if test="${rq.player.lname eq '유적지'}">selected</c:if>>유적지</option>
+								<option value="6"
+									<c:if test="${rq.player.lname eq '신전'}">selected</c:if>>신전</option>
+						</select>
+						</li>
+					</ul>
+					<ul>
+						<li class="flex justify-center">
+							<ul class="active-list ml-2 mr-2 mt-10">
+								<li class="mb-2">
+									<button class="active"
+										onclick="searchAround(${rq.getLoginedMemberId() }, ${rq.player.id})">탐색</button>
+								</li>
+								<li class="mb-2">
+									<button class="active" onclick="recipe_form(${rq.player.id})">조합법
+										연구</button>
+								</li>
+								<li class="flex mb-2">
+									<button class="active"
+										onclick="getSkill_form(${rq.getLoginedMemberId() }, ${rq.player.id}, ${rq.player.level}, ${rq.player.skillPoint})">스킬
+										습득</button>
+								</li>
+								<li class="flex mb-2">
+									<button class="active text-red-400" style="width: 50%"
+										onclick="heal_form(${rq.getLoginedMemberId() }, 0)">
+										<span>치료</span>
+									</button>
+									<button class="active text-yellow-400" style="width: 50%"
+										onclick="heal_form(${rq.getLoginedMemberId() }, 1)">
+										<span>휴식</span>
+									</button>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="ml-2"
+				style="border: 2px solid white; width: 15%; position: relative;">
+				<div>
+					<ul style="border: 2px solid white">
+						<li>행동유형</li>
+					</ul>
+					<ul>
+						<li class="flex justify-center">
+							<ul class="active-list ml-2 mr-2 mt-2">
+								<li class="mb-2">
+									<button class="active" value="1"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">기본</button>
+								</li>
+								<li class="mb-2">
+									<button class="active" value="2"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">선제공격</button>
+								</li>
+								<li class="mb-2">
+									<button class="active" value="3"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">방어태세</button>
+								</li>
+								<li class="mb-2">
+									<button class="active" value="4"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">주변탐색</button>
+								</li>
+								<li class="mb-2">
+									<button class="active" value="5"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">사주경계</button>
+								</li>
+								<li>
+									<button class="active" value="6"
+										onclick="action_type(${rq.getLoginedMemberId() }, this)">은밀기동</button>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
-	</section>
-<%@ include file="../common/foot.jsp" %>
+
+		<div class="mt-2" style="border: 2px solid white; width: 100%;">알림창</div>
+		<div class="alert-section" id="alert-section">
+			<ul class="h-40">
+				<li class="text-left ml-2" id="notify"><p>지금은 무엇을 하지?</p></li>
+			</ul>
+		</div>
+	</div>
+</section>
+<%@ include file="../common/foot.jsp"%>
 
 <%-- 연구중
 onmouseover="pop('<font>${inventory.name }</font>
@@ -754,4 +859,3 @@ onmouseover="pop('<font>${inventory.name }</font>
 													</c:if>
 													','black','20','')" 
 												onmouseout="kill()"  --%>
-												

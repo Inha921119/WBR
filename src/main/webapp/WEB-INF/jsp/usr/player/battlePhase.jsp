@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="WebBattleRoyale" />
+<c:set var="pageTitle" value="BattlePhase" />
 <%@ include file="../common/head.jsp" %>
 	<script>
 	
@@ -10,7 +10,111 @@
 		
 		var timer = null;
 		
-				
+		window.onload=function() {
+			findDeadEnemy($('input[name=onload_memberId]').val(), $('input[name=onload_playerId1]').val(), $('input[name=onload_playerId2]').val());
+		}
+		
+		function findDeadEnemy(memberId, playerId1, playerId2) {
+			var memberId = memberId;
+			var playerId1 = playerId1;
+			var playerId2 = playerId2;
+			
+			$.ajax({
+				url:"../player/findDeadEnemy?playerId1="+playerId1+"&playerId2="+playerId2,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+						if(data.data2.deathStatus == 1) {
+							$("#notify").append("<p>" + data.data2.name + "의 시체를 발견했다.</p>");
+							$("#notify").append("<p>" + data.data2.name + "의 아이템을 습득할 수 있다.</p>");
+							
+							let actionTab = $('#actionTab');
+							let player2Status = $('#player2-status');
+							
+							let addHtml_player2status = `
+								<form action="../player/getEnemyItem" method="POST" name="get-enemy-items-form">
+									<input type="hidden" name="ids" value=""/>
+								</form>
+								<ul style="border: 2px solid white">
+									<li>전리품 목록</li>
+								</ul>
+								<ul class="text-left overflow-y-scroll h-96">`
+								
+								for(var i=0; i < data.data3.length; i++) {
+									var inventory = data.data3[i];
+									addHtml_player2status = addHtml_player2status
+															+ "<li> <input class='ml-2 get-enemy-items' type='checkbox' name='getEnemyItem_" + i + "' value='" + data.data2.id + "," + inventory.itemId + "," + inventory.quantity + "," + inventory.itemDP + "'>";
+															
+									if (inventory.rarity == 0){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: white;'>없음";
+									}
+									if (inventory.rarity == 1){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: white;'>";
+									}
+									if (inventory.rarity == 2){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #24b500;'>";
+									}
+									if (inventory.rarity == 3){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #0073ff;'>";
+									}
+									if (inventory.rarity == 4){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: #fc008f;'>";
+									}
+									if (inventory.rarity == 5){
+										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: gold;'>";
+									}
+									if (inventory.rarity != 0){
+										addHtml_player2status = addHtml_player2status + inventory.name;
+										if (inventory.categoryNum == 1 || inventory.categoryNum == 8){
+											addHtml_player2status = addHtml_player2status
+																	+ "<font class='text-sm font-bold mr-2' style='color: green;' id='quan-"
+																	+ i
+																	+ "'> 수량 : "
+																	+ inventory.quantity
+																	+ "</font>";
+										}
+										if (inventory.categoryNum != 1 && inventory.categoryNum != 8){
+											addHtml_player2status = addHtml_player2status
+																	+ "<font class='text-sm font-bold mr-2' style='color: pink;' id='itemDP-"
+																	+ i
+																	+ "'> 내구도 : "
+																	+ inventory.itemDP
+																	+ "</font>";
+										}
+									}
+									addHtml_player2status = addHtml_player2status + "</span></li>";
+								}
+								addHtml_player2status = addHtml_player2status + "</ul>";
+								
+							player2Status.empty().html("");
+							player2Status.append(addHtml_player2status);
+						 	
+							let addHtml_actionTab = `
+								<ul style="border: 2px solid white">
+									<li>전리품 습득</li>
+								</ul>
+								<ul>
+									<li class="flex justify-center">
+										<ul class="active-list ml-2 mr-2 mt-2">
+											<li class="mb-2">
+												<button class="active" onclick="btnGetEnemyItem();">습득</button>
+											</li>
+											<li class="mb-2">
+												<button class="active" onclick="action_run(${rq.getLoginedMemberId() }, ${player2.memberId }, ${player2.deathStatus })">그냥간다</button>
+											</li>
+										</ul>
+									</li>
+								</ul>`;
+								
+						actionTab.empty().html("");
+						actionTab.append(addHtml_actionTab);
+						}
+					}
+			});
+			show_NewStatus(memberId);
+		}
+		
 		function show_NewStatus(memberId) {
 			var memberId = memberId;
 			
@@ -61,7 +165,7 @@
 							
 							let addHtml_player2status = `
 								<form action="../player/getEnemyItem" method="POST" name="get-enemy-items-form">
-									<input type="hidden" name="ids" value="1,2,0"/>
+									<input type="hidden" name="ids" value=""/>
 								</form>
 								<ul style="border: 2px solid white">
 									<li>전리품 목록</li>
@@ -72,7 +176,7 @@
 									var inventory = data.data3[i];
 									
 									addHtml_player2status = addHtml_player2status
-															+ "<li> <input class='ml-2 get-enemy-items' type='checkbox' name='getEnemyItem_" + i + "' value='" + inventory.itemId + "," + inventory.quantity + "," + inventory.itemDP + "'>";
+															+ "<li> <input class='ml-2 get-enemy-items' type='checkbox' name='getEnemyItem_" + i + "' value='" + data.data2.id + "," + inventory.itemId + "," + inventory.quantity + "," + inventory.itemDP + "'>";
 															
 									if (inventory.rarity == 0){
 										addHtml_player2status = addHtml_player2status + "<span class='ml-2' style='color: white;'>없음";
@@ -262,7 +366,7 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-						if (deathStatus = 1) {
+						if (deathStatus == 1) {
 							$("#notify").append("<p>승리를 만끽하며 돌아간다.</p>");
 							$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
 							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
@@ -280,15 +384,6 @@
 				replace_battle(id);
 			}
 			show_NewStatus(id);
-		}
-		
-		function getEnemyItem(form) {
-			console.log(form.size);
-			console.log(form.getEnemyItem_0.value);
-			console.log(form.getEnemyItem_1.value);
-			console.log(form.getEnemyItem_2.value);
-			
-			/* form.submit(); */
 		}
 		
 		function replace_battle(id) {
@@ -314,6 +409,9 @@
 	<section class="mt-8 bg-black text-white h-screen">
 		<div class="container mx-auto text-center">
 			<div class="mb-20 text-4xl text-red-400" id="nowLocation">전투 발생</div>
+			<input type="hidden" name="onload_memberId" value="${rq.getLoginedMemberId()}">
+			<input type="hidden" name="onload_playerId1" value="${player1.id}">
+			<input type="hidden" name="onload_playerId2" value="${player2.id}">
 				<div class="text-xl flex" style="height: 420px;">
 					<div style="border: 2px solid white; width: 40%; position:relative;" >
 						<div>
@@ -514,7 +612,7 @@
 				<div class="mt-2" style="border: 2px solid white; width: 100%;">알림창</div>
 				<div class="alert-section" id="alert-section">
 					<ul class="h-40">
-						<li class="text-left ml-2" id="notify"><p>${player2.name }을(를) 발견했다.</p><p>무엇을 하지?</p></li>
+						<li class="text-left ml-2" id="notify"><c:if test="${player2.deathStatus == 0 }"><p>${player2.name }을(를) 발견했다.</p><p>무엇을 하지?</p></c:if></li>
 					</ul>
 				</div>
 		</div>

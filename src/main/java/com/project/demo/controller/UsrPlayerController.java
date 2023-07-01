@@ -131,10 +131,15 @@ public class UsrPlayerController {
 	
 	@RequestMapping("/usr/player/moveLocation")
 	@ResponseBody
-	public String moveLocation(int memberId, int location) {
-		playerService.moveLocation(memberId, location);
-		
-		return playerService.getLocationNameById(location);
+	public ResultData moveLocation(int memberId, int location) {
+		Player player = playerService.getPlayerByMemberId(memberId);
+		if (player.getSp()-10 < 0) {
+			return ResultData.from("F-1", "스테미나가 부족합니다.");
+		} else {
+			playerService.doChangeStatus(player.getId(), "sp", 10, 1);
+			playerService.moveLocation(memberId, location);
+			return ResultData.from("S-1", playerService.getLocationNameById(location), "player", player);
+		}
 	}
 	
 	@RequestMapping("/usr/player/showStatus")
@@ -267,9 +272,18 @@ public class UsrPlayerController {
 			case 1: case 2: // 총기
 				if(weapon1.getItemCode() == 152 || weapon1.getItemCode() == 153 || weapon2.getItemCode() == 152 || weapon2.getItemCode() == 153) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -279,9 +293,18 @@ public class UsrPlayerController {
 			case 3: case 4: // 활
 				if(weapon1.getItemCode() == 150 || weapon1.getItemCode() == 151 || weapon2.getItemCode() == 150 || weapon2.getItemCode() == 151) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -291,9 +314,18 @@ public class UsrPlayerController {
 			case 5: // 투척
 				if((weapon1.getItemCode() >= 201 && weapon1.getItemCode() <= 250) || (weapon2.getItemCode() >= 201 && weapon2.getItemCode() <= 250)) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -303,9 +335,18 @@ public class UsrPlayerController {
 			case 7: case 8: // 폭탄
 				if(weapon1.getItemCode() == 208 || weapon2.getItemCode() == 208) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -317,9 +358,18 @@ public class UsrPlayerController {
 					|| weapon1.getItemCode() == 113 || weapon2.getItemCode() == 113 || weapon1.getItemCode() == 116 || weapon2.getItemCode() == 116
 					|| weapon1.getItemCode() == 118 || weapon2.getItemCode() == 118) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -332,9 +382,18 @@ public class UsrPlayerController {
 					|| weapon1.getItemCode() == 114 || weapon2.getItemCode() == 114 || weapon1.getItemCode() == 115 || weapon2.getItemCode() == 115
 					|| weapon1.getItemCode() == 117 || weapon2.getItemCode() == 117) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -344,9 +403,18 @@ public class UsrPlayerController {
 			case 15: case 16: case 17: // 주먹
 				if(weapon1.getItemCode() == 119 || weapon2.getItemCode() == 119) {
 					if (player1.getSp() >= skill.getUseSP()) {
-						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						if (player2.getHp() - damage <= 0) {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+							playerService.changeDeathStatus(player2.getMemberId(), 1);
+							levelUp = getExp(player1.getId(), 5);
+							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+						} else {
+							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+							playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+							return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+						}
 					} else {
 						return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 					}
@@ -355,9 +423,18 @@ public class UsrPlayerController {
 				}
 			default:
 				if (player1.getSp() >= skill.getUseSP()) {
-					playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
-					playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
-					return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					if (player2.getHp() - damage <= 0) {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", player2.getHp(), 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
+						playerService.changeDeathStatus(player2.getMemberId(), 1);
+						levelUp = getExp(player1.getId(), 5);
+						return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
+					} else {
+						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
+						playerService.doChangeStatus(player1.getMemberId(), "sp", 20, 1);
+						return ResultData.from("S-1", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, damage);
+					}
 				} else {
 					return ResultData.from("F-1", "스테미나가 부족합니다.", "player1", player1, 0, "player2", player2, 0);
 				}
@@ -365,37 +442,51 @@ public class UsrPlayerController {
 		}
 	}
 	
+	@RequestMapping("/usr/player/findDeadEnemy")
+	@ResponseBody
+	public  ResultData findDeadEnemy(int playerId1, int playerId2) {
+		
+		Player player1 = playerService.getPlayerById(playerId1);
+		Player player2 = playerService.getPlayerById(playerId2);
+//		List<Inventory> player1Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId1);
+		List<Inventory> player2Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId2);
+		
+		return ResultData.from("S-1", "시체를 발견했습니다.", "player1", player1, 0, "player2", player2, 0, "player2Inventory", player2Inventory, 0);
+	}
+	
 	@RequestMapping("/usr/player/getEnemyItem")
 	@ResponseBody
 	public String getEnemyItem(@RequestParam(defaultValue = "") String ids) {
 		int playerId = playerService.getPlayerByMemberId(rq.getLoginedMemberId()).getId();
 		
-		if (Util.empty(ids)) {
-			return Util.jsHistoryBack("선택한 아이템이 없습니다");
-		}
-
-		List<Integer> itemIdQuanDPs = new ArrayList<>();
+		System.out.println(ids);
+		
+		List<Integer> pIdItemIdQuanDPs = new ArrayList<>();
 
 		for (String idStr : ids.split(",")) {
-			itemIdQuanDPs.add(Integer.parseInt(idStr));
+			pIdItemIdQuanDPs.add(Integer.parseInt(idStr));
 		}
 		
-		for (int i = 0; i < itemIdQuanDPs.size()/3; i++) {
-
-			int itemId = itemIdQuanDPs.get(i*3);
-			int quan = itemIdQuanDPs.get((i*3)+1);
-			int itemDP = itemIdQuanDPs.get((i*3)+2);
-		
+		for (int i = 0; i < pIdItemIdQuanDPs.size()/4; i++) {
+			int player2Id = pIdItemIdQuanDPs.get(i*4);
+			int itemId = pIdItemIdQuanDPs.get((i*4)+1);
+			int quan = pIdItemIdQuanDPs.get((i*4)+2);
+			int itemDP = pIdItemIdQuanDPs.get((i*4)+3);
+			int invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(player2Id, itemId, 0);
+			
 			if (itemVOService.getItemByCode(itemId).getCategoryNum() >= 2 && itemVOService.getItemByCode(itemId).getCategoryNum() <= 7) {
 				quan = -1;
 				inventoryService.addItem(playerId, itemId, quan, itemDP);
+				inventoryService.useEquip(player2Id, itemId, invenId, 0);
 			} else {
 				int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
 				itemDP = 0;
 				if(chkExistItem == 0) {
 					inventoryService.addItem(playerId, itemId, quan, itemDP);
+					inventoryService.useItem(player2Id, itemId, 0);
 				} else {
 					inventoryService.getItem(playerId, itemId, quan);
+					inventoryService.useItem(player2Id, itemId, 0);
 				}
 			}
 		}
@@ -433,7 +524,7 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", item.getIncreseHP(), 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", item.getIncreseSP(), 0);
 		
-		inventoryService.useItem(playerId, itemId);
+		inventoryService.useItem(playerId, itemId, 1);
 		
 		Inventory inventory = inventoryService.getInventoryItemByItemId(playerId, itemId);
 		
@@ -450,7 +541,7 @@ public class UsrPlayerController {
 			inventoryService.useEquip(playerId, itemId, invenId, 0); // 장비 버림 : 0, 장착 : 1
 			return inventoryService.getInventoryItemById(inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
 		} else {
-			inventoryService.useItem(playerId, itemId); // 아이템 갯수 깎
+			inventoryService.useItem(playerId, itemId, 1); // 아이템 갯수 깎
 			return inventoryService.getInventoryItemByItemId(playerId, itemId);
 		}
 	}
@@ -512,7 +603,7 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", item.getDecreseFindItemRate(), 1);
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
-			invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 1);
+			invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 2); // 0 버린거,  1 장착중인거, 2 인벤토리 존재하는거
 			inventoryService.useEquip(playerId, itemId, invenId, 1); // 아이템 갯수 깎
 			
 			if (item.getCategoryNum() !=2) {
@@ -522,23 +613,25 @@ public class UsrPlayerController {
 				oldEquipDP = equip.getUsedItemDP();
 			}
 			
-			inventoryService.changeEquipItem(playerId, oldEquipItemCode, oldEquipDP); // 빠지는 장비 인벤토리에 받기
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHP(), 1); 
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHP(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseSP(), 1); 
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseSP(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseAttackPoint(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseAttackPoint(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseDefencePoint(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseDefencePoint(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHitRate(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHitRate(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseMissRate(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseMissRate(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindEnemyRate(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindEnemyRate(), 0);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindItemRate(), 1);
-			playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindItemRate(), 0);
+			if (oldEquipItemCode != 0) {
+				inventoryService.changeEquipItem(playerId, oldEquipItemCode, oldEquipDP); // 빠지는 장비 인벤토리에 받기
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHP(), 1); 
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "maxHp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHP(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getIncreseSP(), 1); 
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "maxSp", itemVOService.getItemByCode(oldEquipItemCode).getDecreseSP(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseAttackPoint(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseAttackPoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseAttackPoint(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getIncreseDefencePoint(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseDefencePoint", itemVOService.getItemByCode(oldEquipItemCode).getDecreseDefencePoint(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseHitRate(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseHitRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseHitRate(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseMissRate(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "increseMissRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseMissRate(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindEnemyRate(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "findEnemyRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindEnemyRate(), 0);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getIncreseFindItemRate(), 1);
+				playerService.doChangeStatus(rq.getLoginedMemberId(), "findItemRate", itemVOService.getItemByCode(oldEquipItemCode).getDecreseFindItemRate(), 0);
+			}
 		} 
 		
 		equipmentService.equipItem(playerId, itemId, item.getCategoryNum(), equipId); // DB가서 장비아이템 코드 변경(실제 장착)
@@ -582,7 +675,7 @@ public class UsrPlayerController {
 		int chkExistItem = inventoryService.checkExistItem(playerId, itemId);
 		
 		if (item.getCategoryNum() >= 2 && item.getCategoryNum() <= 7) {
-			inventoryService.reviveEquip(playerId, itemId, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 0));
+			inventoryService.reviveEquip(playerId, itemId, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, 1));
 		} else {
 			if (chkExistItem == 1) {
 				inventoryService.getItem(playerId, itemId, quan);
@@ -698,6 +791,35 @@ public class UsrPlayerController {
 		
 		return player;
 	}
+	
+	@RequestMapping("/usr/player/doDiscoverEnemy")
+	@ResponseBody
+	public ResultData doDiscoverEnemy(int player1Id) {
+		
+		Player player1 = playerService.getPlayerById(player1Id);
+		Player player2 = playerService.getPlayerByLocation(player1.getNowLocation(), player1Id);
+		
+		if(player2 == null) {
+			return ResultData.from("S-1", "조회 성공", "player1", player1, player1.getId(), "player2", null, 0);
+		} else {
+			return ResultData.from("S-1", "조회 성공", "player1", player1, player1.getId(), "player2", player2, player2.getId());
+		}
+	}
+	
+	@RequestMapping("/usr/player/doSearchAround")
+	@ResponseBody
+	public ResultData doSearchAround(int playerId) {
+		Player player = playerService.getPlayerById(playerId);
+		if (player.getSp()-10 < 0) {
+			return ResultData.from("F-1", "스테미나가 부족합니다.");
+		} else {
+			playerService.doChangeStatus(playerId, "sp", 10, 1);
+			return ResultData.from("S-1", "탐색 성공", "player", player);
+		}
+	}
+	
+	
+	//------------------------------------------자체 사용함수--------------------------------------------------------------------------//
 	
 	public int getExp(int playerId, int exp) {
 		Player player = playerService.getPlayerById(playerId);

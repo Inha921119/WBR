@@ -28,8 +28,8 @@ public class InventoryService {
 		return inventoryRepository.getInventoryItemByItemId(playerId, itemId);
 	}
 
-	public void useItem(int playerId, int itemId) {
-		inventoryRepository.useItem(playerId, itemId);
+	public void useItem(int playerId, int itemId, int quan) { // all : quan = 0, 1개 : quan = 1 
+		inventoryRepository.useItem(playerId, itemId, quan);
 	}
 
 	public int checkExistItem(int playerId, int itemId) {
@@ -63,6 +63,5 @@ public class InventoryService {
 	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus) {
 		return inventoryRepository.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, delStatus);
 	}
-
 
 }
