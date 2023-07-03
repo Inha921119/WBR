@@ -69,4 +69,10 @@ public interface SkillRepository {
 			""")
 	public Skill getOneSkillById(int skillId);
 	
+	@Select("""
+			SELECT *
+				FROM skillList;
+			""")
+	List<Skill> getAllSkill();
+	
 }

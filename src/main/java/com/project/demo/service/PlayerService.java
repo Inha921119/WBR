@@ -73,7 +73,11 @@ private PlayerRepository playerRepository;
 		return playerRepository.getPlayerByLocation(nowLocation, id);
 	}
 
-	public void getEnemyItem() {
-		playerRepository.getEnemyItem();
+	public int getWinnerPlayerId() {
+		return playerRepository.getWinnerPlayerId();
+	}
+
+	public int existWinner() {
+		return playerRepository.existWinner(); // 0 : 우승자 없음, 1 : 우승자 있음
 	}
 }

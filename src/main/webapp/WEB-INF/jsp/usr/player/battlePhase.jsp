@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="BattlePhase" />
+<c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp" %>
 	<script>
 	
@@ -27,7 +27,12 @@
 				success : function(data) {
 						if(data.data2.deathStatus == 1) {
 							$("#notify").append("<p>" + data.data2.name + "의 시체를 발견했다.</p>");
-							$("#notify").append("<p>" + data.data2.name + "의 아이템을 습득할 수 있다.</p>");
+							
+							if(data.data3.length == 0) {
+								$("#notify").append("<p>이미 누군가가 다 가져간모양이다.</p>");
+							} else {
+								$("#notify").append("<p>" + data.data2.name + "의 아이템을 습득할 수 있다.</p>");
+							}
 							
 							let actionTab = $('#actionTab');
 							let player2Status = $('#player2-status');
@@ -85,6 +90,11 @@
 									}
 									addHtml_player2status = addHtml_player2status + "</span></li>";
 								}
+								if(data.data3.length == 0) {
+									addHtml_player2status = addHtml_player2status
+															+ "<li class='text-center mt-2'><span>없음</span></li>"
+								}
+								
 								addHtml_player2status = addHtml_player2status + "</ul>";
 								
 							player2Status.empty().html("");
@@ -366,14 +376,12 @@
 				datatype:"text",
 				async: false,
 				success : function(data) {
-						if (deathStatus == 1) {
-							$("#notify").append("<p>승리를 만끽하며 돌아간다.</p>");
+						if (deathStatus != 1) {
+							$("#notify").append("<p>" + data.name + "에게서 도망쳤다.</p>");
+						}
+							$("#notify").append("<p>다시 안전한 곳으로 돌아간다.</p>");
 							$("#notify").append("<p>3초뒤에 스테이터스 페이지로 돌아갑니다.</p>");
 							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-						} else {
-							$("#notify").append("<p>" + data.name + "에게서 도망쳤다.</p>");
-							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-						}
 					}
 			});
 			if (deathStatus = 1) {

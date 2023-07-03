@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="pageTitle" value="Battle" />
+<c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp"%>
 <script>
 	
@@ -13,7 +13,8 @@
 		function searchAround(memberId, playerId) {
 			var memberId = memberId;
 			var playerId = playerId;
-			
+			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
+
 			$.ajax({
 				url:"../player/doSearchAround?playerId="+playerId,
 				type:"get",
@@ -25,9 +26,11 @@
 						$("#notify").append("<p>스테미나를 채우고 행동해주세요.</p>");
 						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 					} else {
-						discoverEnemy(memberId, playerId);
-						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						if (50 >= ranNum) {
+							discoverEnemy(memberId, playerId);
+						} else {
+							doFindItem(memberId, playerId);
+						}
 					}
 				}
 			});
@@ -128,6 +131,8 @@
 				async: false,
 				success : function(data) {
 					if(data.data2 == null) {
+						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 						return;
 					}
 					
@@ -138,17 +143,52 @@
 						findRate = player1FindEnmey + 50;
 						if (findRate >= ranNum) {
 							replace_battlePhase(data.data1.id);
+						} else {
+							$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 						}
 					} else if (player1FindEnmey < player2FindEnmey) {
 						findRate = player2FindEnmey + 50;
 						if (findRate >= ranNum) {
 							replace_battlePhase(data.data1.id);
+						} else {
+							$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 						}
 					} else {
 						findRate = player1FindEnmey + 50;
 						if (findRate >= ranNum) {
 							replace_battlePhase(data.data1.id);
+						} else {
+							$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 						}
+					}
+				}
+			});
+		}
+		
+		function doFindItem(memberId, playerId) {
+			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
+			
+			var memberId = memberId;
+			var playerId = playerId;
+			console.log(6);
+			
+			$.ajax({
+				url:"../player/doFindItem?playerId="+playerId+"&ranNum="+ranNum,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if(data.data2 == null) {
+						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						return;
+					} else {
+						$("#notify").append("<p>주변을 탐색했다." + data.data2.name + "을(를) 찾았다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						$('#itemList').load(location.href+' #itemList');
 					}
 				}
 			});
@@ -553,8 +593,7 @@
 						</ul>
 						<ul style="width: 50%;">
 							<li><ul id="equipmentList">
-									<c:forEach var="equipment" items="${equipments }"
-										varStatus="status">
+									<c:forEach var="equipment" items="${equipments }" varStatus="status">
 										<li class="equip" style="width: 100%">[${equipment.category }]
 											: <c:choose>
 												<c:when test="${equipment.usedItemCode < 990}">

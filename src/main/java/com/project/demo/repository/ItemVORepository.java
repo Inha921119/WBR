@@ -37,4 +37,12 @@ public interface ItemVORepository {
 				ON i1.recipeItem3 = i4.itemCode;
 			""")
 	public List<ItemVO> getItemListRecipe();
+	
+	@Select("""
+			SELECT *
+				FROM item
+				ORDER BY RAND()
+				LIMIT 1;
+			""")
+	public ItemVO getRandomItem();
 }

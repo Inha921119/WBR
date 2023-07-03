@@ -32,5 +32,9 @@ public class ItemVOService {
 	public List<ItemVO> getItemListRecipe() {
 		return itemVORepository.getItemListRecipe();
 	}
+
+	public ItemVO getRandomItem() {
+		return itemVORepository.getRandomItem();
+	}
 	
 }

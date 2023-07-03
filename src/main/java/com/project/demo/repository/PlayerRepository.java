@@ -302,6 +302,18 @@ public interface PlayerRepository {
 				WHERE memberId = #{memberId};
 			""")
 	public void changeDeathStatus(int memberId, int num);
+	
+	@Select("""
+			SELECT id
+				FROM player
+				WHERE deathStatus = 0
+				LIMIT 1;
+			""")
+	public int getWinnerPlayerId();
 
-	public void getEnemyItem();
+	
+	@Select("""
+			SELECT (SELECT COUNT(*) FROM player)=(SELECT COUNT(deathStatus) FROM player WHERE deathStatus = 0)
+			""")
+	public int existWinner(); // 0 : 우승자 없음, 1 : 우승자 있음
 }
