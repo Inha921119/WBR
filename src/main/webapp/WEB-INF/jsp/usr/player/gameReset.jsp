@@ -11,7 +11,7 @@
 	</div>
 	<div class="text-center">
 		<button class="mybtn mt-10" onclick="location.href='resetGame';"><span>게임 초기화 및 시작</span></button>
-		<button class="mybtn mt-10" onclick="location.href='/';"><span>돌아가기</span></button>
+		<button class="mybtn mt-10 ml-80" onclick="location.href='/';"><span>돌아가기</span></button>
 	</div>
 </section>
 <%@ include file="../common/foot.jsp"%>

@@ -80,4 +80,8 @@ private PlayerRepository playerRepository;
 	public int existWinner() {
 		return playerRepository.existWinner(); // 0 : 우승자 없음, 1 : 우승자 있음
 	}
+
+	public void resetPlayerData() {
+		playerRepository.resetPlayerData();
+	}
 }

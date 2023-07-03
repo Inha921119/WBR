@@ -1,5 +1,6 @@
 package com.project.demo.repository;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -313,7 +314,12 @@ public interface PlayerRepository {
 
 	
 	@Select("""
-			SELECT (SELECT COUNT(*) FROM player)=(SELECT COUNT(deathStatus) FROM player WHERE deathStatus = 0)
+			SELECT (IF((SELECT COUNT(*) FROM player) = 1, 0, (SELECT COUNT(deathStatus) FROM player WHERE deathStatus = 0))) = 1
 			""")
 	public int existWinner(); // 0 : 우승자 없음, 1 : 우승자 있음
+	
+	@Delete("""
+			TRUNCATE TABLE player;
+			""")
+	public void resetPlayerData();
 }

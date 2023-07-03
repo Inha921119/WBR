@@ -36,5 +36,9 @@ public class SkillService {
 	public Skill getOneSkillById(int skillId) {
 		return skillRepository.getOneSkillById(skillId);
 	}
+
+	public void resetSkillData() {
+		skillRepository.resetSkillData();
+	}
 	
 }

@@ -18,11 +18,11 @@ public class GameLogService {
 		this.gameLogRepository = gameLogRepository;
 	}
 
-	public List<GameLog> getGameLogs() {
-		return gameLogRepository.getGameLogs();
+	public List<GameLog> getGameLogs(int nowRoundId) {
+		return gameLogRepository.getGameLogs(nowRoundId);
 	}
 
-	public void insertGameLog(String gameLog) {
-		gameLogRepository.insertGameLog(gameLog);
+	public void insertGameLog(int nowRoundId, String gameLog) {
+		gameLogRepository.insertGameLog(nowRoundId, gameLog);
 	}
 }

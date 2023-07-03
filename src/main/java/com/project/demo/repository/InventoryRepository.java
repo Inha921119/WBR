@@ -2,6 +2,7 @@ package com.project.demo.repository;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -332,4 +333,9 @@ public interface InventoryRepository {
 			</script>
 			""")
 	public int getInventoryIdByPlayerIdAndItemIdAndDel(int playerId, int itemId, int delStatus);  // 0 버린거,  1 장착중인거, 2 인벤토리 존재하는거
+	
+	@Delete("""
+			TRUNCATE TABLE inventory;
+			""")
+	public void resetInventoryData();
 }

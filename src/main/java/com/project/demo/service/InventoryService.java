@@ -64,4 +64,8 @@ public class InventoryService {
 		return inventoryRepository.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, itemId, delStatus);
 	}
 
+	public void resetInventoryData() {
+		inventoryRepository.resetInventoryData();
+	}
+
 }

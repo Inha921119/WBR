@@ -2,6 +2,7 @@ package com.project.demo.repository;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -12,14 +13,19 @@ import com.project.demo.vo.Equipment;
 @Mapper
 public interface EquipmentRepository {
 	
+	@Delete("""
+			TRUNCATE TABLE equipment;
+			""")
+	public void resetEquipmentData();
 	
 	@Insert("""
 			INSERT INTO equipment
 				SET regDate = NOW(),
 					updateDate = NOW(),
-					playerId = #{id};
+					playerId = #{id},
+					usedItemCode = #{itemCode};
 			""")
-	public void createEquipment(int id);
+	public void createEquipment(int id, int itemCode);
 
 	@Select("""
 			SELECT e.*

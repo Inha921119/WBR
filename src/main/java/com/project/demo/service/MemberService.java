@@ -104,5 +104,10 @@ public class MemberService {
 	public void decreseExistPlayer(int loginedMemberId) {
 		memberRepository.decreseExistPlayer(loginedMemberId);
 	}
+
+	public void resetExistPlayer() {
+		memberRepository.resetExistPlayer();
+		
+	}
 	
 }

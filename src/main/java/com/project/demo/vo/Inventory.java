@@ -11,6 +11,7 @@ public class Inventory {
 	private int id;
 	private String regDate;
 	private String updateDate;
+	private int winRound;
 	private int playerId;
 	private int player2Id;
 	private int itemId;

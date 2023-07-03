@@ -7,13 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Player {
+public class Ranking {
 	private int id;
 	private String regDate;
 	private String updateDate;
+	private int winRound;
 	private String name;
 	private int memberId;
-	private int winRound;
+	private int playerId;
 	private String image;
 	private int gender;
 	private int level;

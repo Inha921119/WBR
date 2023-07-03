@@ -178,3 +178,9 @@ html > body .toast-ui-viewer .toastui-editor-contents {
 .mybtn:hover {
 	background-color: gray;
 }
+
+.foot-setting {
+	background-color: #242323;
+	height: 6rem;
+	margin-top: 6rem;
+}

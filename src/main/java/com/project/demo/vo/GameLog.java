@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class GameLog {
 	private int id;
 	private String regDate;
+	private int roundNum;
 	private String logBody;
 }

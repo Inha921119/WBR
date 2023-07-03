@@ -87,4 +87,10 @@ public interface MemberRepository {
 			""")
 	public void decreseExistPlayer(int loginedMemberId);
 	
+	@Update("""
+			UPDATE `member`
+				SET existPlayer = 0
+			""")
+	public void resetExistPlayer();
+	
 }

@@ -14,14 +14,16 @@ public interface GameLogRepository {
 	@Select("""
 			SELECT *
 				FROM gameLog
-				ORDER BY regDate DESC;
+				WHERE roundNum = #{nowRoundId}
+				ORDER BY id DESC;
 			""")
-	public List<GameLog> getGameLogs();
+	public List<GameLog> getGameLogs(int nowRoundId);
 	
 	@Insert("""
 			INSERT INTO gameLog
-				SET regDate = NOW;
+				SET regDate = NOW()
+					, roundNum = #{nowRoundId}
 					, logBody = #{gameLog};
 			""")
-	public void insertGameLog(String gameLog);
+	public void insertGameLog(int nowRoundId, String gameLog);
 }

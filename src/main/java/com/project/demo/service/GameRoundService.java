@@ -19,4 +19,12 @@ public class GameRoundService {
 	public GameRound getNowGameRound() {
 		return gameRoundRepository.getNowGameRound();
 	}
+
+	public void addNewGame() {
+		gameRoundRepository.addNewGame();
+	}
+	
+	public void updateEndGame(int nowGameRoundId, int winMemberId, String winnerName) {
+		gameRoundRepository.updateEndGame(nowGameRoundId, winMemberId, winnerName);
+	}
 }

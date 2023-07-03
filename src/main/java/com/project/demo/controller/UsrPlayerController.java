@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.project.demo.service.EquipmentService;
 import com.project.demo.service.GameLogService;
+import com.project.demo.service.GameRoundService;
 import com.project.demo.service.InventoryService;
 import com.project.demo.service.ItemVOService;
 import com.project.demo.service.MemberService;
 import com.project.demo.service.PlayerService;
+import com.project.demo.service.RankingService;
 import com.project.demo.service.SkillService;
 import com.project.demo.util.Util;
 import com.project.demo.vo.Equipment;
@@ -36,12 +38,14 @@ public class UsrPlayerController {
 	private InventoryService inventoryService;
 	private SkillService skillService;
 	private GameLogService gameLogService;
+	private GameRoundService gameRoundService;
+	private RankingService rankingService;
 	private Rq rq;
 	
 	@Autowired
 	public UsrPlayerController(PlayerService playerService, MemberService memberService, ItemVOService itemVOService,
 								EquipmentService equipmentService, InventoryService inventoryService, SkillService skillService,
-								GameLogService gameLogService, Rq rq) {
+								GameLogService gameLogService, GameRoundService gameRoundService, RankingService rankingService, Rq rq) {
 		this.playerService = playerService;
 		this.memberService = memberService;
 		this.itemVOService = itemVOService;
@@ -49,6 +53,8 @@ public class UsrPlayerController {
 		this.inventoryService = inventoryService;
 		this.skillService = skillService;
 		this.gameLogService = gameLogService;
+		this.gameRoundService = gameRoundService;
+		this.rankingService = rankingService;
 		this.rq = rq;
 	}
 
@@ -72,11 +78,16 @@ public class UsrPlayerController {
 		}
 		
 		memberService.increseExistPlayer(memberId);
-		equipmentService.createEquipment(doParticipationAppRd.getData1());
-		
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 994);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 994);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 995);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 996);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 997);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 998);
+		equipmentService.createEquipment(doParticipationAppRd.getData1(), 999);
 		
 		String gameLog = name + "이(가) 전장에 참여하였다.";
-		gameLogService.insertGameLog(gameLog);
+		gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(),gameLog);
 		
 		return Util.jsReplace(doParticipationAppRd.getMsg(), "/");
 	}
@@ -103,6 +114,19 @@ public class UsrPlayerController {
 		Player player = playerService.getPlayerByMemberId(id);
 		
 		if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+			int winnerId = playerService.getWinnerPlayerId();
+			
+			Player winPlayer = playerService.getPlayerById(winnerId);
+			
+			List<Equipment> equipments = equipmentService.getEquipmentsByPlayerId(winnerId);
+			List<Inventory> inventory = inventoryService.getInventoryByPlayerId(winnerId);
+			List<Skill> skills = skillService.getSkillByPlayerId(winnerId);
+			
+			model.addAttribute("equipments", equipments);
+			model.addAttribute("inventory", inventory);
+			model.addAttribute("skills", skills);
+			model.addAttribute("player", winPlayer);
+			
 			return "usr/player/gameEnd";
 		} else if (player.getDeathStatus() == 1) {
 			return "usr/player/death";
@@ -151,9 +175,9 @@ public class UsrPlayerController {
 		
 		Player player = playerService.getPlayerById(winnerId);
 		
-		List<Equipment> equipments = equipmentService.getEquipmentsByPlayerId(player.getId());
-		List<Inventory> inventory = inventoryService.getInventoryByPlayerId(player.getId());
-		List<Skill> skills = skillService.getSkillByPlayerId(player.getId());
+		List<Equipment> equipments = equipmentService.getEquipmentsByPlayerId(winnerId);
+		List<Inventory> inventory = inventoryService.getInventoryByPlayerId(winnerId);
+		List<Skill> skills = skillService.getSkillByPlayerId(winnerId);
 		
 		model.addAttribute("equipments", equipments);
 		model.addAttribute("inventory", inventory);
@@ -170,7 +194,17 @@ public class UsrPlayerController {
 	@RequestMapping("/usr/player/resetGame")
 	@ResponseBody
 	public String doResetGame() {
-		return Util.jsHistoryBack("게임이 초기화 되었습니다.");
+		gameRoundService.addNewGame();
+		
+		String gameLog = "기존 게임이 초기화 되고 새로운 게임(" + gameRoundService.getNowGameRound().getId() + "회차)이 시작되었다." ;
+		gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+		
+		skillService.resetSkillData();
+		equipmentService.resetEquipmentData();
+		playerService.resetPlayerData();
+		inventoryService.resetInventoryData();
+		
+		return Util.jsReplace("게임이 초기화 되었습니다.", "/");
 	}
 	
 	@RequestMapping("/usr/player/moveLocation")
@@ -274,15 +308,15 @@ public class UsrPlayerController {
 	
 	@RequestMapping("/usr/player/battlePhaseAttack")
 	@ResponseBody
-	public  ResultData battlePhaseAttack(int playerId1, int playerId2, int skillId) {
+	public ResultData battlePhaseAttack(int playerId1, int playerId2, int skillId) {
 		
 		Player player1 = playerService.getPlayerById(playerId1);
 		Player player2 = playerService.getPlayerById(playerId2);
 //		List<Inventory> player1Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId1);
 		List<Inventory> player2Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId2);
 		Skill skill = skillService.getOneSkillById(skillId);
-		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByPlayerId(playerId1, 2));
-		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByPlayerId(playerId1, 2));
+		Equipment weapon1 = equipmentService.getEquipmentById(equipmentService.getMinEquipIdByPlayerId(playerId1, 2));
+		Equipment weapon2 = equipmentService.getEquipmentById(equipmentService.getMaxEquipIdByPlayerId(playerId1, 2));
 		
 		double damageCalc = 0;
 		int damage = 0;
@@ -299,13 +333,31 @@ public class UsrPlayerController {
 					playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 					playerService.changeDeathStatus(player2.getMemberId(), 1);
 					
-					String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-					gameLogService.insertGameLog(gameLog);
+					String weaponName = "";
+					String gameLog = "";
+					if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+						gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+					} else {
+						if (weapon2.getUsedItemCode() == 994) {
+							weaponName = weapon2.getName();
+						} else {
+							weaponName = weapon1.getName();
+						}
+						gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+					}
+					gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 					if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+						gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+						
+						registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+						
 						gameLog = player1.getName() + "이(가) 우승하였습니다.";
-						gameLogService.insertGameLog(gameLog);
-						gameLog = "게임 종료";
-						gameLogService.insertGameLog(gameLog);
+						gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+						gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+						gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+						
+						memberService.resetExistPlayer();
+						
 					}
 					
 					levelUp = getExp(player1.getId(), 5);
@@ -332,13 +384,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -363,13 +433,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -394,13 +482,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -425,13 +531,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -458,13 +582,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -492,13 +634,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -523,13 +683,31 @@ public class UsrPlayerController {
 							playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 							playerService.changeDeathStatus(player2.getMemberId(), 1);
 							
-							String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-							gameLogService.insertGameLog(gameLog);
+							String weaponName = "";
+							String gameLog = "";
+							if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+							} else {
+								if (weapon2.getUsedItemCode() == 994) {
+									weaponName = weapon2.getName();
+								} else {
+									weaponName = weapon1.getName();
+								}
+								gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+							}
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 							if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+								gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+								
+								registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+								
 								gameLog = player1.getName() + "이(가) 우승하였습니다.";
-								gameLogService.insertGameLog(gameLog);
-								gameLog = "게임 종료";
-								gameLogService.insertGameLog(gameLog);
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+								gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+								
+								memberService.resetExistPlayer();
+								
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
@@ -553,13 +731,31 @@ public class UsrPlayerController {
 						playerService.doChangeStatus(player1.getMemberId(), "killPoint", 1, 0);
 						playerService.changeDeathStatus(player2.getMemberId(), 1);
 						
-						String gameLog = player2.getName() + "은(는)" + player1.getName() + "의" + weapon1.getName() + "에 의해 사망하였다." ;
-						gameLogService.insertGameLog(gameLog);
+						String weaponName = "";
+						String gameLog = "";
+						if (weapon1.getUsedItemCode() == 994 && weapon2.getUsedItemCode() == 994) {
+							gameLog = player2.getName() + "은(는) " + player1.getName() + "의 주먹에 의해 사망하였다." ;
+						} else {
+							if (weapon2.getUsedItemCode() == 994) {
+								weaponName = weapon2.getName();
+							} else {
+								weaponName = weapon1.getName();
+							}
+							gameLog = player2.getName() + "은(는) " + player1.getName() + "의 " + weaponName + "에 의해 사망하였다." ;
+						}
+						gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
 						if (playerService.existWinner() == 1) { // 0 : 우승자 없음, 1 : 우승자 있음
+							gameRoundService.updateEndGame(gameRoundService.getNowGameRound().getId(), player1.getMemberId(), player1.getName());
+							
+							registWinnerData(player1.getId(), gameRoundService.getNowGameRound().getId());
+							
 							gameLog = player1.getName() + "이(가) 우승하였습니다.";
-							gameLogService.insertGameLog(gameLog);
-							gameLog = "게임 종료";
-							gameLogService.insertGameLog(gameLog);
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+							gameLog = gameRoundService.getNowGameRound().getId() + "회차 게임 종료";
+							gameLogService.insertGameLog(gameRoundService.getNowGameRound().getId(), gameLog);
+							
+							memberService.resetExistPlayer();
+							
 						}
 						
 						levelUp = getExp(player1.getId(), 5);
@@ -903,6 +1099,35 @@ public class UsrPlayerController {
 		return possibleMixItems;
 	}
 	
+	@RequestMapping("/usr/player/mixItem")
+	@ResponseBody
+	public ItemVO mixItem(int playerId, int itemCode, int recItem1, int recItem2, int recItem3) {
+		ItemVO mixedItem = itemVOService.getItemByCode(itemCode);
+		int checkExistItem = inventoryService.checkExistItem(playerId, itemCode);
+		
+		if (mixedItem.getCategoryNum() >= 2 && mixedItem.getCategoryNum() <= 7) {
+			inventoryService.useEquip(playerId, recItem1, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, recItem1, 2), 0);
+			inventoryService.useEquip(playerId, recItem2, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, recItem2, 2), 0);
+			if (recItem3 != 0) {
+				inventoryService.useEquip(playerId, recItem3, inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(playerId, recItem3, 2), 0);
+			}
+			inventoryService.addItem(playerId, itemCode, 1, mixedItem.getDurabilityPoint());
+		} else {
+			inventoryService.useItem(playerId, recItem1, 1);
+			inventoryService.useItem(playerId, recItem2, 1);
+			if (recItem3 != 0) {
+				inventoryService.useItem(playerId, recItem3, 1);
+			}
+			if (checkExistItem == 0) {
+				inventoryService.addItem(playerId, itemCode, 1, mixedItem.getDurabilityPoint());
+			} else {
+				inventoryService.getItem(playerId, itemCode, 1);
+			}
+		}
+		
+		return mixedItem;
+	}
+	
 	@RequestMapping("/usr/player/learnSkill")
 	@ResponseBody
 	public ResultData<Skill> learnSkill(int playerId, int skillId) {
@@ -1010,5 +1235,9 @@ public class UsrPlayerController {
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "maxExp", 10, 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "level", 1, 0);
 		playerService.doChangeStatus(rq.getLoginedMemberId(), "skillPoint", 1, 0);
+	}
+	
+	public void registWinnerData(int playerId, int winRound) {
+		rankingService.registWinnerData(playerId, winRound);
 	}
 }

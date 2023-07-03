@@ -13,6 +13,7 @@ public class Skill {
 	private String updateDate;
 	private String name;
 	private int playerId;
+	private int winRound;
 	private int skillId;
 	private int skillType;
 	private int needSkillPoint;

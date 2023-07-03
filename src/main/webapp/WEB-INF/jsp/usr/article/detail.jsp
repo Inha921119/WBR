@@ -32,8 +32,8 @@
 	</script>
 
 	<section class="mt-8 text-xl h-screen">
-		<div class="container mx-auto px-3 pb-5 border-bottom-line text-black">
-			<div class="table-box-type-1">
+		<div class="container mx-auto px-3 pb-5 border-bottom-line text-black ">
+			<div class="table-box-type-1 bg-white">
 				<table>
 					<colgroup>
 						<col width="200" />

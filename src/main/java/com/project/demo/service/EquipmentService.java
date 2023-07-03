@@ -18,8 +18,8 @@ public class EquipmentService {
 		this.equipmentRepository = equipmentRepository;
 	}
 
-	public void createEquipment(int id) {
-		equipmentRepository.createEquipment(id);
+	public void createEquipment(int id, int itemCode) {
+		equipmentRepository.createEquipment(id, itemCode);
 	}
 
 	public List<Equipment> getEquipmentsByPlayerId(int playerId) {
@@ -49,6 +49,10 @@ public class EquipmentService {
 
 	public Equipment getEquipByPIdAndItemId(int playerId, int itemId) {
 		return equipmentRepository.getEquipByPIdAndItemId(playerId, itemId);
+	}
+
+	public void resetEquipmentData() {
+		equipmentRepository.resetEquipmentData();		
 	}
 
 	

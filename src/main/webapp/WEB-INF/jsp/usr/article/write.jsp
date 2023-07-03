@@ -7,7 +7,7 @@
 	<section class="mt-8 text-xl h-screen">
 		<div class="container mx-auto px-3 text-black">
 			<form action="doWrite" method="POST" onsubmit="submitForm(this); return false;">
-				<div class="table-box-type-1">
+				<div class="table-box-type-1 bg-white">
 					<table>
 						<colgroup>
 							<col width="200" />
@@ -29,12 +29,12 @@
 							</tr>
 							<tr>
 								<th>제목</th>
-								<td><input class="input input-bordered w-full" type="text" name="title" placeholder="제목을 입력해주세요"/></td>
+								<td><input class="input input-bordered w-full text-black" type="text" name="title" placeholder="제목을 입력해주세요"/></td>
 							</tr>
 							<tr>
 								<th>내용</th>
 								<td>
-									<div class="toast-ui-editor">
+									<div class="toast-ui-editor bg-white">
 										<script type="text/x-template"></script>
 									</div>
 									<input name="body" type="hidden" />

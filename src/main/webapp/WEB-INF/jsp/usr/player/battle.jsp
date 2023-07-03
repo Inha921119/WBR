@@ -4,7 +4,13 @@
 <c:set var="pageTitle" value="WebBattleRoyale" />
 <%@ include file="../common/head.jsp"%>
 <script>
-	
+		
+	window.onload = function(){
+		var endStatus = $('input[name=endStatus]').val();
+		if (endStatus == 1) {
+			replace_home();
+		}
+	}
 		originalForm = null;
 		originalId = null;
 		
@@ -173,7 +179,6 @@
 			
 			var memberId = memberId;
 			var playerId = playerId;
-			console.log(6);
 			
 			$.ajax({
 				url:"../player/doFindItem?playerId="+playerId+"&ranNum="+ranNum,
@@ -463,6 +468,31 @@
 			}, 'json');
 		}	
 		
+		function mixItem(playerId, itemCode, recItem1, recItem2, recItem3) {
+			var playerId = playerId;
+			var itemCode = itemCode;
+			var recItem1 = recItem1;
+			var recItem2 = recItem2;
+			var recItem3 = recItem3;
+			
+			$.ajax({
+				url:"../player/mixItem?playerId="+playerId+"&itemCode="+itemCode+"&recItem1="+recItem1+"&recItem2="+recItem2+"&recItem3="+recItem3,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+				    $('#actionTab').load(location.href+' #actionTab');
+				    if(data.recipeItem3 == 0) {
+						$("#notify").append("<p>" + data.recipeItem1Name + "와(과) " + data.recipeItem2Name + "을(를) 조합하여 " + data.name + "을(를) 얻었다.</p>");
+				    }else {
+						$("#notify").append("<p>" + data.recipeItem1Name + "와(과) " + data.recipeItem2Name + "와(과) " + data.recipeItem3Name + "을(를) 조합하여 " + data.name + "을(를) 얻었다.</p>");
+				    }
+					$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					$('#itemList').load(location.href+' #itemList');
+				}
+			});
+		}
+		
 		function recipe_form(playerId) {
 			var playerId = playerId;
 			
@@ -499,14 +529,15 @@
 				 		} else{
 					 		addHtml = addHtml 
 					 				+ "<li class='flex justify-between'><span class='text-sm'>" + item.name + " = " + item.recipeItem1Name + " + " + item.recipeItem2Name;
+					 		
 				 		}
 			 		}
-			 		addHtml = addHtml
+		 			addHtml = addHtml
 			 				+ `</span>
-			 					<button class='mybtn ml-2 text-sm'>
+			 					<button class='mybtn ml-2 text-sm' onclick="mixItem(\${playerId}, \${item.itemCode}, \${item.recipeItem1}, \${item.recipeItem2}, \${item.recipeItem3}); actionTab_cancle();">
 			 						<span>조합</span>
 		 						</button>
-	 						</li>`
+								</li>`
 				}
 			 		addHtml = addHtml
 			 				+ `</ul>
@@ -531,6 +562,11 @@
 			location.replace(url);
 		}
 		
+		function replace_home() {
+			var url = `/`;
+			location.replace(url);
+		}
+		
 		function actionTab_cancle() {
 			let actionTab = $('#actionTab');
 			actionTab.html(originalForm);
@@ -548,6 +584,7 @@
 
 <section class="mt-8 bg-black text-white h-screen">
 	<div class="container mx-auto text-center">
+	<input type="hidden" name="endStatus" value="${rq.gameRound.endStatus}">
 		<div class="mb-20 text-2xl" id="nowLocation">현재 위치 :
 			${rq.player.lname }</div>
 		<div class="text-xl flex" style="height: 420px;">

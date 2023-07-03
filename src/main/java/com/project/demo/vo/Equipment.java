@@ -11,6 +11,7 @@ public class Equipment {
 	private int id;
 	private String regDate;
 	private String updateDate;
+	private int winRound;
 	private int playerId;
 	private int usedItemCode;
 	private int itemCode;
