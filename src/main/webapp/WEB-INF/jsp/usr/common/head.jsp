@@ -8,6 +8,7 @@
 <title>${pageTitle }</title>
 <!-- 파비콘 불러오기 -->
 <link rel="shortcut icon" href="/resource/images/favicon.ico" />
+<link rel="main img" href="/resource/images/main.jpg" />
 <!-- 테일윈드 불러오기 -->
 <!-- 노말라이즈, 라이브러리 -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.7/tailwind.min.css" />
@@ -21,7 +22,7 @@
 <script src="/resource/common.js" defer="defer"></script>
 
 </head>
-<body class="bg-black text-white h-full">
+<body class="bg-black text-white h-full" style="position: relative; z-index: -3;">
 	<div class="flex justify-between ">
 		<div class="inline-block mt-2">
 			<a href="/" class="btn btn-ghost normal-case text-xl"><img src="/resource/images/logo.png"/></a>
