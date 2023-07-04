@@ -361,6 +361,7 @@ public class UsrPlayerController {
 					}
 					
 					levelUp = getExp(player1.getId(), 5);
+					player2 = playerService.getPlayerById(playerId2);
 					return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 				} else {
 					playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -412,6 +413,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -461,6 +463,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -510,6 +513,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -559,6 +563,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -610,6 +615,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -662,6 +668,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -711,6 +718,7 @@ public class UsrPlayerController {
 							}
 							
 							levelUp = getExp(player1.getId(), 5);
+							player2 = playerService.getPlayerById(playerId2);
 							return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 						} else {
 							playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -759,6 +767,7 @@ public class UsrPlayerController {
 						}
 						
 						levelUp = getExp(player1.getId(), 5);
+						player2 = playerService.getPlayerById(playerId2);
 						return ResultData.from("S-2", "데미지를 입혔습니다.", "player1", player1, damage, "player2", player2, levelUp, "player2Inventory", player2Inventory, 0);
 					} else {
 						playerService.doChangeStatus(player2.getMemberId(), "hp", damage, 1);
@@ -782,6 +791,18 @@ public class UsrPlayerController {
 		List<Inventory> player2Inventory = inventoryService.getInventoryUsefulItemCodeByPlayerId(playerId2);
 		
 		return ResultData.from("S-1", "시체를 발견했습니다.", "player1", player1, 0, "player2", player2, 0, "player2Inventory", player2Inventory, 0);
+	}
+
+	@RequestMapping("/usr/player/doSearchAround")
+	@ResponseBody
+	public ResultData doSearchAround(int playerId) {
+		Player player = playerService.getPlayerById(playerId);
+		if (player.getSp()-10 < 0) {
+			return ResultData.from("F-1", "스테미나가 부족합니다.");
+		} else {
+			playerService.doChangeStatus(playerId, "sp", 10, 1);
+			return ResultData.from("S-1", "탐색 성공", "player", player);
+		}
 	}
 	
 	@RequestMapping("/usr/player/doFindItem")
@@ -822,8 +843,6 @@ public class UsrPlayerController {
 	public String getEnemyItem(@RequestParam(defaultValue = "") String ids) {
 		int playerId = playerService.getPlayerByMemberId(rq.getLoginedMemberId()).getId();
 		
-		System.out.println(ids);
-		
 		List<Integer> pIdItemIdQuanDPs = new ArrayList<>();
 
 		for (String idStr : ids.split(",")) {
@@ -835,8 +854,8 @@ public class UsrPlayerController {
 			int itemId = pIdItemIdQuanDPs.get((i*4)+1);
 			int quan = pIdItemIdQuanDPs.get((i*4)+2);
 			int itemDP = pIdItemIdQuanDPs.get((i*4)+3);
-			int invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(player2Id, itemId, 0);
-			
+			int invenId = inventoryService.getInventoryIdByPlayerIdAndItemIdAndDel(player2Id, itemId, 2);
+
 			if (itemVOService.getItemByCode(itemId).getCategoryNum() >= 2 && itemVOService.getItemByCode(itemId).getCategoryNum() <= 7) {
 				quan = -1;
 				inventoryService.addItem(playerId, itemId, quan, itemDP);
@@ -1197,19 +1216,6 @@ public class UsrPlayerController {
 			return ResultData.from("S-1", "조회 성공", "player1", player1, player1.getId(), "player2", player2, player2.getId());
 		}
 	}
-	
-	@RequestMapping("/usr/player/doSearchAround")
-	@ResponseBody
-	public ResultData doSearchAround(int playerId) {
-		Player player = playerService.getPlayerById(playerId);
-		if (player.getSp()-10 < 0) {
-			return ResultData.from("F-1", "스테미나가 부족합니다.");
-		} else {
-			playerService.doChangeStatus(playerId, "sp", 10, 1);
-			return ResultData.from("S-1", "탐색 성공", "player", player);
-		}
-	}
-	
 	
 	//------------------------------------------자체 사용함수--------------------------------------------------------------------------//
 	

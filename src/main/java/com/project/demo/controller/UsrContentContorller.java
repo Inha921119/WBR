@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.project.demo.service.ContentService;
 import com.project.demo.service.GameLogService;
 import com.project.demo.service.GameRoundService;
 import com.project.demo.service.RankingService;
@@ -16,27 +15,22 @@ import com.project.demo.vo.Equipment;
 import com.project.demo.vo.GameLog;
 import com.project.demo.vo.Inventory;
 import com.project.demo.vo.Player;
-import com.project.demo.vo.Rq;
 import com.project.demo.vo.Skill;
 
 @Controller
 public class UsrContentContorller {
 	
-	private ContentService contentService;
 	private SkillService skillService;
 	private GameLogService gameLogService;
 	private GameRoundService gameRoundService;
 	private RankingService rankingService;
-	private Rq rq;
 	
 	@Autowired
-	public UsrContentContorller(ContentService contentService, SkillService skillService, GameLogService gameLogService, GameRoundService gameRoundService, RankingService rankingService, Rq rq) {
-		this.contentService = contentService;
+	public UsrContentContorller(SkillService skillService, GameLogService gameLogService, GameRoundService gameRoundService, RankingService rankingService) {
 		this.skillService = skillService;
 		this.gameLogService = gameLogService;
 		this.gameRoundService = gameRoundService;
 		this.rankingService = rankingService;
-		this.rq = rq;
 	}
 	
 	@RequestMapping("/usr/content/itemListAndRecipe")
