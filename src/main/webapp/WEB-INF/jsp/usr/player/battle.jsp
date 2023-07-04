@@ -16,31 +16,23 @@
 		
 		var timer = null;
 		
-		function searchAround(memberId, playerId) {
+		function show_NewStatus(memberId) {
 			var memberId = memberId;
-			var playerId = playerId;
-			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
-
+			
 			$.ajax({
-				url:"../player/doSearchAround?playerId="+playerId,
+				url:"../player/showStatus?memberId="+memberId,
 				type:"get",
 				datatype:"text",
 				async: false,
 				success : function(data) {
-					if (data.resultCode == "F-1") {
-						$("#notify").append("<p>스테미나가 부족합니다.</p>");
-						$("#notify").append("<p>스테미나를 채우고 행동해주세요.</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-					} else {
-						if (50 >= ranNum) {
-							discoverEnemy(memberId, playerId);
-						} else {
-							doFindItem(memberId, playerId);
-						}
-					}
+					$("#hp").text("체력 : " + data.hp + " / " + data.maxHp);
+					$("#sp").text("스테미나 : " + data.sp + " / " + data.maxSp);
+					$("#attack").text("공격력 : " + data.attackPoint + "  (" + data.increseAttackPoint + ")");
+					$("#defence").text("방어력 : " + data.defencePoint + "  (" + data.increseDefencePoint + ")");
+					$("#hit").text("적중 : " + data.hitRate + "  (" + data.increseHitRate + ")");
+					$("#miss").text("회피 : " + data.missRate + "  (" + data.increseMissRate + ")");
 				}
 			});
-			show_NewStatus(memberId);
 		}
 		
 		function locationMove(memberId, player1Id, lo) {
@@ -69,6 +61,58 @@
 					}
 				});
 			show_NewStatus(memberId);
+		}
+		
+		function searchAround(memberId, playerId) {
+			var memberId = memberId;
+			var playerId = playerId;
+			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
+
+			$.ajax({
+				url:"../player/doSearchAround?playerId="+playerId,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if (data.resultCode == "F-1") {
+						$("#notify").append("<p>스테미나가 부족합니다.</p>");
+						$("#notify").append("<p>스테미나를 채우고 행동해주세요.</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+					} else {
+						if (50 >= ranNum) {
+							discoverEnemy(memberId, playerId);
+						} else {
+							doFindItem(memberId, playerId);
+						}
+					}
+				}
+			});
+			show_NewStatus(memberId);
+		}
+		
+		function doFindItem(memberId, playerId) {
+			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
+			
+			var memberId = memberId;
+			var playerId = playerId;
+			
+			$.ajax({
+				url:"../player/doFindItem?playerId="+playerId+"&ranNum="+ranNum,
+				type:"get",
+				datatype:"text",
+				async: false,
+				success : function(data) {
+					if(data.data2 == null) {
+						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						return;
+					} else {
+						$("#notify").append("<p>주변을 탐색했다." + data.data2.name + "을(를) 찾았다.</p><p>이제 무엇을 하지?</p>");
+						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
+						$('#itemList').load(location.href+' #itemList');
+					}
+				}
+			});
 		}
 		
 		function action_type(memberId, ty) {
@@ -100,25 +144,6 @@
 				}
 			});
 			show_NewStatus(memberId);
-		}
-		
-		function show_NewStatus(memberId) {
-			var memberId = memberId;
-			
-			$.ajax({
-				url:"../player/showStatus?memberId="+memberId,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					$("#hp").text("체력 : " + data.hp + " / " + data.maxHp);
-					$("#sp").text("스테미나 : " + data.sp + " / " + data.maxSp);
-					$("#attack").text("공격력 : " + data.attackPoint + "  (" + data.increseAttackPoint + ")");
-					$("#defence").text("방어력 : " + data.defencePoint + "  (" + data.increseDefencePoint + ")");
-					$("#hit").text("적중 : " + data.hitRate + "  (" + data.increseHitRate + ")");
-					$("#miss").text("회피 : " + data.missRate + "  (" + data.increseMissRate + ")");
-				}
-			});
 		}
 		
 		function discoverEnemy(memberId, player1Id) {
@@ -169,31 +194,6 @@
 							$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
 							$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
 						}
-					}
-				}
-			});
-		}
-		
-		function doFindItem(memberId, playerId) {
-			const ranNum = Math.floor((Math.random() * 99) +1); // 1~100 랜덤값 생성
-			
-			var memberId = memberId;
-			var playerId = playerId;
-			
-			$.ajax({
-				url:"../player/doFindItem?playerId="+playerId+"&ranNum="+ranNum,
-				type:"get",
-				datatype:"text",
-				async: false,
-				success : function(data) {
-					if(data.data2 == null) {
-						$("#notify").append("<p>주변을 탐색했다. 아무것도 찾지 못했다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-						return;
-					} else {
-						$("#notify").append("<p>주변을 탐색했다." + data.data2.name + "을(를) 찾았다.</p><p>이제 무엇을 하지?</p>");
-						$('#alert-section').scrollTop($('#alert-section')[0].scrollHeight);
-						$('#itemList').load(location.href+' #itemList');
 					}
 				}
 			});

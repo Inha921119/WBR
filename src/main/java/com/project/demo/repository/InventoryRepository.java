@@ -52,7 +52,8 @@ public interface InventoryRepository {
 				ON iv.itemId = i.itemCode
 				INNER JOIN itemCategory AS ic
 				ON i.categoryNum = ic.id
-				WHERE iv.playerId = #{playerId};
+				WHERE iv.playerId = #{playerId}
+				ORDER BY i.categoryNum;
 			""")
 	List<Inventory> getInventoryByPlayerId(int playerId);
 
@@ -307,7 +308,8 @@ public interface InventoryRepository {
 				INNER JOIN itemCategory AS ic
 				ON i.categoryNum = ic.id
 				WHERE iv.playerId = #{playerId}
-				AND iv.quantity != 0;
+				AND iv.quantity != 0
+				ORDER BY i.categoryNum;
 			""")
 	List<Inventory> getInventoryUsefulItemCodeByPlayerId(int playerId);
 	
