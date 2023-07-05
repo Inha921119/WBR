@@ -1,0 +1,836 @@
+# 체력(1~) : 약초(1), 붕대(2)(천쪼가리+천쪼가리), 회복약(3)(빈캡슐+약초), 구급상자(4)(빈상자+약초+붕대)
+SELECT * FROM item;
+DESC item;
+
+# 삽입용
+INSERT INTO item
+	SET regDate = NOW(),
+		updateDate = NOW(),
+		itemCode = 4,
+		`name` = '구급상자';
+	
+# 업데이트용		
+UPDATE item
+	SET updateDate = NOW(),
+		rarity = 0,
+		useType = 0,
+		useHand = 0,
+		useHP = 0,
+		recoveryHP = 0,
+		increseHP = 0,
+		decreseHP = 0,
+		useSP = 0,
+		recoverySP = 0,
+		increseSP = 0,
+		decreseSP = 0,
+		increseAttackPoint = 0,
+		decreseAttackPoint = 0,
+		increseDefencePoint = 0,
+		decreseDefencePoint = 0,
+		increseHitRate = 0,
+		decreseHitRate = 0,
+		increseMissRate = 0,
+		decreseMissRate = 0,
+		increseFindItemRate = 0,
+		decreseFindItemRate = 0,
+		increseFindEnemyRate = 0,
+		decreseFindEnemyRate = 0,
+		durabilityPoint = 0,
+		inventoryPoint = 0,
+		dropRate = 0
+	where itemCode = 0;
+
+# 스테미나(51~) : 빵(51), 컵라면(52), 에너지바(53), 물(54), 음료수(55), 통조림(56), 전투식량(57)
+
+# 무기(근거리, 101~) : 단검(101), 호미(102), 낫(103), 돌도끼(104), 철도끼(105), 목검(106), 나무배트(107), 경광봉(108), 대나무창(109), 삼지창(110), 골프채(111), 쌍절곤(112), 정글도(113), 철퇴(114), 사슬채찍(115), 사슬낫(116)(낫+사슬), 3단봉(117), 장검(118), 너클(119), 냄비뚜껑(120), 후라이팬(121), 경찰방패(122)
+
+# 무기(원거리, 151~) : 활(150), 석궁(151), 권총(152), 소총(153)
+
+# 무기(투척, 201~) : 돌(201), 사냥돌(202)(돌+밧줄), 화염병(203), 수리검(204), 승표(205)(수리검+밧줄), 유성추(206)(쇠공+밧줄), 투창(207), 다이너마이트(208)
+
+# 무기(한손) : 단검, 정글도, 경찰방패, 후라이팬, 냄비뚜껑, 화염병, 다이너마이트, 투창, 철도끼, 목검, 삼지창, 사슬채찍, 돌도끼, 나무배트, 쌍절곤, 경광봉, 3단봉, 권총, 수리검, 승표(수리검+밧줄), 유성추(쇠공+밧줄), 낫, 사슬낫(낫+사슬), 호미, 사냥돌(돌+밧줄), 돌, 골프채, 너클
+# 무기(양손) : 소총, 대나무창, 봉, 활, 석궁, 철퇴, 장검
+
+
+# 방어구(머리, 251~) : 안전모(251), 싸이클헬멧(252), 오토바이헬멧(253), 방독면(254), 사슬헬멧(255), 강철헬멧(256), 방탄모자(257)(철판+오토바이헬멧)  
+
+# 방어구(상의, 301~) : 안전조끼(301), 패딩(302)(천쪼가리+솜), 가죽재킷(303), 보호복(304), 방화복(305)(부직포+패딩), 사슬갑옷(306), 방검복(307)(사슬+가죽재킷), 강철갑옷(308), 방탄조끼(309)(철판+가죽재킷),  
+
+# 방어구(하의, 351~) : 청바지(351), 패딩바지(352), 군용바지(353), 사슬갑옷하의(354), 강철갑옷하의(355)
+
+# 방어구(팔, 401~) : 팔토시(401), 아대(402), 싸이클 팔꿈치 보호대(403), 사슬갑옷 팔 보호대(404), 강철갑옷 팔 보호대(405)
+
+# 방어구(신발, 451~) : 운동화(451), 장화(452), 전투화(453), 사슬부츠(454), 강철부츠(455)
+
+# 기타(501~) : 실(501), 솜(502), 천쪼가리(503), 나무(504), 대나무(505), 숫돌(506), 부직포(507), 유리병(508), 쇠공(509), 밧줄(510), 화살(511)(숫돌+나무) 못(512), 망치(513), 공구세트(514), 빈캡슐(515), 빈상자(516), 사슬(517), 철판(518), 화약(519), 총알(520)
+INSERT INTO item
+	SET regDate = NOW(),
+		updateDate = NOW(),
+		itemCode = 520,
+		`name` = '총알';
+
+desc player
+select * from player
+desc `member`
+select * from `member`
+
+alter table player add column increseMissRate int not null default 0 after MissRate
+update player
+	set increseAttackPoint = 0
+		, increseDefencePoint = 0
+		, increseHitRate = 0
+		, increseMissRate = 0
+		, findEnemyRate = 0
+		, findItemRate = 0;
+
+update `member`
+	set existPlayer = 1
+	where id = 1;
+select * from `member`
+
+create table equipment(
+	id int unsigned not null primary key auto_increment,
+	regDate datetime not null,
+	updateDate datetime not null,
+	playerId int unsigned not null,
+	usedItemCode int unsigned not null default 999,
+	usedItemDP INT UNSIGNED NOT NULL DEFAULT 999
+);
+
+desc equipment
+
+insert into equipment
+	SET regDate = NOW(),
+		updateDate = NOW(),
+		playerId = 4
+
+select * from equipment
+SELECT * FROM player
+SELECT * FROM item
+
+update item
+	set category = 7
+	where itemCode between 451 and 500;
+
+desc item
+
+alter table item add column category int unsigned not null default 8 after itemCode
+
+create table itemCategory(
+	id int unsigned primary key auto_increment NOT NULL,
+	regDate datetime not null,
+	updateDate datetime not null,
+	category varchar(20) not null
+)
+
+select * from itemCategory
+
+insert into itemCategory
+	set regDate = now()
+		, updateDate = now()
+		, category = '기타'
+
+select (select count(*) from player)=(select count(deathStatus) from player where deathStatus = 0) 
+
+select 1=0
+
+select e.*
+	, ic.category
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	from equipment as e
+	inner join itemCategory as ic
+	on e.usedItemCode = ic.itemCode
+	inner join item as i
+	on ic.itemCode = i.itemCode
+	where e.playerId = 1;
+
+	
+# location 테이블 생성
+create table location(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	lname varchar(20) not null
+);
+
+# location 데이터 추가
+insert into location
+	set id = 999
+		, regDate = now()
+		, updateDate = now()
+		, lname = '대기실';
+
+select * from location
+
+
+SELECT *
+	FROM player
+	WHERE memberId = 1
+SELECT p.id
+	, p.regDate
+	, p.updateDate
+	, p.`name`
+	, p.memberId
+	, p.image
+	, p.gender
+	, p.level
+	, p.exp
+	, p.maxExp
+	, p.hp
+	, p.maxHp
+	, p.sp
+	, p.maxSp
+	, p.attackPoint
+	, p.defencePoint
+	, p.hitRate
+	, p.missRate
+	, p.findEnemyRate
+	, p.findItemRate
+	, p.inventoryPoint
+	, p.killPoint
+	, p.deathStatus
+	, p.deathDate
+	, p.actionType
+	, l.lname
+	FROM player as p
+	inner join location as l
+	on p.nowlocation = l.id
+	WHERE p.memberId = 1;
+	
+# actionType 테이블 생성
+create table actionType(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	TypeName VARCHAR(20) NOT NULl
+);
+
+# location 데이터 추가
+insert into actionType
+	set regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '기본';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '선제공격';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '방어태세';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '주변탐색';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '사주경계';
+INSERT INTO actionType
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, TypeName = '은밀기동';
+		
+select * from actionType
+SELECT * FROM player
+
+# actionType에 따른 공격력 증감 질문 2면 공격력 증가 2가 아니면 감소? 그러면 다른 행동 선택할때마다 공격력 감소가 일어남 그렇다고 기본값 그대로 넘겨주면 계속 2번 행동으로 변경하면서 공격력 무한증식
+# -> 쿼리에서 해결하지 않고 코드에서 해결해보기
+update player
+	set actionType = 2
+		, attackPoint = case when actionType = 2 then attackPoint + 5 END
+		, defencePoint = CASE WHEN THEN END
+		, findEnemyRate = CASE WHEN THEN END
+		, findItemRate = CASE WHEN THEN end
+	where memberId = 1
+
+# inventory 테이블 생성
+CREATE TABLE inventory(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	playerId int unsigned NOT NULL,
+	itemId INT UNSIGNED NOT NULL,
+	quantity INT UNSIGNED NOT NULL
+);
+
+# inventory 데이터 추가
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 2
+		, itemId = 1
+		, quantity = 5;
+
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 2
+		, itemId = 2
+		, quantity = 3;
+
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 2
+		, itemId = 51
+		, quantity = 6;
+		
+INSERT INTO inventory
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 2
+		, itemId = 104
+		, quantity = 1;
+							
+select * from inventory where playerId = 2
+SELECT * FROM item
+select * from itemCategory
+select * from player
+select * from equipment
+
+
+alter table inventory add column delStatus smallint unsigned not null default 1 comment '삭제됨 = 0, 삭제안됨 = 1'
+
+update item
+	set useHand = 3
+
+SELECT iv.*
+	, ic.category
+	, i.category
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	FROM inventory AS iv
+	INNER JOIN item AS i
+	ON iv.itemId = i.itemCode
+	INNER JOIN itemCategory AS ic
+	ON i.itemCode = ic.id
+	WHERE iv.playerId = 1
+	and itemId = 1;
+select * from player
+
+
+INSERT INTO item
+	SET id = 998,
+		regDate = NOW(),
+		updateDate = NOW(),
+		category = 6,
+		itemCode = 998,
+		`name` = '없음';
+		
+UPDATE equipment AS e
+	INNER JOIN item AS i
+	ON e.usedItemCode = i.itemCode
+		SET e.usedItemCode = 101
+			, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE itemCode = 403)
+			WHERE playerId = 1
+			AND i.categoryNum = 2
+			and e.id = if ;
+
+SELECT EXISTS(SELECT * FROM inventory WHERE playerId = 1 and itemId = 353);
+select * from item
+select * from equipment
+
+
+UPDATE equipment AS e
+	INNER JOIN item AS i
+	ON e.usedItemCode = i.itemCode
+		SET e.usedItemCode = (select itemCode from item where categoryNum = 2 and itemCode > 990)
+			, e.usedItemDP = (SELECT durabilityPoint FROM item WHERE categoryNum = 2 AND itemCode > 990)
+			WHERE e.playerId = 1
+			AND i.categoryNum = 2;
+
+select max(id)
+	from equipment
+	where playerId = 2
+	and usedItemCode = 101 
+	
+select *
+	from item
+	where recipeItem1 in (1, 2)
+	and recipeItem2 IN (1, 2);
+	
+select *
+	from player
+	order by rand()
+	limit 1;
+
+# skillList table 생성	
+create table skillList(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	`name` varchar(20) not null,
+	skillType smallint unsigned not null comment '패시브 = 1, 액티브 = 2',
+	needSkillPoint INT UNSIGNED NOT NULL DEFAULT 1,
+	needLearnLevel INT UNSIGNED NOT NULL DEFAULT 1,
+	weaponType INT UNSIGNED NOT NULL default 0,
+	attackPoint int unsigned not null default 0,
+	defencePoint INT UNSIGNED NOT NULL DEFAULT 0,
+	useHP INT UNSIGNED NOT NULL DEFAULT 0,
+	recoveryHP INT NOT NULL DEFAULT 0,
+	increseHP INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseHP INT UNSIGNED NOT NULL DEFAULT 0,
+	useSP INT UNSIGNED NOT NULL DEFAULT 0,
+	recoverySP INT NOT NULL DEFAULT 0,
+	increseSP INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseSP INT UNSIGNED NOT NULL DEFAULT 0,
+	increseAttackPoint INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseAttackPoint INT UNSIGNED NOT NULL DEFAULT 0,
+	increseDefencePoint INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseDefencePoint INT UNSIGNED NOT NULL DEFAULT 0,
+	increseHitRate INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseHitRate INT UNSIGNED NOT NULL DEFAULT 0,
+	increseMissRate INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseMissRate INT UNSIGNED NOT NULL DEFAULT 0,
+	increseFindItemRate INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseFindItemRate INT UNSIGNED NOT NULL DEFAULT 0,
+	increseFindEnemyRate INT UNSIGNED NOT NULL DEFAULT 0,
+	decreseFindEnemyRate INT UNSIGNED NOT NULL DEFAULT 0
+);
+
+insert into skillList
+	set regDate = now()
+		, updateDate = now()
+		, `name` = '급소공격'
+		, skillType = 2;
+		
+
+select *
+	from skillList
+
+drop table skill
+
+# skill table 생성
+CREATE TABLE skill(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	skillId INT UNSIGNED NOT NULL
+);
+
+INSERT INTO skill
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, playerId = 3
+		, skillId = 9;
+		
+select s.*
+	, sl.name
+	, sl.skillType
+	, sl.needSkillPoint
+	, sl.needLearnLevel
+	, sl.weaponType
+	, sl.useHP
+	, sl.increseHP
+	, sl.decreseHP
+	, sl.useSP
+	, sl.increseSP
+	, sl.decreseSP
+	, sl.increseAttackPoint
+	, sl.decreseAttackPoint
+	, sl.increseDefencePoint
+	, sl.decreseDefencePoint
+	, sl.increseHitRate
+	, sl.decreseHitRate
+	, sl.increseMissRate
+	, sl.decreseMissRate
+	, sl.increseFindItemRate
+	, sl.decreseFindItemRate
+	, sl.increseFindEnemyRate
+	, sl.decreseFindEnemyRate
+	from skill as s
+	inner join skillList as sl
+	on s.skillId = sl.id
+	where playerId = 2
+
+SELECT *
+	FROM skillList
+	WHERE needLearnLevel <= 1
+	and id not in (select skillId from skill where playerId = 2)
+
+select *
+	from skilllist
+	where skillType = 1
+select *
+	from player
+	
+select *
+	from item
+	where categoryNum = 2
+	
+	SELECT i.itemCode
+				FROM item AS i
+				INNER JOIN inventory AS iv
+				ON i.itemCode = iv.itemId
+				WHERE iv.playerId = 2
+				AND iv.quantity != 0;
+
+SELECT e.*
+	, ic.category
+	, i.categoryNum
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHand
+	, i.useHP
+	, i.recoveryHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.recoverySP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	, i.recipeItem1
+	, i.recipeItem2
+	, i.recipeItem3
+	FROM equipment AS e
+	INNER JOIN item AS i
+	ON e.usedItemCode = i.itemCode
+	INNER JOIN itemCategory AS ic
+	ON i.categoryNum = ic.id
+	WHERE e.id = 1;				
+				
+				
+SELECT iv.*
+				, ic.category
+				, i.categoryNum
+				, i.name
+				, i.rarity
+				, i.useType
+				, i.useHand
+				, i.useHP
+				, i.recoveryHP
+				, i.increseHP
+				, i.decreseHP
+				, i.useSP
+				, i.recoverySP
+				, i.increseSP
+				, i.decreseSP
+				, i.increseAttackPoint
+				, i.decreseAttackPoint
+				, i.increseDefencePoint
+				, i.decreseDefencePoint
+				, i.increseHitRate
+				, i.decreseHitRate
+				, i.increseMissRate
+				, i.decreseMissRate
+				, i.increseFindItemRate
+				, i.decreseFindItemRate
+				, i.increseFindEnemyRate
+				, i.decreseFindEnemyRate
+				, i.durabilityPoint
+				, i.inventoryPoint
+				, i.dropRate
+				, i.recipeItem1
+				, i.recipeItem2
+				, i.recipeItem3
+
+SELECT i1.*
+	, ifnull(i2.name, 0) as recipeItem1Name
+	, IFNULL(i3.name, 0) AS recipeItem2Name
+	, IFNULL(i4.name, 0) AS recipeItem3Name
+	FROM item as i1
+	left join item as i2
+	on i1.recipeItem1 = i2.itemCode
+	LEFT JOIN item AS i3
+	ON i1.recipeItem2 = i3.itemCode
+	LEFT JOIN item AS i4
+	ON i1.recipeItem3 = i4.itemCode;
+
+select * from player
+
+select * from skill
+select * from inventory where playerId = 2
+SELECT *
+	FROM item
+	ORDER BY RAND()
+	LIMIT 1;
+select * from skillList where skillType = 2
+
+SELECT iv.*
+	, ic.category
+	, i.categoryNum
+	, i.name
+	, i.rarity
+	, i.useType
+	, i.useHand
+	, i.useHP
+	, i.recoveryHP
+	, i.increseHP
+	, i.decreseHP
+	, i.useSP
+	, i.recoverySP
+	, i.increseSP
+	, i.decreseSP
+	, i.increseAttackPoint
+	, i.decreseAttackPoint
+	, i.increseDefencePoint
+	, i.decreseDefencePoint
+	, i.increseHitRate
+	, i.decreseHitRate
+	, i.increseMissRate
+	, i.decreseMissRate
+	, i.increseFindItemRate
+	, i.decreseFindItemRate
+	, i.increseFindEnemyRate
+	, i.decreseFindEnemyRate
+	, i.durabilityPoint
+	, i.inventoryPoint
+	, i.dropRate
+	, i.recipeItem1
+	, i.recipeItem2
+	, i.recipeItem3
+	FROM inventory AS iv
+	INNER JOIN item AS i
+	ON iv.itemId = i.itemCode
+	INNER JOIN itemCategory AS ic
+	ON i.categoryNum = ic.id
+	WHERE iv.playerId = 3
+	AND iv.quantity != 0;
+	
+	
+select * from inventory where playerId =2
+
+playerId=2&itemId=101&equipId=9 
+
+SELECT id
+	FROM inventory
+	WHERE itemId = 101
+	AND playerId = 2
+	AND quantity = 0
+	AND delStatus = 1
+	LIMIT 1;
+	
+	SELECT *
+		FROM item
+		WHERE itemCode = 101;
+		
+SELECT *
+	FROM gameLog
+	ORDER BY id DESC;
+			
+create table gameLog(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	roundNum INT UNSIGNED NOT NULL,
+	logBody text not null
+);
+
+Insert into gameLog
+	set regDate = now()
+		, roundNum = 1
+		, logBody = "test1이(가) 전장에 참가하였다";
+		
+INSERT INTO gameLog
+	SET regDate = NOW()
+		, roundNum = 1
+		, logBody = "test2이(가) 전장에 참가하였다";
+		
+INSERT INTO gameLog
+	SET regDate = NOW()
+		, roundNum = 1
+		, logBody = 'test1은(는) 테스트의 없음에 의해 사망하였다.';
+		
+CREATE TABLE gameRound(
+	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	winMemberId int unsigned,
+	winnerName varchar(20),
+	endStatus smallint unsigned not null default 0,
+	endDate datetime
+);
+select * from player
+insert into gameRound
+	set regDate = now()
+		, updateDate = now()
+		
+SELECT * FROM equipment
+SELECT * FROM inventory
+select * from player
+SELECT * FROM skill
+select * from item
+
+
+# winPlayer 테이블 생성
+CREATE TABLE winPlayer(
+	Nid INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	id INT UNSIGNED NOT NULL,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	winRound INT UNSIGNED NOT NULL,
+	`name` VARCHAR(20) NOT NULL,
+	memberId INT UNSIGNED NOT NULL,
+	image VARCHAR(20) NOT NULL,
+	gender TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '성별 (남성 = 0, 여성 = 1)',
+	`level` INT UNSIGNED NOT NULL DEFAULT 1,
+	skillPoint INT UNSIGNED NOT NULL DEFAULT 1,
+	`exp` INT UNSIGNED NOT NULL DEFAULT 0,
+	maxExp INT UNSIGNED NOT NULL DEFAULT 10,
+	hp INT UNSIGNED NOT NULL DEFAULT 100,
+	maxHp INT UNSIGNED NOT NULL DEFAULT 100,
+	sp INT UNSIGNED NOT NULL DEFAULT 100,
+	maxSp INT UNSIGNED NOT NULL DEFAULT 100,
+	attackPoint INT UNSIGNED NOT NULL DEFAULT 10,
+	increseAttackPoint INT NOT NULL DEFAULT 0,
+	defencePoint INT UNSIGNED NOT NULL DEFAULT 10,
+	increseDefencePoint INT NOT NULL DEFAULT 0,
+	hitRate INT UNSIGNED NOT NULL DEFAULT 30,
+	increseHitRate INT NOT NULL DEFAULT 0,
+	missRate INT UNSIGNED NOT NULL DEFAULT 0,
+	increseMissRate INT NOT NULL DEFAULT 0,
+	findEnemyRate INT NOT NULL DEFAULT 0,
+	findItemRate INT UNSIGNED NOT NULL DEFAULT 20,
+	inventoryPoint INT UNSIGNED NOT NULL DEFAULT 0,
+	killPoint INT UNSIGNED NOT NULL DEFAULT 0,
+	deathStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '사망여부 (사망 전 = 0, 사망 후 = 1)',
+	deathDate DATETIME COMMENT '사망 날짜',
+	actionType INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '행동유형 (기본행동 = 1, 탐색위주 = 2, 사주경계 = 3, 은밀행동 = 4)',
+	nowLocation INT UNSIGNED NOT NULL DEFAULT 999
+);
+
+# winnerSkill table 생성
+CREATE TABLE winnerSkill(
+	Nid INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	id INT UNSIGNED NOT NULL,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	winRound INT UNSIGNED NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	skillId INT UNSIGNED NOT NULL
+);
+
+# winnerInventory 테이블 생성
+CREATE TABLE winnerInventory(
+	Nid INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	id INT UNSIGNED NOT NULL,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	winRound INT UNSIGNED NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	itemId INT UNSIGNED NOT NULL,
+	quantity INT UNSIGNED NOT NULL,
+	itemDP INT UNSIGNED NOT NULL default 0,
+	delStatus smallINT UNSIGNED NOT NULL default 1
+);
+
+# winnerEquipment 테이블 생성
+CREATE TABLE winnerEquipment(
+	Nid INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	id INT UNSIGNED NOT NULL,
+	regDate DATETIME NOT NULL,
+	updateDate DATETIME NOT NULL,
+	winRound INT UNSIGNED NOT NULL,
+	playerId INT UNSIGNED NOT NULL,
+	usedItemCode INT UNSIGNED NOT NULL DEFAULT 0,
+	usedItemDP INT UNSIGNED NOT NULL DEFAULT 999
+);
+
+INSERT INTO winnerSkill (id, regDate, updateDate, winRound, playerId, skillId)
+SELECT id, regDate, updateDate, 1, playerId, skillId FROM skill WHERE playerId = 1
+
+select * from winnerSkill
+SELECT * FROM winPlayer
+SELECT * FROM winnerInventory
+SELECT * FROM winnerEquipment
+
+
+truncate player
+truncate equipment
+SELECT * FROM `member`
+
+SELECT * FROM gameround
+
+SELECT * FROM gamelog
+
+SELECT * from player
+				FROM winPlayer
+				ORDER BY Nid DESC;
+
+SELECT id
+				FROM player
+				WHERE deathStatus = 0
+				LIMIT 1;
+
+truncate winnerSkill
+TRUNCATE winPlayer
+TRUNCATE winnerInventory
+TRUNCATE winnerEquipment
+
+SELECT i1.*
+				, IFNULL(i2.name, 0) AS recipeItem1Name
+				, IFNULL(i3.name, 0) AS recipeItem2Name
+				, IFNULL(i4.name, 0) AS recipeItem3Name
+				FROM item AS i1
+				LEFT JOIN item AS i2
+				ON i1.recipeItem1 = i2.itemCode
+				LEFT JOIN item AS i3
+				ON i1.recipeItem2 = i3.itemCode
+				LEFT JOIN item AS i4
+				ON i1.recipeItem3 = i4.itemCode
+				WHERE i1.itemCode = 2;
+
+
+SELECT (if((SELECT COUNT(*) FROM player) = 1, 0, (SELECT COUNT(deathStatus) FROM player WHERE deathStatus = 0))) = 1
