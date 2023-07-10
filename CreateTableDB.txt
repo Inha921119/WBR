@@ -5,6 +5,7 @@ USE WBR;
 # member 테이블 생성
 CREATE TABLE `member`(
 	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	
 	regDate DATETIME NOT NULL,
 	updateDate DATETIME NOT NULL,
 	loginId VARCHAR(20) NOT NULL UNIQUE,
@@ -51,7 +52,7 @@ CREATE TABLE player(
 	deathStatus TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '사망여부 (사망 전 = 0, 사망 후 = 1)',
 	deathDate DATETIME COMMENT '사망 날짜',
 	actionType INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '행동유형 (기본 = 1, 선제공격 = 2, 방어태세 = 3, 주변탐색 = 4, 사주경계 = 5, 은밀기동 = 6)',
-	nowLocation INT UNSIGNED NOT NULL DEFAULT 0
+	nowLocation INT UNSIGNED NOT NULL DEFAULT 1
 );
 
 # item 테이블 생성
